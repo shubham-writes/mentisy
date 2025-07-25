@@ -31,12 +31,12 @@ export const Navbar = () => {
                 )}
                 {!isAuthenticated && !isLoading && (
                     <>
-                        <SignInButton mode="modal">
+                        <SignInButton mode="modal" fallbackRedirectUrl="/hello" forceRedirectUrl="/hello">
                             <Button variant="ghost" size="sm">
                                 Log in
                             </Button>
                         </SignInButton>
-                        <SignUpButton mode="modal">
+                        <SignUpButton mode="modal" fallbackRedirectUrl="/hello" forceRedirectUrl="/hello">
                             <Button size="sm">
                                 Get Bolt free
                                 <Zap className="h-4 w-4 ml-2" />

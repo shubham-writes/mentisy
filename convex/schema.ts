@@ -1,3 +1,4 @@
+// Update your existing convex/schema.ts file by adding the test_table
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
@@ -19,4 +20,11 @@ export default defineSchema({
         text: v.string(),
         likes: v.number(),
     }).index("by_author", ["authorId"]),
+    
+    // Add this test table for database testing
+    test_table: defineTable({
+        message: v.string(),
+        timestamp: v.number(),
+        createdAt: v.number(),
+    }),
 });

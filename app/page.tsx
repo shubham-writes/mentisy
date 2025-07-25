@@ -6,6 +6,8 @@ import { Heading } from "./_home/heading";
 import { Hero } from "./_home/hero";
 import { App } from "./(crud)/app";
 import Partners from "./_home/partners";
+import { DatabaseTest } from "@/components/database-test";
+import { Hello } from "@/components/hello";
 
 export default function Home() {
   return (
@@ -14,10 +16,15 @@ export default function Home() {
         <Heading />
         <Partners />
         <Hero />
+        
+        <DatabaseTest />
+         <App />
       </Unauthenticated>
       <Authenticated>
+        <Hello />
         <App />
       </Authenticated>
+      
     </div>
   );
 }
