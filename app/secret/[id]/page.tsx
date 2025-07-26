@@ -1,25 +1,25 @@
-// app/secret/[id]/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id, Doc } from "@/convex/_generated/dataModel";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { CountdownTimer } from "@/components/countdown-timer"; // Import the new component
 
 export default function SecretPage({ params }: { params: { id: string } }) {
-    // State to hold our secret message, or know if it's loading/unavailable
     const [secret, setSecret] = useState<Doc<"secrets"> | null | undefined>(undefined);
     const revealSecret = useMutation(api.secrets.readAndReveal);
+    const hasRevealedRef = useRef(false);
 
-    // When the page loads, run the mutation once
     useEffect(() => {
+        if (hasRevealedRef.current) return;
+        hasRevealedRef.current = true;
+
         const reveal = async () => {
             try {
-                const revealedSecret = await revealSecret({
-                    secretId: params.id as Id<"secrets">,
-                });
+                const revealedSecret = await revealSecret({ secretId: params.id as Id<"secrets"> });
                 setSecret(revealedSecret);
             } catch (error) {
                 console.error("Failed to reveal secret:", error);
@@ -29,18 +29,23 @@ export default function SecretPage({ params }: { params: { id: string } }) {
         reveal();
     }, [params.id, revealSecret]);
 
-    // Helper function to render the correct content
+    // This function will be passed to the timer and called when it finishes.
+    const handleTimerComplete = () => {
+        setSecret(null);
+    };
+
     const renderContent = () => {
-        if (secret === undefined) {
-            return <p>Revealing your secret...</p>;
-        }
-        if (secret === null) {
-            return <p>This secret message could not be found. It may have already been read or deleted.</p>;
-        }
+        if (secret === undefined) return <p>Revealing your secret...</p>;
+        if (secret === null) return <p>This secret message could not be found. It may have already been read or deleted.</p>;
+
         return (
-            <p className="text-lg sm:text-xl p-4 bg-muted rounded-md">
-                &ldquo;{secret.message}&rdquo;
-            </p>
+            <>
+                <p className="text-lg sm:text-xl p-4 bg-muted rounded-md">
+                    &ldquo;{secret.message}&rdquo;
+                </p>
+                {/* Use the new, clean component here */}
+                <CountdownTimer initialSeconds={10} onComplete={handleTimerComplete} />
+            </>
         );
     };
 
@@ -51,7 +56,6 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                 {renderContent()}
                 <Button asChild className="mt-8">
                     <Link href="/">Create your own secret message</Link>
-
                 </Button>
             </div>
         </div>

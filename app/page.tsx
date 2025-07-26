@@ -5,7 +5,7 @@ import { Authenticated, Unauthenticated } from "convex/react";
 import { Heading } from "./_home/heading";
 
 import Partners from "./_home/partners";
-import { DatabaseTest } from "@/components/database-test";
+import { SecretForm } from "@/components/secret-form";
 import { Hello } from "@/components/hello";
 
 export default function Home() {
@@ -21,7 +21,7 @@ export default function Home() {
       </Unauthenticated>
       <Authenticated>
         <Hello />
-        <DatabaseTest />
+        <SecretForm />
       </Authenticated>
       
     </div>

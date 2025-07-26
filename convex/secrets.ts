@@ -1,8 +1,9 @@
 // convex/secrets.ts
 import { v } from "convex/values";
-import { mutation } from "./_generated/server";
+// 1. Import internalMutation and internal
+import { mutation, internalMutation } from "./_generated/server";
+import { internal } from "./_generated/api";
 
-// Update the 'create' mutation to set 'isRead' to false initially
 export const create = mutation({
     args: { message: v.string() },
     handler: async (ctx, args) => {
@@ -10,41 +11,46 @@ export const create = mutation({
         if (!identity) {
             throw new Error("You must be logged in to create a secret message.");
         }
-
         const user = await ctx.db
             .query("users")
             .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
             .unique();
-
         if (!user) {
             throw new Error("User not found.");
         }
-
         const secretId = await ctx.db.insert("secrets", {
             authorId: user._id,
             message: args.message,
-            isRead: false, // Set the flag to false on creation
+            isRead: false,
         });
-
         return secretId;
     },
 });
 
-// Replace the old 'get' query with this new 'readAndReveal' mutation
 export const readAndReveal = mutation({
     args: { secretId: v.id("secrets") },
     handler: async (ctx, args) => {
         const secret = await ctx.db.get(args.secretId);
 
-        // If the secret doesn't exist or is already read, do nothing.
         if (!secret || secret.isRead) {
             return null;
         }
 
-        // Otherwise, mark it as read...
         await ctx.db.patch(secret._id, { isRead: true });
 
-        // ...and then return the message.
+        // 2. Schedule the deletion to run in 10 seconds
+        ctx.scheduler.runAfter(10000, internal.secrets.destroy, {
+            secretId: secret._id,
+        });
+
         return secret;
+    },
+});
+
+// 3. Create a new internal mutation to delete the secret
+export const destroy = internalMutation({
+    args: { secretId: v.id("secrets") },
+    handler: async (ctx, args) => {
+        await ctx.db.delete(args.secretId);
     },
 });
