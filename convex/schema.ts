@@ -18,7 +18,9 @@ export default defineSchema({
     secrets: defineTable({
         authorId: v.id("users"),
         message: v.string(),
-        isRead: v.optional(v.boolean()), // <-- Add this line
+        recipientName: v.optional(v.string()),
+        publicNote: v.optional(v.string()),
+        isRead: v.optional(v.boolean()),
     }).index("by_author", ["authorId"]),
 
     test_table: defineTable({

@@ -1,11 +1,15 @@
 // convex/secrets.ts
 import { v } from "convex/values";
-// 1. Import internalMutation and internal
 import { mutation, internalMutation } from "./_generated/server";
 import { internal } from "./_generated/api";
 
+// Update the 'create' mutation to accept a recipientName
 export const create = mutation({
-    args: { message: v.string() },
+    args: {
+        message: v.string(),
+        recipientName: v.optional(v.string()), 
+        publicNote: v.optional(v.string()),
+    },
     handler: async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) {
@@ -21,33 +25,29 @@ export const create = mutation({
         const secretId = await ctx.db.insert("secrets", {
             authorId: user._id,
             message: args.message,
+            recipientName: args.recipientName, // Store the recipient's name
             isRead: false,
         });
         return secretId;
     },
 });
 
+// (The rest of your 'readAndReveal' and 'destroy' functions remain the same)
 export const readAndReveal = mutation({
     args: { secretId: v.id("secrets") },
     handler: async (ctx, args) => {
         const secret = await ctx.db.get(args.secretId);
-
         if (!secret || secret.isRead) {
             return null;
         }
-
         await ctx.db.patch(secret._id, { isRead: true });
-
-        // 2. Schedule the deletion to run in 10 seconds
         ctx.scheduler.runAfter(10000, internal.secrets.destroy, {
             secretId: secret._id,
         });
-
         return secret;
     },
 });
 
-// 3. Create a new internal mutation to delete the secret
 export const destroy = internalMutation({
     args: { secretId: v.id("secrets") },
     handler: async (ctx, args) => {
