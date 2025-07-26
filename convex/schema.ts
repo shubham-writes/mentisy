@@ -1,4 +1,4 @@
-// Update your existing convex/schema.ts file by adding the test_table
+// convex/schema.ts
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
@@ -7,24 +7,23 @@ export default defineSchema({
         tokenIdentifier: v.string(),
         clerkUserId: v.string(),
         imageUrl: v.string(),
-        email: v.string(), // set as required for use as primary contact information
-        username: v.string(), // set as required for use as unique identifier in app
-        wallet: v.optional(v.string()), // web3 wallet address
-        numPosts: v.optional(v.number()),
-        totalLiked: v.optional(v.number()),
+        email: v.string(),
+        username: v.string(),
+        wallet: v.optional(v.string()),
     })
         .index("by_token", ["tokenIdentifier"])
         .index("username", ["username"]),
-    posts: defineTable({
-        authorId: v.id("users"),
-        text: v.string(),
-        likes: v.number(),
-    }).index("by_author", ["authorId"]),
-    
-    // Add this test table for database testing
+
+    // This test table is for database testing
     test_table: defineTable({
         message: v.string(),
         timestamp: v.number(),
         createdAt: v.number(),
     }),
+    
+// This secrets table is for storing user massages
+    secrets: defineTable({
+        authorId: v.id("users"),
+        message: v.string(),
+    }).index("by_author", ["authorId"]),
 });

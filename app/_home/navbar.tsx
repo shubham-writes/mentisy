@@ -52,7 +52,7 @@ export const Navbar = () => {
                                 <GithubIcon className="h-4 w-4 ml-2" />
                             </Link>
                         </Button>
-                        <UserButton afterSignOutUrl="/" />
+                        <UserButton afterSignOutRedirectUrl="/" />
                     </>
                 )}
                 <ModeToggle />

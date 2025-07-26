@@ -10,7 +10,7 @@ export const getTestData = query({
       const testData = await ctx.db
         .query("test_table")
         .order("desc")
-        .take(5);
+        .collect();
       return testData;
     } catch (error) {
       // If table doesn't exist, return empty array

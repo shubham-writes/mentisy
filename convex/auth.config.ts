@@ -1,7 +1,7 @@
 const authConfig = {
     providers: [
         {
-            domain: "https://your-clerk-url/",
+            domain: "https://living-ostrich-19.clerk.accounts.dev/",
             applicationID: "convex",
         },
     ]
