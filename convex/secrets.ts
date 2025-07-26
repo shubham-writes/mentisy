@@ -1,9 +1,8 @@
 // convex/secrets.ts
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
-import { Doc, Id } from "./_generated/dataModel";
+import { mutation } from "./_generated/server";
 
-// Function to create a new secret message (requires login)
+// Update the 'create' mutation to set 'isRead' to false initially
 export const create = mutation({
     args: { message: v.string() },
     handler: async (ctx, args) => {
@@ -24,17 +23,28 @@ export const create = mutation({
         const secretId = await ctx.db.insert("secrets", {
             authorId: user._id,
             message: args.message,
+            isRead: false, // Set the flag to false on creation
         });
 
         return secretId;
     },
 });
 
-// Function to get a secret message by its ID (public, no login required)
-export const get = query({
+// Replace the old 'get' query with this new 'readAndReveal' mutation
+export const readAndReveal = mutation({
     args: { secretId: v.id("secrets") },
     handler: async (ctx, args) => {
         const secret = await ctx.db.get(args.secretId);
+
+        // If the secret doesn't exist or is already read, do nothing.
+        if (!secret || secret.isRead) {
+            return null;
+        }
+
+        // Otherwise, mark it as read...
+        await ctx.db.patch(secret._id, { isRead: true });
+
+        // ...and then return the message.
         return secret;
     },
 });

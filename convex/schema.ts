@@ -3,6 +3,7 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+    // ... users and test_table definitions
     users: defineTable({
         tokenIdentifier: v.string(),
         clerkUserId: v.string(),
@@ -14,16 +15,15 @@ export default defineSchema({
         .index("by_token", ["tokenIdentifier"])
         .index("username", ["username"]),
 
-    // This test table is for database testing
+    secrets: defineTable({
+        authorId: v.id("users"),
+        message: v.string(),
+        isRead: v.optional(v.boolean()), // <-- Add this line
+    }).index("by_author", ["authorId"]),
+
     test_table: defineTable({
         message: v.string(),
         timestamp: v.number(),
         createdAt: v.number(),
     }),
-    
-// This secrets table is for storing user massages
-    secrets: defineTable({
-        authorId: v.id("users"),
-        message: v.string(),
-    }).index("by_author", ["authorId"]),
 });
