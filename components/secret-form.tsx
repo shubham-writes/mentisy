@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ShareButton } from "./share-button";
 import { UploadButton } from "./uploadthing";
-import { FilePreview } from "./file-preview"; // 1. Import the new component
+import { FilePreview } from "./file-preview";
 
 export function SecretForm() {
     const [message, setMessage] = useState("");
@@ -17,6 +17,10 @@ export function SecretForm() {
     const [generatedLink, setGeneratedLink] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [uploadedFile, setUploadedFile] = useState<{ url: string; type: "image" | "video" } | null>(null);
+    
+    // 1. Add state to track the upload status
+    const [isUploading, setIsUploading] = useState(false);
+    
     const createSecret = useMutation(api.secrets.create);
 
     const handleGenerate = async () => {
@@ -35,6 +39,8 @@ export function SecretForm() {
             });
             const link = `${window.location.origin}/secret/${secretId}`;
             setGeneratedLink(link);
+            setMessage("");
+            setUploadedFile(null);
         } catch (error) {
             console.error(error);
             alert("Failed to create secret message.");
@@ -47,37 +53,43 @@ export function SecretForm() {
         <div className="w-full max-w-md p-6 border rounded-lg bg-card">
             <h3 className="text-lg font-semibold mb-4">Create a Secret Message</h3>
 
-            {/* --- Start of Changes --- */}
             {uploadedFile ? (
-                // 2. If a file is uploaded, show the preview component
                 <FilePreview file={uploadedFile} onRemove={() => setUploadedFile(null)} />
             ) : (
-                // 3. If no file is uploaded, show the upload buttons
                 <div className="mb-4 p-4 border-dashed border-2 rounded-lg">
                     <p className="text-sm text-muted-foreground mb-2">Upload a secret file (optional):</p>
                     <div className="flex justify-center gap-x-4">
                         <UploadButton
                             endpoint="imageUploader"
+                            onUploadBegin={() => setIsUploading(true)} // 2. Set uploading to true
                             onClientUploadComplete={(res) => {
                                 if (res) {
                                     setUploadedFile({ url: res[0].url, type: "image" });
+                                    setIsUploading(false); // 3. Set uploading to false
                                 }
                             }}
-                            onUploadError={(error: Error) => alert(`ERROR! ${error.message}`)}
+                            onUploadError={(error: Error) => {
+                                alert(`ERROR! ${error.message}`);
+                                setIsUploading(false); // 4. Set uploading to false on error
+                            }}
                         />
                         <UploadButton
                             endpoint="videoUploader"
+                            onUploadBegin={() => setIsUploading(true)} // 2. Set uploading to true
                             onClientUploadComplete={(res) => {
                                 if (res) {
                                     setUploadedFile({ url: res[0].url, type: "video" });
+                                    setIsUploading(false); // 3. Set uploading to false
                                 }
                             }}
-                            onUploadError={(error: Error) => alert(`ERROR! ${error.message}`)}
+                            onUploadError={(error: Error) => {
+                                alert(`ERROR! ${error.message}`);
+                                setIsUploading(false); // 4. Set uploading to false on error
+                            }}
                         />
                     </div>
                 </div>
             )}
-            {/* --- End of Changes --- */}
 
             <Input
                 placeholder="Recipient's name (optional)"
@@ -97,8 +109,9 @@ export function SecretForm() {
                 onChange={(e) => setMessage(e.target.value)}
                 className="mb-4"
             />
-            <Button onClick={handleGenerate} disabled={isLoading} className="w-full">
-                {isLoading ? "Generating..." : "Generate Shareable Link"}
+            {/* 5. Disable the button if loading OR uploading */}
+            <Button onClick={handleGenerate} disabled={isLoading || isUploading} className="w-full">
+                {isUploading ? "Uploading file..." : (isLoading ? "Generating link..." : "Generate Shareable Link")}
             </Button>
             
             {generatedLink && (

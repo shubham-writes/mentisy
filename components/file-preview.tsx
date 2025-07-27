@@ -1,5 +1,4 @@
 "use client";
-
 import Image from "next/image";
 import { Button } from "./ui/button";
 import { X } from "lucide-react";
@@ -21,20 +20,31 @@ export function FilePreview({ file, onRemove }: FilePreviewProps) {
           <Image
             src={file.url}
             alt="Uploaded preview"
-            layout="fill"
-            objectFit="contain"
+            fill
+            style={{ objectFit: "contain" }}
           />
         ) : (
-          <video
-            src={file.url}
-            controls
-            className="w-full h-full object-contain"
-          />
+          <div className="relative w-full h-full">
+            <video
+              src={file.url}
+              controls
+              playsInline
+              preload="metadata"
+              className="w-full h-full object-contain bg-black"
+              onLoadedMetadata={(e) => {
+                // Ensure audio is unmuted when video loads
+                e.currentTarget.muted = false;
+                e.currentTarget.volume = 1.0;
+              }}
+            >
+              Your browser does not support the video tag.
+            </video>
+          </div>
         )}
         <Button
           variant="destructive"
           size="icon"
-          className="absolute top-2 right-2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute top-2 right-2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity z-10"
           onClick={onRemove}
         >
           <X className="h-4 w-4" />

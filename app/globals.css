@@ -66,3 +66,10 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+video::-webkit-media-controls-volume-slider,
+video::-webkit-media-controls-mute-button {
+  display: block !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
