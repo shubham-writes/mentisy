@@ -1,4 +1,3 @@
-// app/secret/[id]/page.tsx
 "use client";
 
 import { useEffect, useState, useRef } from "react";
@@ -9,6 +8,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { CountdownTimer } from "@/components/countdown-timer";
 import { ShareButton } from "@/components/share-button";
+import Image from "next/image"; // Make sure the Image component is imported
 
 export default function SecretPage({ params }: { params: { id: string } }) {
     const [secret, setSecret] = useState<Doc<"secrets"> | null | undefined>(undefined);
@@ -34,21 +34,34 @@ export default function SecretPage({ params }: { params: { id: string } }) {
         setSecret(null);
     };
 
+    // This is the key part that needs to be correct
     const renderContent = () => {
         if (secret === undefined) return <p>Revealing your secret...</p>;
         if (secret === null) return <p>This secret message could not be found. It may have already been read or deleted.</p>;
 
         return (
             <>
-                <p className="text-lg sm:text-xl p-4 bg-muted rounded-md">
-                    &ldquo;{secret.message}&rdquo;
-                </p>
+                {/* Check for an image file and display it */}
+                {secret.fileType === "image" && secret.fileUrl && (
+                    <div className="relative w-full h-64 mb-4 rounded-lg overflow-hidden">
+                        <Image src={secret.fileUrl} alt="Secret Image" layout="fill" objectFit="contain" />
+                    </div>
+                )}
+                {/* Check for a video file and display it */}
+                {secret.fileType === "video" && secret.fileUrl && (
+                    <video src={secret.fileUrl} controls className="w-full rounded-lg mb-4" />
+                )}
+                {/* Display the text message if it exists */}
+                {secret.message && (
+                    <p className="text-lg sm:text-xl p-4 bg-muted rounded-md">
+                        &ldquo;{secret.message}&rdquo;
+                    </p>
+                )}
                 <CountdownTimer initialSeconds={10} onComplete={handleTimerComplete} />
             </>
         );
     };
-
-    // Personalize the heading based on the recipient's name
+    
     const getHeading = () => {
         if (secret && secret.recipientName) {
             return `A Secret Message For ${secret.recipientName}`;
@@ -61,10 +74,7 @@ export default function SecretPage({ params }: { params: { id: string } }) {
             <div className="max-w-xl p-8 border rounded-lg bg-card shadow-lg">
                 <h1 className="text-2xl sm:text-3xl font-bold mb-4">{getHeading()}</h1>
                 {renderContent()}
-
-                {/* 2. Add the ShareButton and the "Create New" button */}
                 <div className="flex items-center justify-center gap-x-4 mt-8">
-                    {/* The ShareButton is only shown if the secret is visible */}
                     {secret && (
                         <ShareButton
                             title="A Secret Message"

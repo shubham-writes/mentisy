@@ -7,6 +7,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ShareButton } from "./share-button";
+import { UploadButton } from "./uploadthing";
 
 export function SecretForm() {
     const [message, setMessage] = useState("");
@@ -14,13 +15,23 @@ export function SecretForm() {
     const [publicNote, setPublicNote] = useState("");
     const [generatedLink, setGeneratedLink] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [uploadedFile, setUploadedFile] = useState<{ url: string; type: "image" | "video" } | null>(null);
     const createSecret = useMutation(api.secrets.create);
 
     const handleGenerate = async () => {
-        if (!message) return;
+        if (!message && !uploadedFile) {
+            alert("Please provide a message or upload a file.");
+            return;
+        }
         setIsLoading(true);
         try {
-            const secretId: Id<"secrets"> = await createSecret({ message, recipientName, publicNote });
+            const secretId: Id<"secrets"> = await createSecret({
+                message,
+                recipientName,
+                publicNote,
+                fileUrl: uploadedFile?.url,
+                fileType: uploadedFile?.type, // Pass the correct file type
+            });
             const link = `${window.location.origin}/secret/${secretId}`;
             setGeneratedLink(link);
         } catch (error) {
@@ -34,6 +45,41 @@ export function SecretForm() {
     return (
         <div className="w-full max-w-md p-6 border rounded-lg bg-card">
             <h3 className="text-lg font-semibold mb-4">Create a Secret Message</h3>
+
+            {/* --- Start of Changes --- */}
+            <div className="mb-4 p-4 border-dashed border-2 rounded-lg">
+                <p className="text-sm text-muted-foreground mb-2">Upload a secret file (optional):</p>
+                <div className="flex justify-center gap-x-4">
+                    {/* Button for Images */}
+                    <UploadButton
+                        endpoint="imageUploader"
+                        onClientUploadComplete={(res) => {
+                            if (res) {
+                                // Set the file type to "image"
+                                setUploadedFile({ url: res[0].url, type: "image" });
+                                alert("Image upload complete!");
+                            }
+                        }}
+                        onUploadError={(error: Error) => alert(`ERROR! ${error.message}`)}
+                    />
+                    {/* Button for Videos */}
+                    <UploadButton
+                        endpoint="videoUploader"
+                        onClientUploadComplete={(res) => {
+                            if (res) {
+                                // Set the file type to "video"
+                                setUploadedFile({ url: res[0].url, type: "video" });
+                                alert("Video upload complete!");
+                            }
+                        }}
+                        onUploadError={(error: Error) => alert(`ERROR! ${error.message}`)}
+                    />
+                </div>
+            </div>
+            {/* --- End of Changes --- */}
+            
+            {uploadedFile && <p className="text-sm text-green-600 mb-4">File uploaded successfully!</p>}
+
             <Input
                 placeholder="Recipient's name (optional)"
                 value={recipientName}
@@ -47,7 +93,7 @@ export function SecretForm() {
                 className="mb-4"
             />
             <Input
-                placeholder="Your secret message please..."
+                placeholder="Your secret message (optional)"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 className="mb-4"
@@ -57,7 +103,7 @@ export function SecretForm() {
             </Button>
             
             {generatedLink && (
-                <div className="mt-4 p-2 border rounded bg-muted text-left">
+                 <div className="mt-4 p-2 border rounded bg-muted text-left">
                     <p className="text-sm text-muted-foreground">Share your message:</p>
                     <div className="text-sm break-all mt-2">
                         <span>{publicNote} </span>
@@ -66,7 +112,6 @@ export function SecretForm() {
                         </a>
                     </div>
                     <div className="mt-4">
-                        {/* This is the corrected ShareButton call */}
                         <ShareButton
                             title="A Secret Message"
                             text={publicNote || "Someone sent you a secret message!"}

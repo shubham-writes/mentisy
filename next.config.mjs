@@ -6,6 +6,11 @@ const nextConfig = {
                 protocol: "https",
                 hostname: "img.clerk.com",
             },
+            // Add this second object for uploadthing
+            {
+                protocol: "https",
+                hostname: "utfs.io",
+            },
         ],
     },
 };
