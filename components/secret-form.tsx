@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ShareButton } from "./share-button";
 import { UploadButton } from "./uploadthing";
+import { FilePreview } from "./file-preview"; // 1. Import the new component
 
 export function SecretForm() {
     const [message, setMessage] = useState("");
@@ -26,11 +27,11 @@ export function SecretForm() {
         setIsLoading(true);
         try {
             const secretId: Id<"secrets"> = await createSecret({
-                message,
+                message: message || undefined,
                 recipientName,
                 publicNote,
                 fileUrl: uploadedFile?.url,
-                fileType: uploadedFile?.type, // Pass the correct file type
+                fileType: uploadedFile?.type,
             });
             const link = `${window.location.origin}/secret/${secretId}`;
             setGeneratedLink(link);
@@ -47,38 +48,36 @@ export function SecretForm() {
             <h3 className="text-lg font-semibold mb-4">Create a Secret Message</h3>
 
             {/* --- Start of Changes --- */}
-            <div className="mb-4 p-4 border-dashed border-2 rounded-lg">
-                <p className="text-sm text-muted-foreground mb-2">Upload a secret file (optional):</p>
-                <div className="flex justify-center gap-x-4">
-                    {/* Button for Images */}
-                    <UploadButton
-                        endpoint="imageUploader"
-                        onClientUploadComplete={(res) => {
-                            if (res) {
-                                // Set the file type to "image"
-                                setUploadedFile({ url: res[0].url, type: "image" });
-                                alert("Image upload complete!");
-                            }
-                        }}
-                        onUploadError={(error: Error) => alert(`ERROR! ${error.message}`)}
-                    />
-                    {/* Button for Videos */}
-                    <UploadButton
-                        endpoint="videoUploader"
-                        onClientUploadComplete={(res) => {
-                            if (res) {
-                                // Set the file type to "video"
-                                setUploadedFile({ url: res[0].url, type: "video" });
-                                alert("Video upload complete!");
-                            }
-                        }}
-                        onUploadError={(error: Error) => alert(`ERROR! ${error.message}`)}
-                    />
+            {uploadedFile ? (
+                // 2. If a file is uploaded, show the preview component
+                <FilePreview file={uploadedFile} onRemove={() => setUploadedFile(null)} />
+            ) : (
+                // 3. If no file is uploaded, show the upload buttons
+                <div className="mb-4 p-4 border-dashed border-2 rounded-lg">
+                    <p className="text-sm text-muted-foreground mb-2">Upload a secret file (optional):</p>
+                    <div className="flex justify-center gap-x-4">
+                        <UploadButton
+                            endpoint="imageUploader"
+                            onClientUploadComplete={(res) => {
+                                if (res) {
+                                    setUploadedFile({ url: res[0].url, type: "image" });
+                                }
+                            }}
+                            onUploadError={(error: Error) => alert(`ERROR! ${error.message}`)}
+                        />
+                        <UploadButton
+                            endpoint="videoUploader"
+                            onClientUploadComplete={(res) => {
+                                if (res) {
+                                    setUploadedFile({ url: res[0].url, type: "video" });
+                                }
+                            }}
+                            onUploadError={(error: Error) => alert(`ERROR! ${error.message}`)}
+                        />
+                    </div>
                 </div>
-            </div>
+            )}
             {/* --- End of Changes --- */}
-            
-            {uploadedFile && <p className="text-sm text-green-600 mb-4">File uploaded successfully!</p>}
 
             <Input
                 placeholder="Recipient's name (optional)"

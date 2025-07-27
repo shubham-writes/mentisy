@@ -8,10 +8,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { CountdownTimer } from "@/components/countdown-timer";
 import { ShareButton } from "@/components/share-button";
-import Image from "next/image"; // Make sure the Image component is imported
+import Image from "next/image";
+import { LoaderCircle } from "lucide-react";
 
 export default function SecretPage({ params }: { params: { id: string } }) {
     const [secret, setSecret] = useState<Doc<"secrets"> | null | undefined>(undefined);
+    const [isMediaLoading, setIsMediaLoading] = useState(true);
     const revealSecret = useMutation(api.secrets.readAndReveal);
     const hasRevealedRef = useRef(false);
 
@@ -22,6 +24,9 @@ export default function SecretPage({ params }: { params: { id: string } }) {
             try {
                 const revealedSecret = await revealSecret({ secretId: params.id as Id<"secrets"> });
                 setSecret(revealedSecret);
+                if (revealedSecret && !revealedSecret.fileUrl) {
+                    setIsMediaLoading(false);
+                }
             } catch (error) {
                 console.error("Failed to reveal secret:", error);
                 setSecret(null);
@@ -34,34 +39,61 @@ export default function SecretPage({ params }: { params: { id: string } }) {
         setSecret(null);
     };
 
-    // This is the key part that needs to be correct
+    const handleMediaLoad = () => {
+        setIsMediaLoading(false);
+    };
+
     const renderContent = () => {
         if (secret === undefined) return <p>Revealing your secret...</p>;
         if (secret === null) return <p>This secret message could not be found. It may have already been read or deleted.</p>;
 
+        const showLoadingIndicator = secret.fileUrl && isMediaLoading;
+
         return (
             <>
-                {/* Check for an image file and display it */}
-                {secret.fileType === "image" && secret.fileUrl && (
-                    <div className="relative w-full h-64 mb-4 rounded-lg overflow-hidden">
-                        <Image src={secret.fileUrl} alt="Secret Image" layout="fill" objectFit="contain" />
+                {showLoadingIndicator && (
+                    <div className="flex flex-col items-center justify-center h-64">
+                        <LoaderCircle className="h-8 w-8 animate-spin text-muted-foreground" />
+                        <p className="text-sm text-muted-foreground mt-2">Loading secret media...</p>
                     </div>
                 )}
-                {/* Check for a video file and display it */}
-                {secret.fileType === "video" && secret.fileUrl && (
-                    <video src={secret.fileUrl} controls className="w-full rounded-lg mb-4" />
-                )}
-                {/* Display the text message if it exists */}
-                {secret.message && (
-                    <p className="text-lg sm:text-xl p-4 bg-muted rounded-md">
-                        &ldquo;{secret.message}&rdquo;
-                    </p>
-                )}
-                <CountdownTimer initialSeconds={10} onComplete={handleTimerComplete} />
+
+                <div style={{ visibility: showLoadingIndicator ? 'hidden' : 'visible' }}>
+                    {secret.fileType === "image" && secret.fileUrl && (
+                        <div className="relative w-full h-64 mb-4 rounded-lg overflow-hidden">
+                            <Image
+                                src={secret.fileUrl}
+                                alt="Secret Image"
+                                layout="fill"
+                                objectFit="contain"
+                                onLoad={handleMediaLoad}
+                                priority // Prioritize loading the secret image
+                            />
+                        </div>
+                    )}
+                    {secret.fileType === "video" && secret.fileUrl && (
+                        <video
+                            src={secret.fileUrl}
+                            controls
+                            className="w-full rounded-lg mb-4"
+                            onLoadedData={handleMediaLoad}
+                        />
+                    )}
+                    {secret.message && (
+                        <p className="text-lg sm:text-xl p-4 bg-muted rounded-md">
+                            &ldquo;{secret.message}&rdquo;
+                        </p>
+                    )}
+                    
+                    {/* This is the key change: Only render the timer when media is NOT loading */}
+                    {!isMediaLoading && (
+                        <CountdownTimer initialSeconds={10} onComplete={handleTimerComplete} />
+                    )}
+                </div>
             </>
         );
     };
-    
+
     const getHeading = () => {
         if (secret && secret.recipientName) {
             return `A Secret Message For ${secret.recipientName}`;
