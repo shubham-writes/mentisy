@@ -42,13 +42,15 @@ export default function SecretPage({ params }: { params: { id: string } }) {
   }, [params.id, revealSecret]);
 
   const handleTimerComplete = () => {
-  videoRef.current?.pause();
-  if (videoRef.current) {
-    videoRef.current.src = "";
-    videoRef.current.load();
+  const videoEl = document.getElementById("secret-video") as HTMLVideoElement;
+  if (videoEl) {
+    videoEl.pause();
+    videoEl.src = "";
+    videoEl.load();
   }
   setSecret(null);
 };
+
 
   const handleMediaLoad = () => {
     setIsMediaLoading(false);
@@ -56,14 +58,26 @@ export default function SecretPage({ params }: { params: { id: string } }) {
 
   // Prevent tab switch — delete immediately
   useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        setSecret(null);
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === "hidden") {
+      const videoEl = document.getElementById("secret-video") as HTMLVideoElement;
+      if (videoEl) {
+        videoEl.pause();
+        videoEl.src = "";
+        videoEl.load();
       }
-    };
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
-  }, []);
+      setSecret(null);
+    }
+  };
+
+  document.addEventListener("visibilitychange", handleVisibilityChange);
+
+  return () => {
+    document.removeEventListener("visibilitychange", handleVisibilityChange);
+  };
+}, []);
+
+
 
   // Prevent pause using keyboard
   useEffect(() => {
@@ -137,6 +151,7 @@ export default function SecretPage({ params }: { params: { id: string } }) {
     <div className="relative w-full">
       <video
         ref={videoRef}
+        id="secret-video"
         src={secret.fileUrl}
         playsInline
         preload="auto"
