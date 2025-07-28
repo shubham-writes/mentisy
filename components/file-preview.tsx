@@ -30,11 +30,12 @@ export function FilePreview({ file, onRemove }: FilePreviewProps) {
               controls
               playsInline
               preload="metadata"
+              muted // Start muted by default
               className="w-full h-full object-contain bg-black"
               onLoadedMetadata={(e) => {
-                // Ensure audio is unmuted when video loads
-                e.currentTarget.muted = false;
-                e.currentTarget.volume = 1.0;
+                // Ensure volume controls are available but keep muted initially
+                e.currentTarget.volume = 0.5;
+                // Keep muted = true for initial state
               }}
             >
               Your browser does not support the video tag.
