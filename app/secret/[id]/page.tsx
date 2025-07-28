@@ -16,6 +16,8 @@ export default function SecretPage({ params }: { params: { id: string } }) {
   const [isMediaLoading, setIsMediaLoading] = useState(true);
   const [duration, setDuration] = useState<number | null>(null);
   const [hasStarted, setHasStarted] = useState(false);
+  const [bufferedPercent, setBufferedPercent] = useState(0);
+
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hasRevealedRef = useRef(false);
@@ -122,11 +124,14 @@ export default function SecretPage({ params }: { params: { id: string } }) {
     return (
       <>
         {showLoadingIndicator && (
-          <div className="flex flex-col items-center justify-center h-64">
-            <LoaderCircle className="h-8 w-8 animate-spin text-muted-foreground" />
-            <p className="text-sm text-muted-foreground mt-2">Loading secret media...</p>
-          </div>
-        )}
+  <div className="flex flex-col items-center justify-center h-64">
+    <LoaderCircle className="h-8 w-8 animate-spin text-muted-foreground" />
+    <p className="text-sm text-muted-foreground mt-2">
+      Loading secret media... {Math.floor(bufferedPercent)}%
+    </p>
+  </div>
+)}
+
 
         <div style={{ visibility: showLoadingIndicator ? "hidden" : "visible" }}>
           {secret.fileType === "image" && secret.fileUrl && (
@@ -150,19 +155,37 @@ export default function SecretPage({ params }: { params: { id: string } }) {
 
     <div className="relative w-full">
       <video
-        ref={videoRef}
-        id="secret-video"
-        src={secret.fileUrl}
-        playsInline
-        preload="auto"
-        className="w-full rounded-lg mb-2 pointer-events-none"
-        onContextMenu={(e) => e.preventDefault()}
-        onLoadedMetadata={(e) => {
-          handleMediaLoad();
-          setDuration(Math.ceil(e.currentTarget.duration));
-        }}
-        onEnded={handleTimerComplete}
-      />
+  ref={videoRef}
+  src={secret.fileUrl}
+  playsInline
+  preload="auto"
+  className="w-full rounded-lg mb-2 pointer-events-none"
+  onContextMenu={(e) => e.preventDefault()}
+  onLoadedMetadata={(e) => {
+    const video = e.currentTarget;
+
+    const handleFullyBuffered = () => {
+      handleMediaLoad(); // hide loader
+      setDuration(Math.ceil(video.duration));
+      video.removeEventListener("canplaythrough", handleFullyBuffered);
+    };
+
+    video.addEventListener("canplaythrough", handleFullyBuffered);
+  }}
+  onProgress={(e) => {
+    const video = e.currentTarget;
+    if (video.buffered.length > 0) {
+      const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+      const duration = video.duration;
+      if (duration > 0) {
+        const percent = Math.min((bufferedEnd / duration) * 100, 100);
+        setBufferedPercent(percent);
+      }
+    }
+  }}
+  onEnded={handleTimerComplete}
+/>
+
       <div className="flex items-center justify-between gap-4 mt-2">
         {!hasStarted && (
           <button
