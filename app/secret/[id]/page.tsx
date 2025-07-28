@@ -17,6 +17,8 @@ export default function SecretPage({ params }: { params: { id: string } }) {
   const [duration, setDuration] = useState<number | null>(null);
   const [hasStarted, setHasStarted] = useState(false);
   const [bufferedPercent, setBufferedPercent] = useState(0);
+  const [showVideo, setShowVideo] = useState(true);
+
 
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -44,14 +46,15 @@ export default function SecretPage({ params }: { params: { id: string } }) {
   }, [params.id, revealSecret]);
 
   const handleTimerComplete = () => {
-  const videoEl = document.getElementById("secret-video") as HTMLVideoElement;
-  if (videoEl) {
-    videoEl.pause();
-    videoEl.src = "";
-    videoEl.load();
+  if (videoRef.current) {
+    videoRef.current.pause();
+    videoRef.current.src = "";
+    videoRef.current.load();
   }
+  setShowVideo(false); // 💥 unmount video
   setSecret(null);
 };
+
 
 
   const handleMediaLoad = () => {
@@ -62,14 +65,15 @@ export default function SecretPage({ params }: { params: { id: string } }) {
   useEffect(() => {
   const handleVisibilityChange = () => {
     if (document.visibilityState === "hidden") {
-      const videoEl = document.getElementById("secret-video") as HTMLVideoElement;
-      if (videoEl) {
-        videoEl.pause();
-        videoEl.src = "";
-        videoEl.load();
-      }
-      setSecret(null);
-    }
+  if (videoRef.current) {
+    videoRef.current.pause();
+    videoRef.current.src = "";
+    videoRef.current.load();
+  }
+  setShowVideo(false); // 💥 unmount video
+  setSecret(null);
+}
+
   };
 
   document.addEventListener("visibilitychange", handleVisibilityChange);
@@ -154,6 +158,8 @@ export default function SecretPage({ params }: { params: { id: string } }) {
     </p>
 
     <div className="relative w-full">
+      {secret.fileType === "video" && secret.fileUrl && showVideo && (
+  <>
       <video
   ref={videoRef}
   src={secret.fileUrl}
@@ -185,6 +191,8 @@ export default function SecretPage({ params }: { params: { id: string } }) {
   }}
   onEnded={handleTimerComplete}
 />
+  </>
+)}
 
       <div className="flex items-center justify-between gap-4 mt-2">
         {!hasStarted && (
