@@ -18,8 +18,7 @@ export default function SecretPage({ params }: { params: { id: string } }) {
   const [hasStarted, setHasStarted] = useState(false);
   const [bufferedPercent, setBufferedPercent] = useState(0);
   const [showVideo, setShowVideo] = useState(true);
-
-
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hasRevealedRef = useRef(false);
@@ -45,47 +44,60 @@ export default function SecretPage({ params }: { params: { id: string } }) {
     reveal();
   }, [params.id, revealSecret]);
 
+  // Simulate image loading progress
+  useEffect(() => {
+    if (secret?.fileType === "image" && secret.fileUrl && !imageLoaded) {
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += Math.random() * 15 + 5; // Random increment between 5-20
+        if (progress >= 100) {
+          progress = 100;
+          clearInterval(interval);
+        }
+        setBufferedPercent(Math.floor(progress));
+      }, 100);
+
+      return () => clearInterval(interval);
+    }
+  }, [secret?.fileType, secret?.fileUrl, imageLoaded]);
+
   const handleTimerComplete = () => {
-  if (videoRef.current) {
-    videoRef.current.pause();
-    videoRef.current.src = "";
-    videoRef.current.load();
-  }
-  setShowVideo(false); // 💥 unmount video
-  setSecret(null);
-};
-
-
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.src = "";
+      videoRef.current.load();
+    }
+    setShowVideo(false);
+    setSecret(null);
+  };
 
   const handleMediaLoad = () => {
     setIsMediaLoading(false);
+    if (secret?.fileType === "image") {
+      setImageLoaded(true);
+      setBufferedPercent(100);
+    }
   };
 
-  // Prevent tab switch — delete immediately
   useEffect(() => {
-  const handleVisibilityChange = () => {
-    if (document.visibilityState === "hidden") {
-  if (videoRef.current) {
-    videoRef.current.pause();
-    videoRef.current.src = "";
-    videoRef.current.load();
-  }
-  setShowVideo(false); // 💥 unmount video
-  setSecret(null);
-}
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        if (videoRef.current) {
+          videoRef.current.pause();
+          videoRef.current.src = "";
+          videoRef.current.load();
+        }
+        setShowVideo(false);
+        setSecret(null);
+      }
+    };
 
-  };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
 
-  document.addEventListener("visibilitychange", handleVisibilityChange);
-
-  return () => {
-    document.removeEventListener("visibilitychange", handleVisibilityChange);
-  };
-}, []);
-
-
-
-  // Prevent pause using keyboard
   useEffect(() => {
     const preventKey = (e: KeyboardEvent) => {
       if (e.code === "Space") {
@@ -96,7 +108,6 @@ export default function SecretPage({ params }: { params: { id: string } }) {
     return () => window.removeEventListener("keydown", preventKey);
   }, []);
 
-  // Auto-resume if user pauses manually
   useEffect(() => {
     if (!videoRef.current) return;
     const video = videoRef.current;
@@ -113,7 +124,6 @@ export default function SecretPage({ params }: { params: { id: string } }) {
 
   const handleUserPlay = () => {
     if (hasStarted || !videoRef.current) return;
-
     const video = videoRef.current;
     setHasStarted(true);
     video.play();
@@ -128,14 +138,20 @@ export default function SecretPage({ params }: { params: { id: string } }) {
     return (
       <>
         {showLoadingIndicator && (
-  <div className="flex flex-col items-center justify-center h-64">
-    <LoaderCircle className="h-8 w-8 animate-spin text-muted-foreground" />
-    <p className="text-sm text-muted-foreground mt-2">
-      Loading secret media... {Math.floor(bufferedPercent)}%
-    </p>
-  </div>
-)}
-
+          <div className="flex flex-col items-center justify-center h-64">
+            <LoaderCircle className="h-8 w-8 animate-spin text-muted-foreground" />
+            <p className="text-sm text-muted-foreground mt-2">
+              Loading secret media... {Math.floor(bufferedPercent)}%
+            </p>
+            {/* Progress bar */}
+            <div className="w-48 bg-gray-200 rounded-full h-2 mt-2">
+              <div 
+                className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                style={{ width: `${bufferedPercent}%` }}
+              ></div>
+            </div>
+          </div>
+        )}
 
         <div style={{ visibility: showLoadingIndicator ? "hidden" : "visible" }}>
           {secret.fileType === "image" && secret.fileUrl && (
@@ -146,87 +162,86 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                 fill
                 style={{ objectFit: "contain" }}
                 onLoad={handleMediaLoad}
+                onError={() => {
+                  console.error("Failed to load image");
+                  setIsMediaLoading(false);
+                }}
                 priority
               />
             </div>
           )}
 
           {secret.fileType === "video" && secret.fileUrl && (
-  <>
-    <p className="text-sm text-red-600 font-medium mb-2">
-      ⚠️ One-time view: You cannot pause, replay, or download. Stay focused!
-    </p>
+            <>
+              <p className="text-sm text-red-600 font-medium mb-2">
+                ⚠️ One-time view: You cannot pause, replay, or download. Stay focused!
+              </p>
 
-    <div className="relative w-full">
-      {secret.fileType === "video" && secret.fileUrl && showVideo && (
-  <>
-      <video
-  ref={videoRef}
-  src={secret.fileUrl}
-  playsInline
-  preload="auto"
-  className="w-full rounded-lg mb-2 pointer-events-none"
-  onContextMenu={(e) => e.preventDefault()}
-  onLoadedMetadata={(e) => {
-    const video = e.currentTarget;
+              <div className="relative w-full">
+                {showVideo && (
+                  <video
+                    ref={videoRef}
+                    src={secret.fileUrl}
+                    playsInline
+                    preload="auto"
+                    className="w-full rounded-lg mb-2 pointer-events-none"
+                    onContextMenu={(e) => e.preventDefault()}
+                    onLoadedMetadata={(e) => {
+                      const video = e.currentTarget;
+                      const handleFullyBuffered = () => {
+                        handleMediaLoad();
+                        setDuration(Math.ceil(video.duration));
+                        video.removeEventListener("canplaythrough", handleFullyBuffered);
+                      };
+                      video.addEventListener("canplaythrough", handleFullyBuffered);
+                    }}
+                    onProgress={(e) => {
+                      const video = e.currentTarget;
+                      if (video.buffered.length > 0) {
+                        const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+                        const duration = video.duration;
+                        if (duration > 0) {
+                          const percent = Math.min((bufferedEnd / duration) * 100, 100);
+                          setBufferedPercent(percent);
+                        }
+                      }
+                    }}
+                    onEnded={handleTimerComplete}
+                  />
+                )}
 
-    const handleFullyBuffered = () => {
-      handleMediaLoad(); // hide loader
-      setDuration(Math.ceil(video.duration));
-      video.removeEventListener("canplaythrough", handleFullyBuffered);
-    };
-
-    video.addEventListener("canplaythrough", handleFullyBuffered);
-  }}
-  onProgress={(e) => {
-    const video = e.currentTarget;
-    if (video.buffered.length > 0) {
-      const bufferedEnd = video.buffered.end(video.buffered.length - 1);
-      const duration = video.duration;
-      if (duration > 0) {
-        const percent = Math.min((bufferedEnd / duration) * 100, 100);
-        setBufferedPercent(percent);
-      }
-    }
-  }}
-  onEnded={handleTimerComplete}
-/>
-  </>
-)}
-
-      <div className="flex items-center justify-between gap-4 mt-2">
-        {!hasStarted && (
-          <button
-            onClick={handleUserPlay}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
-          >
-            ▶️ Play
-          </button>
-        )}
-        <div className="flex items-center gap-2">
-          <label htmlFor="volume" className="text-sm font-medium">
-            🔊 Volume
-          </label>
-          <input
-            id="volume"
-            type="range"
-            min="0"
-            max="1"
-            step="0.05"
-            defaultValue="1"
-            onChange={(e) => {
-              if (videoRef.current) {
-                videoRef.current.volume = parseFloat(e.target.value);
-              }
-            }}
-            className="w-32"
-          />
-        </div>
-      </div>
-    </div>
-  </>
-)}
-
+                <div className="flex items-center justify-between gap-4 mt-2">
+                  {!hasStarted && (
+                    <button
+                      onClick={handleUserPlay}
+                      className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                    >
+                      ▶️ Play
+                    </button>
+                  )}
+                  <div className="flex items-center gap-2">
+                    <label htmlFor="volume" className="text-sm font-medium">
+                      🔊 Volume
+                    </label>
+                    <input
+                      id="volume"
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.05"
+                      defaultValue="1"
+                      onChange={(e) => {
+                        if (videoRef.current) {
+                          videoRef.current.volume = parseFloat(e.target.value);
+                        }
+                      }}
+                      className="w-32"
+                    />
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
 
           {secret.message && (
             <p className="text-lg sm:text-xl p-4 bg-muted rounded-md">
@@ -234,9 +249,16 @@ export default function SecretPage({ params }: { params: { id: string } }) {
             </p>
           )}
 
-          {/* Show timer only after user starts playing */}
-          {hasStarted && duration && (
-            <CountdownTimer initialSeconds={duration} onComplete={handleTimerComplete} />
+          {/* Timer for images (10 seconds) and videos (duration based) */}
+          {!isMediaLoading && (
+            <>
+              {secret.fileType === "image" && (
+                <CountdownTimer initialSeconds={10} onComplete={handleTimerComplete} />
+              )}
+              {secret.fileType === "video" && hasStarted && duration && (
+                <CountdownTimer initialSeconds={duration} onComplete={handleTimerComplete} />
+              )}
+            </>
           )}
         </div>
       </>
