@@ -73,3 +73,14 @@ video::-webkit-media-controls-mute-button {
   opacity: 1 !important;
   pointer-events: auto !important;
 }
+
+
+
+@keyframes scrollWatermark {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}

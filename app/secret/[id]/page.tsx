@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useMutation } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id, Doc } from "@/convex/_generated/dataModel";
 import Link from "next/link";
@@ -10,6 +10,7 @@ import { CountdownTimer } from "@/components/countdown-timer";
 import { ShareButton } from "@/components/share-button";
 import Image from "next/image";
 import { LoaderCircle } from "lucide-react";
+import { Watermark } from "@/components/watermark"; // 1. Import the watermark
 
 export default function SecretPage({ params }: { params: { id: string } }) {
     const [secret, setSecret] = useState<Doc<"secrets"> | null | undefined>(undefined);
@@ -19,22 +20,40 @@ export default function SecretPage({ params }: { params: { id: string } }) {
     const [bufferedPercent, setBufferedPercent] = useState(0);
     const [showVideo, setShowVideo] = useState(true);
     const [imageLoaded, setImageLoaded] = useState(false);
+    // 2. Add state for the IP address
+    const [receiverIp, setReceiverIp] = useState<string | null>(null);
 
     const videoRef = useRef<HTMLVideoElement | null>(null);
     const hasRevealedRef = useRef(false);
+    
+    // NOTE: This is using an old function name. Please ensure your `secrets.ts` file has been updated
+    // to use `getSecretForViewing` and `markAsRead` for the full secure flow.
     const revealSecret = useMutation(api.secrets.readAndReveal);
 
     useEffect(() => {
         if (hasRevealedRef.current) return;
         hasRevealedRef.current = true;
 
+        // 3. Function to fetch the IP address
+        const fetchIp = async () => {
+            try {
+                const res = await fetch("https://api64.ipify.org?format=json");
+                const data = await res.json();
+                setReceiverIp(data.ip);
+            } catch (error) {
+                console.error("Failed to fetch IP address:", error);
+            }
+        };
+
         const reveal = async () => {
             try {
                 const revealedSecret = await revealSecret({ secretId: params.id as Id<"secrets"> });
                 setSecret(revealedSecret);
-                // This correctly handles the text-only case for loading
-                if (revealedSecret && !revealedSecret.fileUrl) {
-                    setIsMediaLoading(false);
+                if (revealedSecret) {
+                    fetchIp(); // Fetch the IP when the secret is revealed
+                    if (!revealedSecret.fileUrl) {
+                        setIsMediaLoading(false);
+                    }
                 }
             } catch (error) {
                 console.error("Failed to reveal secret:", error);
@@ -45,19 +64,18 @@ export default function SecretPage({ params }: { params: { id: string } }) {
         reveal();
     }, [params.id, revealSecret]);
 
-    // Simulate image loading progress
+    // ... (All of your other useEffect and handler functions remain unchanged) ...
     useEffect(() => {
         if (secret?.fileType === "image" && secret.fileUrl && !imageLoaded) {
             let progress = 0;
             const interval = setInterval(() => {
-                progress += Math.random() * 15 + 5; // Random increment between 5-20
+                progress += Math.random() * 15 + 5;
                 if (progress >= 100) {
                     progress = 100;
                     clearInterval(interval);
                 }
                 setBufferedPercent(Math.floor(progress));
             }, 100);
-
             return () => clearInterval(interval);
         }
     }, [secret?.fileType, secret?.fileUrl, imageLoaded]);
@@ -92,7 +110,6 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                 setSecret(null);
             }
         };
-
         document.addEventListener("visibilitychange", handleVisibilityChange);
         return () => {
             document.removeEventListener("visibilitychange", handleVisibilityChange);
@@ -112,13 +129,11 @@ export default function SecretPage({ params }: { params: { id: string } }) {
     useEffect(() => {
         if (!videoRef.current) return;
         const video = videoRef.current;
-
         const handlePause = () => {
             if (hasStarted) {
                 video.play();
             }
         };
-
         video.addEventListener("pause", handlePause);
         return () => video.removeEventListener("pause", handlePause);
     }, [hasStarted]);
@@ -168,6 +183,8 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                                 }}
                                 priority
                             />
+                            {/* 4. Add the watermark over the image */}
+                            <Watermark name={secret.recipientName} ip={receiverIp ?? undefined} />
                         </div>
                     )}
 
@@ -208,7 +225,9 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                                         onEnded={handleTimerComplete}
                                     />
                                 )}
-
+                                {/* 4. Add the watermark over the video */}
+                                <Watermark name={secret.recipientName} ip={receiverIp ?? undefined} animated={true}/>
+                                
                                 <div className="flex items-center justify-between gap-4 mt-2">
                                     {!hasStarted && (
                                         <button
@@ -248,20 +267,16 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                         </p>
                     )}
 
-                    {/* --- Start of Fix --- */}
                     {!isMediaLoading && (
                         <>
-                            {/* Timer for images and text-only messages (10 seconds) */}
                             {(!secret.fileType || secret.fileType === "image") && (
                                 <CountdownTimer initialSeconds={10} onComplete={handleTimerComplete} />
                             )}
-                            {/* Timer for videos (duration based) */}
                             {secret.fileType === "video" && hasStarted && duration && (
                                 <CountdownTimer initialSeconds={duration} onComplete={handleTimerComplete} />
                             )}
                         </>
                     )}
-                    {/* --- End of Fix --- */}
                 </div>
             </>
         );
