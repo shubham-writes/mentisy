@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ShareButton } from "./share-button";
@@ -17,10 +16,7 @@ export function SecretForm() {
     const [generatedLink, setGeneratedLink] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [uploadedFile, setUploadedFile] = useState<{ url: string; type: "image" | "video" } | null>(null);
-    
-    // 1. Add state to track the upload status
     const [isUploading, setIsUploading] = useState(false);
-    
     const createSecret = useMutation(api.secrets.create);
 
     const handleGenerate = async () => {
@@ -30,15 +26,21 @@ export function SecretForm() {
         }
         setIsLoading(true);
         try {
-            const secretId: Id<"secrets"> = await createSecret({
+            // The backend now returns the publicId
+            const publicId = await createSecret({
                 message: message || undefined,
                 recipientName,
                 publicNote,
                 fileUrl: uploadedFile?.url,
                 fileType: uploadedFile?.type,
             });
-            const link = `${window.location.origin}/secret/${secretId}`;
-            setGeneratedLink(link);
+
+            // Construct the new redirect link
+            if (publicId) {
+                const link = `${window.location.origin}/redirect/${publicId}`;
+                setGeneratedLink(link);
+            }
+
             setMessage("");
             setUploadedFile(null);
         } catch (error) {
@@ -50,6 +52,7 @@ export function SecretForm() {
     };
 
     return (
+        // ... (The rest of your form's JSX remains the same)
         <div className="w-full max-w-md p-6 border rounded-lg bg-card">
             <h3 className="text-lg font-semibold mb-4">Create a Secret Message</h3>
 
@@ -61,30 +64,30 @@ export function SecretForm() {
                     <div className="flex justify-center gap-x-4">
                         <UploadButton
                             endpoint="imageUploader"
-                            onUploadBegin={() => setIsUploading(true)} // 2. Set uploading to true
+                            onUploadBegin={() => setIsUploading(true)}
                             onClientUploadComplete={(res) => {
                                 if (res) {
                                     setUploadedFile({ url: res[0].url, type: "image" });
-                                    setIsUploading(false); // 3. Set uploading to false
+                                    setIsUploading(false);
                                 }
                             }}
                             onUploadError={(error: Error) => {
                                 alert(`ERROR! ${error.message}`);
-                                setIsUploading(false); // 4. Set uploading to false on error
+                                setIsUploading(false);
                             }}
                         />
                         <UploadButton
                             endpoint="videoUploader"
-                            onUploadBegin={() => setIsUploading(true)} // 2. Set uploading to true
+                            onUploadBegin={() => setIsUploading(true)}
                             onClientUploadComplete={(res) => {
                                 if (res) {
                                     setUploadedFile({ url: res[0].url, type: "video" });
-                                    setIsUploading(false); // 3. Set uploading to false
+                                    setIsUploading(false);
                                 }
                             }}
                             onUploadError={(error: Error) => {
                                 alert(`ERROR! ${error.message}`);
-                                setIsUploading(false); // 4. Set uploading to false on error
+                                setIsUploading(false);
                             }}
                         />
                     </div>
@@ -109,7 +112,6 @@ export function SecretForm() {
                 onChange={(e) => setMessage(e.target.value)}
                 className="mb-4"
             />
-            {/* 5. Disable the button if loading OR uploading */}
             <Button onClick={handleGenerate} disabled={isLoading || isUploading} className="w-full">
                 {isUploading ? "Uploading file..." : (isLoading ? "Generating link..." : "Generate Shareable Link")}
             </Button>

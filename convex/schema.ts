@@ -3,6 +3,7 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+    // ... users and test_table definitions
     users: defineTable({
         tokenIdentifier: v.string(),
         clerkUserId: v.string(),
@@ -16,13 +17,16 @@ export default defineSchema({
 
     secrets: defineTable({
         authorId: v.id("users"),
+        publicId: v.string(), // 1. Add the publicId field
         message: v.optional(v.string()),
         recipientName: v.optional(v.string()),
         publicNote: v.optional(v.string()),
         isRead: v.optional(v.boolean()),
         fileUrl: v.optional(v.string()),
         fileType: v.optional(v.union(v.literal("image"), v.literal("video"))),
-    }).index("by_author", ["authorId"]),
+    })
+        .index("by_author", ["authorId"])
+        .index("by_publicId", ["publicId"]), // 2. Add an index for the publicId
 
     test_table: defineTable({
         message: v.string(),
