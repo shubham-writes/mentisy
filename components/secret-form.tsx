@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,17 @@ export function SecretForm() {
     const [isUploading, setIsUploading] = useState(false);
     const [addWatermark, setAddWatermark] = useState(true);
     const createSecret = useMutation(api.secrets.create);
+
+    const inputRef = useRef<HTMLInputElement | null>(null);
+
+    const handleCapture = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        const url = URL.createObjectURL(file);
+        const type = file.type.startsWith("image") ? "image" : "video";
+        setUploadedFile({ url, type });
+    };
 
     const handleGenerate = async () => {
         if (!message && !uploadedFile) {
@@ -61,8 +72,8 @@ export function SecretForm() {
                 <FilePreview file={uploadedFile} onRemove={() => setUploadedFile(null)} />
             ) : (
                 <div className="mb-4 p-4 border-dashed border-2 rounded-lg">
-                    <p className="text-sm text-muted-foreground mb-2">Upload a secret file (optional):</p>
-                    <div className="flex justify-center gap-x-4">
+                    <p className="text-sm text-muted-foreground mb-2">Upload or capture a secret file (optional):</p>
+                    <div className="flex flex-wrap justify-center gap-4">
                         <UploadButton
                             endpoint="imageUploader"
                             onUploadBegin={() => setIsUploading(true)}
@@ -91,6 +102,17 @@ export function SecretForm() {
                                 setIsUploading(false);
                             }}
                         />
+                        <input
+                            ref={inputRef}
+                            type="file"
+                            accept="image/*,video/*"
+                            capture="environment"
+                            onChange={handleCapture}
+                            className="hidden"
+                        />
+                        <Button variant="secondary" onClick={() => inputRef.current?.click()}>
+                            📷 Capture Media
+                        </Button>
                     </div>
                 </div>
             )}
@@ -113,10 +135,10 @@ export function SecretForm() {
                 onChange={(e) => setMessage(e.target.value)}
                 className="mb-4"
             />
-            
+
             <div className="flex items-center space-x-2 mb-4 p-3 bg-muted rounded-md">
-                <Switch 
-                    id="watermark-toggle" 
+                <Switch
+                    id="watermark-toggle"
                     checked={addWatermark}
                     onCheckedChange={setAddWatermark}
                 />
@@ -129,11 +151,11 @@ export function SecretForm() {
             </div>
 
             <Button onClick={handleGenerate} disabled={isLoading || isUploading} className="w-full">
-                {isUploading ? "Uploading file..." : (isLoading ? "Generating link..." : "Generate Shareable Link")}
+                {isUploading ? "Uploading file..." : isLoading ? "Generating link..." : "Generate Shareable Link"}
             </Button>
-            
+
             {generatedLink && (
-                 <div className="mt-4 p-2 border rounded bg-muted text-left">
+                <div className="mt-4 p-2 border rounded bg-muted text-left">
                     <p className="text-sm text-muted-foreground">Share your message:</p>
                     <div className="text-sm break-all mt-2">
                         <span>{publicNote} </span>
