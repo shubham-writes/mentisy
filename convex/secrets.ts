@@ -14,7 +14,7 @@ export const create = mutation({
         publicNote: v.optional(v.string()),
         fileUrl: v.optional(v.string()),
         fileType: v.optional(v.union(v.literal("image"), v.literal("video"))),
-        withWatermark: v.optional(v.boolean()), // <-- Add this argument
+        withWatermark: v.optional(v.boolean()),
     },
     handler: async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity();
@@ -30,7 +30,7 @@ export const create = mutation({
             publicNote: args.publicNote,
             fileUrl: args.fileUrl,
             fileType: args.fileType,
-            withWatermark: args.withWatermark, // <-- Save the value
+            withWatermark: args.withWatermark,
             isRead: false,
         });
         
@@ -39,7 +39,43 @@ export const create = mutation({
     },
 });
 
-// This is the function your page is correctly calling
+export const getMySecrets = query({
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      return [];
+    }
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) =>
+        q.eq("tokenIdentifier", identity.tokenIdentifier)
+      )
+      .unique();
+    if (!user) {
+      return [];
+    }
+    const secrets = await ctx.db
+      .query("secrets")
+      .withIndex("by_author", (q) => q.eq("authorId", user._id))
+      .order("desc")
+      .collect();
+    return secrets;
+  },
+});
+
+// --- This is the key change ---
+export const clearSecretContent = internalMutation({
+    args: { secretId: v.id("secrets") },
+    handler: async (ctx, args) => {
+        // Use 'undefined' instead of 'null' to match the schema
+        await ctx.db.patch(args.secretId, {
+            message: undefined,
+            fileUrl: undefined,
+            fileType: undefined,
+        });
+    },
+});
+
 export const readAndReveal = mutation({
     args: { secretId: v.id("secrets") },
     handler: async (ctx, args) => {
@@ -51,7 +87,25 @@ export const readAndReveal = mutation({
     },
 });
 
-// All the other functions for deleting the file are also needed
+
+export const destroy = internalAction({
+    args: { secretId: v.id("secrets") },
+    handler: async (ctx, args) => {
+        const secret = await ctx.runQuery(internal.secrets.getSecretForAction, { secretId: args.secretId });
+
+        if (secret?.fileUrl) {
+            const fileKey = secret.fileUrl.substring(secret.fileUrl.lastIndexOf("/") + 1);
+            const vercelUrl = process.env.NEXT_PUBLIC_URL;
+            const internalSecret = process.env.INTERNAL_API_SECRET;
+            if (vercelUrl && internalSecret) {
+                await fetch(`${vercelUrl}/api/deleteFile`, { method: "POST", headers: { "Content-Type": "application/json", "x-internal-secret": internalSecret }, body: JSON.stringify({ fileKey }), });
+            }
+        }
+
+        await ctx.runMutation(internal.secrets.clearSecretContent, { secretId: args.secretId });
+    },
+});
+
 export const getSecretIdFromPublicId = query({
     args: { publicId: v.string() },
     handler: async (ctx, args) => {
@@ -60,27 +114,9 @@ export const getSecretIdFromPublicId = query({
     },
 });
 
-export const destroy = internalAction({
+export const getSecretForAction = internalQuery({
     args: { secretId: v.id("secrets") },
     handler: async (ctx, args) => {
-        const secret = await ctx.runQuery(internal.secrets.getSecretForDeletion, { secretId: args.secretId });
-        if (secret?.fileUrl) {
-            const fileKey = secret.fileUrl.substring(secret.fileUrl.lastIndexOf("/") + 1);
-            const vercelUrl = process.env.NEXT_PUBLIC_URL; const internalSecret = process.env.INTERNAL_API_SECRET;
-            if (vercelUrl && internalSecret) {
-                await fetch(`${vercelUrl}/api/deleteFile`, { method: "POST", headers: { "Content-Type": "application/json", "x-internal-secret": internalSecret }, body: JSON.stringify({ fileKey }), });
-            }
-        }
-        await ctx.runMutation(internal.secrets.deleteSecretRecord, { secretId: args.secretId });
+        return await ctx.db.get(args.secretId);
     },
-});
-
-export const getSecretForDeletion = internalQuery({
-    args: { secretId: v.id("secrets") },
-    handler: async (ctx, args) => { return await ctx.db.get(args.secretId); },
-});
-
-export const deleteSecretRecord = internalMutation({
-    args: { secretId: v.id("secrets") },
-    handler: async (ctx, args) => { await ctx.db.delete(args.secretId); },
 });

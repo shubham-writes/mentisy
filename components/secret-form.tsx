@@ -10,6 +10,7 @@ import { UploadButton } from "./uploadthing";
 import { FilePreview } from "./file-preview";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { MySecretsList } from "@/components/my-secrets-list";
 
 export function SecretForm() {
     const [message, setMessage] = useState("");
@@ -148,6 +149,7 @@ export function SecretForm() {
                             url={generatedLink}
                         />
                     </div>
+                    <MySecretsList/>
                 </div>
             )}
         </div>

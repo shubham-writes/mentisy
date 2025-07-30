@@ -11,6 +11,7 @@ import { ShareButton } from "@/components/share-button";
 import Image from "next/image";
 import { LoaderCircle } from "lucide-react";
 import { Watermark } from "@/components/watermark";
+import { MySecretsList } from "@/components/my-secrets-list";
 
 export default function SecretPage({ params }: { params: { id: string } }) {
     const [secret, setSecret] = useState<Doc<"secrets"> | null | undefined>(undefined);
@@ -254,6 +255,7 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                                         />
                                     </div>
                                 </div>
+                                <MySecretsList />
                             </div>
                         </>
                     )}
