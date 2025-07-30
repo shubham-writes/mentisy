@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { ShareButton } from "./share-button";
 import { UploadButton } from "./uploadthing";
 import { FilePreview } from "./file-preview";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 export function SecretForm() {
     const [message, setMessage] = useState("");
@@ -17,6 +19,7 @@ export function SecretForm() {
     const [isLoading, setIsLoading] = useState(false);
     const [uploadedFile, setUploadedFile] = useState<{ url: string; type: "image" | "video" } | null>(null);
     const [isUploading, setIsUploading] = useState(false);
+    const [addWatermark, setAddWatermark] = useState(true);
     const createSecret = useMutation(api.secrets.create);
 
     const handleGenerate = async () => {
@@ -26,16 +29,15 @@ export function SecretForm() {
         }
         setIsLoading(true);
         try {
-            // The backend now returns the publicId
             const publicId = await createSecret({
                 message: message || undefined,
                 recipientName,
                 publicNote,
                 fileUrl: uploadedFile?.url,
                 fileType: uploadedFile?.type,
+                withWatermark: addWatermark,
             });
 
-            // Construct the new redirect link
             if (publicId) {
                 const link = `${window.location.origin}/redirect/${publicId}`;
                 setGeneratedLink(link);
@@ -52,7 +54,6 @@ export function SecretForm() {
     };
 
     return (
-        // ... (The rest of your form's JSX remains the same)
         <div className="w-full max-w-md p-6 border rounded-lg bg-card">
             <h3 className="text-lg font-semibold mb-4">Create a Secret Message</h3>
 
@@ -112,6 +113,21 @@ export function SecretForm() {
                 onChange={(e) => setMessage(e.target.value)}
                 className="mb-4"
             />
+            
+            <div className="flex items-center space-x-2 mb-4 p-3 bg-muted rounded-md">
+                <Switch 
+                    id="watermark-toggle" 
+                    checked={addWatermark}
+                    onCheckedChange={setAddWatermark}
+                />
+                <Label htmlFor="watermark-toggle" className="flex flex-col">
+                    <span>Add Security Watermark</span>
+                    {!addWatermark && (
+                        <span className="text-xs text-red-500">Warning: Disabling this makes screen recording easier.</span>
+                    )}
+                </Label>
+            </div>
+
             <Button onClick={handleGenerate} disabled={isLoading || isUploading} className="w-full">
                 {isUploading ? "Uploading file..." : (isLoading ? "Generating link..." : "Generate Shareable Link")}
             </Button>

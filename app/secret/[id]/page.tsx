@@ -10,7 +10,7 @@ import { CountdownTimer } from "@/components/countdown-timer";
 import { ShareButton } from "@/components/share-button";
 import Image from "next/image";
 import { LoaderCircle } from "lucide-react";
-import { Watermark } from "@/components/watermark"; // 1. Import the watermark
+import { Watermark } from "@/components/watermark";
 
 export default function SecretPage({ params }: { params: { id: string } }) {
     const [secret, setSecret] = useState<Doc<"secrets"> | null | undefined>(undefined);
@@ -20,21 +20,17 @@ export default function SecretPage({ params }: { params: { id: string } }) {
     const [bufferedPercent, setBufferedPercent] = useState(0);
     const [showVideo, setShowVideo] = useState(true);
     const [imageLoaded, setImageLoaded] = useState(false);
-    // 2. Add state for the IP address
     const [receiverIp, setReceiverIp] = useState<string | null>(null);
 
     const videoRef = useRef<HTMLVideoElement | null>(null);
     const hasRevealedRef = useRef(false);
-    
-    // NOTE: This is using an old function name. Please ensure your `secrets.ts` file has been updated
-    // to use `getSecretForViewing` and `markAsRead` for the full secure flow.
+
     const revealSecret = useMutation(api.secrets.readAndReveal);
 
     useEffect(() => {
         if (hasRevealedRef.current) return;
         hasRevealedRef.current = true;
 
-        // 3. Function to fetch the IP address
         const fetchIp = async () => {
             try {
                 const res = await fetch("https://api64.ipify.org?format=json");
@@ -50,7 +46,7 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                 const revealedSecret = await revealSecret({ secretId: params.id as Id<"secrets"> });
                 setSecret(revealedSecret);
                 if (revealedSecret) {
-                    fetchIp(); // Fetch the IP when the secret is revealed
+                    fetchIp();
                     if (!revealedSecret.fileUrl) {
                         setIsMediaLoading(false);
                     }
@@ -64,7 +60,6 @@ export default function SecretPage({ params }: { params: { id: string } }) {
         reveal();
     }, [params.id, revealSecret]);
 
-    // ... (All of your other useEffect and handler functions remain unchanged) ...
     useEffect(() => {
         if (secret?.fileType === "image" && secret.fileUrl && !imageLoaded) {
             let progress = 0;
@@ -183,8 +178,9 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                                 }}
                                 priority
                             />
-                            {/* 4. Add the watermark over the image */}
-                            <Watermark name={secret.recipientName} ip={receiverIp ?? undefined} />
+                            {secret.withWatermark && (
+                                <Watermark name={secret.recipientName} ip={receiverIp ?? undefined} />
+                            )}
                         </div>
                     )}
 
@@ -225,9 +221,10 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                                         onEnded={handleTimerComplete}
                                     />
                                 )}
-                                {/* 4. Add the watermark over the video */}
-                                <Watermark name={secret.recipientName} ip={receiverIp ?? undefined} animated={true}/>
-                                
+                                {secret.withWatermark && (
+                                    <Watermark name={secret.recipientName} ip={receiverIp ?? undefined} animated={true} />
+                                )}
+
                                 <div className="flex items-center justify-between gap-4 mt-2">
                                     {!hasStarted && (
                                         <button
