@@ -17,7 +17,8 @@ export default defineSchema({
         isRead: v.optional(v.boolean()),
         fileUrl: v.optional(v.string()),
         fileType: v.optional(v.union(v.literal("image"), v.literal("video"))),
-        withWatermark: v.optional(v.boolean()), // <-- Add this line
+        withWatermark: v.optional(v.boolean()),
+        hiddenForSender: v.optional(v.boolean()), // <-- This is the missing line
     })
         .index("by_author", ["authorId"])
         .index("by_publicId", ["publicId"]),

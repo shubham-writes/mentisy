@@ -11,7 +11,7 @@ import { ShareButton } from "@/components/share-button";
 import Image from "next/image";
 import { LoaderCircle } from "lucide-react";
 import { Watermark } from "@/components/watermark";
-import { MySecretsList } from "@/components/my-secrets-list";
+
 
 export default function SecretPage({ params }: { params: { id: string } }) {
     const [secret, setSecret] = useState<Doc<"secrets"> | null | undefined>(undefined);
@@ -143,9 +143,17 @@ export default function SecretPage({ params }: { params: { id: string } }) {
 
     const renderContent = () => {
         if (secret === undefined) return <p>Revealing your secret...</p>;
-        if (secret === null) return <p>This secret message could not be found. It may have already been read or deleted.</p>;
+
+        // --- This is the key change ---
+        // A secret is also considered expired if its content was cleared by the sender.
+        const isManuallyExpired = secret && !secret.fileUrl && !secret.message;
+
+        if (secret === null || isManuallyExpired) {
+            return <p>This secret message could not be found. It may have already been read or deleted.</p>;
+        }
 
         const showLoadingIndicator = secret.fileUrl && isMediaLoading;
+        const secureFileUrl = secret.fileUrl || "";
 
         return (
             <>
@@ -168,7 +176,7 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                     {secret.fileType === "image" && secret.fileUrl && (
                         <div className="relative w-full h-64 mb-4 rounded-lg overflow-hidden">
                             <Image
-                                src={secret.fileUrl}
+                                src={secureFileUrl} // Use the secure proxy URL
                                 alt="Secret Image"
                                 fill
                                 style={{ objectFit: "contain" }}
@@ -194,7 +202,7 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                                 {showVideo && (
                                     <video
                                         ref={videoRef}
-                                        src={secret.fileUrl}
+                                        src={secureFileUrl} // Use the secure proxy URL
                                         playsInline
                                         preload="auto"
                                         className="w-full rounded-lg mb-2 pointer-events-none"
@@ -255,7 +263,6 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                                         />
                                     </div>
                                 </div>
-                                <MySecretsList />
                             </div>
                         </>
                     )}
