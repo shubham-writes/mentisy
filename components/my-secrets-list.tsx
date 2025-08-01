@@ -60,7 +60,7 @@ export function MySecretsList() {
                 )}
                 {visibleSecrets.map((secret) => {
                     const link = `${window.location.origin}/redirect/${secret.publicId}`;
-                    const isExpired = !secret.message && !secret.fileUrl;
+                    const isExpired = secret.isRead && !secret.message && !secret.fileUrl;
                     return (
                         <div key={secret._id} className="p-3 bg-muted rounded-md text-left">
                             <div className="flex justify-between items-start">

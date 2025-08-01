@@ -18,7 +18,8 @@ export default defineSchema({
         fileUrl: v.optional(v.string()),
         fileType: v.optional(v.union(v.literal("image"), v.literal("video"))),
         withWatermark: v.optional(v.boolean()),
-        hiddenForSender: v.optional(v.boolean()), // <-- This is the missing line
+        hiddenForSender: v.optional(v.boolean()), 
+         duration: v.optional(v.number()),
     })
         .index("by_author", ["authorId"])
         .index("by_publicId", ["publicId"]),

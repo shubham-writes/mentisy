@@ -9,6 +9,7 @@ import { ShareButton } from "./share-button";
 import { UploadButton } from "./uploadthing";
 import { FilePreview } from "./file-preview";
 import { Switch } from "@/components/ui/switch";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { MySecretsList } from "@/components/my-secrets-list";
 
@@ -21,6 +22,7 @@ export function SecretForm() {
     const [uploadedFile, setUploadedFile] = useState<{ url: string; type: "image" | "video" } | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [addWatermark, setAddWatermark] = useState(true);
+    const [duration, setDuration] = useState("10");
     const createSecret = useMutation(api.secrets.create);
 
     const handleGenerate = async () => {
@@ -37,6 +39,9 @@ export function SecretForm() {
                 fileUrl: uploadedFile?.url,
                 fileType: uploadedFile?.type,
                 withWatermark: addWatermark,
+                // --- This is the key change ---
+                // Only send a duration if the file is NOT a video.
+                duration: uploadedFile?.type === 'video' ? undefined : parseInt(duration),
             });
 
             if (publicId) {
@@ -53,6 +58,8 @@ export function SecretForm() {
             setIsLoading(false);
         }
     };
+
+    const isTimerDisabled = uploadedFile?.type === 'video';
 
     return (
         <div className="w-full max-w-md p-6 border rounded-lg bg-card">
@@ -114,7 +121,32 @@ export function SecretForm() {
                 onChange={(e) => setMessage(e.target.value)}
                 className="mb-4"
             />
-            
+            <div className="mb-4">
+                <Label className="text-sm font-medium">Self-Destruct Timer</Label>
+                {isTimerDisabled && (
+                    <p className="text-xs text-muted-foreground mt-1">Timer will match the video&apos;s duration automatically.</p>
+                )}
+                <RadioGroup 
+                    defaultValue="10" 
+                    className="flex gap-x-4 mt-2"
+                    value={duration}
+                    onValueChange={setDuration}
+                    disabled={isTimerDisabled}
+                >
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="3" id="r1" />
+                        <Label htmlFor="r1">3 Sec</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="5" id="r2" />
+                        <Label htmlFor="r2">5 Sec</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="10" id="r3" />
+                        <Label htmlFor="r3">10 Sec</Label>
+                    </div>
+                </RadioGroup>
+            </div>
             <div className="flex items-center space-x-2 mb-4 p-3 bg-muted rounded-md">
                 <Switch 
                     id="watermark-toggle" 

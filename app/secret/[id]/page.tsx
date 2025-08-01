@@ -142,152 +142,157 @@ export default function SecretPage({ params }: { params: { id: string } }) {
     };
 
     const renderContent = () => {
-        if (secret === undefined) return <p>Revealing your secret...</p>;
+    if (secret === undefined) return <p>Revealing your secret...</p>;
 
-        // --- This is the key change ---
-        // A secret is also considered expired if its content was cleared by the sender.
-        const isManuallyExpired = secret && !secret.fileUrl && !secret.message;
+    if (secret === null) {
+        return <p>This secret message could not be found.</p>;
+    }
 
-        if (secret === null || isManuallyExpired) {
-            return <p>This secret message could not be found. It may have already been read or deleted.</p>;
-        }
+    // Check if the secret is expired (read but no content)
+    const isExpired = secret.isRead && !secret.fileUrl && !secret.message;
+    
+    if (isExpired) {
+        return <p>This secret message has expired and is no longer available.</p>;
+    }
 
-        const showLoadingIndicator = secret.fileUrl && isMediaLoading;
-        const secureFileUrl = secret.fileUrl || "";
+    const showLoadingIndicator = secret.fileUrl && isMediaLoading;
+    const secureFileUrl = secret.fileUrl || "";
 
-        return (
-            <>
-                {showLoadingIndicator && (
-                    <div className="flex flex-col items-center justify-center h-64">
-                        <LoaderCircle className="h-8 w-8 animate-spin text-muted-foreground" />
-                        <p className="text-sm text-muted-foreground mt-2">
-                            Loading secret media... {Math.floor(bufferedPercent)}%
-                        </p>
-                        <div className="w-48 bg-gray-200 rounded-full h-2 mt-2">
-                            <div
-                                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                                style={{ width: `${bufferedPercent}%` }}
-                            ></div>
-                        </div>
+    return (
+        <>
+            {showLoadingIndicator && (
+                <div className="flex flex-col items-center justify-center h-64">
+                    <LoaderCircle className="h-8 w-8 animate-spin text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground mt-2">
+                        Loading secret media... {Math.floor(bufferedPercent)}%
+                    </p>
+                    <div className="w-48 bg-gray-200 rounded-full h-2 mt-2">
+                        <div
+                            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${bufferedPercent}%` }}
+                        ></div>
+                    </div>
+                </div>
+            )}
+
+            <div style={{ visibility: showLoadingIndicator ? "hidden" : "visible" }}>
+                {secret.fileType === "image" && secret.fileUrl && (
+                    <div className="relative w-full h-64 mb-4 rounded-lg overflow-hidden">
+                        <Image
+                            src={secureFileUrl}
+                            alt="Secret Image"
+                            fill
+                            style={{ objectFit: "contain" }}
+                            onLoad={handleMediaLoad}
+                            onError={() => {
+                                console.error("Failed to load image");
+                                setIsMediaLoading(false);
+                            }}
+                            priority
+                        />
+                        {secret.withWatermark && (
+                            <Watermark name={secret.recipientName} ip={receiverIp ?? undefined} />
+                        )}
                     </div>
                 )}
 
-                <div style={{ visibility: showLoadingIndicator ? "hidden" : "visible" }}>
-                    {secret.fileType === "image" && secret.fileUrl && (
-                        <div className="relative w-full h-64 mb-4 rounded-lg overflow-hidden">
-                            <Image
-                                src={secureFileUrl} // Use the secure proxy URL
-                                alt="Secret Image"
-                                fill
-                                style={{ objectFit: "contain" }}
-                                onLoad={handleMediaLoad}
-                                onError={() => {
-                                    console.error("Failed to load image");
-                                    setIsMediaLoading(false);
-                                }}
-                                priority
-                            />
-                            {secret.withWatermark && (
-                                <Watermark name={secret.recipientName} ip={receiverIp ?? undefined} />
+                {secret.fileType === "video" && secret.fileUrl && (
+                    <>
+                        <p className="text-sm text-red-600 font-medium mb-2">
+                            ⚠️ One-time view: You cannot pause, replay, or download. Stay focused!
+                        </p>
+                        <div className="relative w-full">
+                            {showVideo && (
+                                <video
+                                    ref={videoRef}
+                                    src={secureFileUrl}
+                                    playsInline
+                                    preload="auto"
+                                    className="w-full rounded-lg mb-2 pointer-events-none"
+                                    onContextMenu={(e) => e.preventDefault()}
+                                    onLoadedMetadata={(e) => {
+                                        const video = e.currentTarget;
+                                        const handleFullyBuffered = () => {
+                                            handleMediaLoad();
+                                            setDuration(Math.ceil(video.duration));
+                                            video.removeEventListener("canplaythrough", handleFullyBuffered);
+                                        };
+                                        video.addEventListener("canplaythrough", handleFullyBuffered);
+                                    }}
+                                    onProgress={(e) => {
+                                        const video = e.currentTarget;
+                                        if (video.buffered.length > 0) {
+                                            const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+                                            const duration = video.duration;
+                                            if (duration > 0) {
+                                                const percent = Math.min((bufferedEnd / duration) * 100, 100);
+                                                setBufferedPercent(percent);
+                                            }
+                                        }
+                                    }}
+                                    onEnded={handleTimerComplete}
+                                />
                             )}
-                        </div>
-                    )}
+                            {secret.withWatermark && (
+                                <Watermark name={secret.recipientName} ip={receiverIp ?? undefined} animated={true} />
+                            )}
 
-                    {secret.fileType === "video" && secret.fileUrl && (
-                        <>
-                            <p className="text-sm text-red-600 font-medium mb-2">
-                                ⚠️ One-time view: You cannot pause, replay, or download. Stay focused!
-                            </p>
-                            <div className="relative w-full">
-                                {showVideo && (
-                                    <video
-                                        ref={videoRef}
-                                        src={secureFileUrl} // Use the secure proxy URL
-                                        playsInline
-                                        preload="auto"
-                                        className="w-full rounded-lg mb-2 pointer-events-none"
-                                        onContextMenu={(e) => e.preventDefault()}
-                                        onLoadedMetadata={(e) => {
-                                            const video = e.currentTarget;
-                                            const handleFullyBuffered = () => {
-                                                handleMediaLoad();
-                                                setDuration(Math.ceil(video.duration));
-                                                video.removeEventListener("canplaythrough", handleFullyBuffered);
-                                            };
-                                            video.addEventListener("canplaythrough", handleFullyBuffered);
-                                        }}
-                                        onProgress={(e) => {
-                                            const video = e.currentTarget;
-                                            if (video.buffered.length > 0) {
-                                                const bufferedEnd = video.buffered.end(video.buffered.length - 1);
-                                                const duration = video.duration;
-                                                if (duration > 0) {
-                                                    const percent = Math.min((bufferedEnd / duration) * 100, 100);
-                                                    setBufferedPercent(percent);
-                                                }
+                            <div className="flex items-center justify-between gap-4 mt-2">
+                                {!hasStarted && (
+                                    <button
+                                        onClick={handleUserPlay}
+                                        className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                                    >
+                                        ▶️ Play
+                                    </button>
+                                )}
+                                <div className="flex items-center gap-2">
+                                    <label htmlFor="volume" className="text-sm font-medium">
+                                        🔊 Volume
+                                    </label>
+                                    <input
+                                        id="volume"
+                                        type="range"
+                                        min="0"
+                                        max="1"
+                                        step="0.05"
+                                        defaultValue="1"
+                                        onChange={(e) => {
+                                            if (videoRef.current) {
+                                                videoRef.current.volume = parseFloat(e.target.value);
                                             }
                                         }}
-                                        onEnded={handleTimerComplete}
+                                        className="w-32"
                                     />
-                                )}
-                                {secret.withWatermark && (
-                                    <Watermark name={secret.recipientName} ip={receiverIp ?? undefined} animated={true} />
-                                )}
-
-                                <div className="flex items-center justify-between gap-4 mt-2">
-                                    {!hasStarted && (
-                                        <button
-                                            onClick={handleUserPlay}
-                                            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
-                                        >
-                                            ▶️ Play
-                                        </button>
-                                    )}
-                                    <div className="flex items-center gap-2">
-                                        <label htmlFor="volume" className="text-sm font-medium">
-                                            🔊 Volume
-                                        </label>
-                                        <input
-                                            id="volume"
-                                            type="range"
-                                            min="0"
-                                            max="1"
-                                            step="0.05"
-                                            defaultValue="1"
-                                            onChange={(e) => {
-                                                if (videoRef.current) {
-                                                    videoRef.current.volume = parseFloat(e.target.value);
-                                                }
-                                            }}
-                                            className="w-32"
-                                        />
-                                    </div>
                                 </div>
                             </div>
-                        </>
-                    )}
+                        </div>
+                    </>
+                )}
 
-                    {secret.message && (
-                        <p className="text-lg sm:text-xl p-4 bg-muted rounded-md">
-                            &ldquo;{secret.message}&rdquo;
-                        </p>
-                    )}
+                {secret.message && (
+                    <p className="text-lg sm:text-xl p-4 bg-muted rounded-md">
+                        &ldquo;{secret.message}&rdquo;
+                    </p>
+                )}
 
-                    {!isMediaLoading && (
-                        <>
-                            {(!secret.fileType || secret.fileType === "image") && (
-                                <CountdownTimer initialSeconds={10} onComplete={handleTimerComplete} />
-                            )}
-                            {secret.fileType === "video" && hasStarted && duration && (
-                                <CountdownTimer initialSeconds={duration} onComplete={handleTimerComplete} />
-                            )}
-                        </>
-                    )}
-                </div>
-            </>
-        );
-    };
-
+                {!isMediaLoading && (
+                    <>
+                        {(!secret.fileType || secret.fileType === "image") && (
+                            <CountdownTimer initialSeconds={secret.duration || 10} onComplete={handleTimerComplete} />
+                        )}
+                        {secret.fileType === "video" && hasStarted && (
+                            <CountdownTimer 
+                                initialSeconds={duration || 10}
+                                onComplete={handleTimerComplete} 
+                            />
+                        )}
+                    </>
+                )}
+            </div>
+        </>
+    );
+};
     const getHeading = () => {
         if (secret && secret.recipientName) {
             return `A Secret Message For ${secret.recipientName}`;

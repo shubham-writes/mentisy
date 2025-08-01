@@ -9,11 +9,15 @@ function generatePublicId(length = 8) {
 }
 
 export const create = mutation({
-    args: { message: v.optional(v.string()), recipientName: v.optional(v.string()), publicNote: v.optional(v.string()), fileUrl: v.optional(v.string()), fileType: v.optional(v.union(v.literal("image"), v.literal("video"))), withWatermark: v.optional(v.boolean()) },
+    args: { message: v.optional(v.string()), recipientName: v.optional(v.string()), publicNote: v.optional(v.string()), fileUrl: v.optional(v.string()), fileType: v.optional(v.union(v.literal("image"), v.literal("video"))), withWatermark: v.optional(v.boolean()),
+        duration: v.optional(v.number()),
+     },
     handler: async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity(); if (!identity) throw new Error("Unauthorized");
         const user = await ctx.db.query("users").withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier)).unique(); if (!user) throw new Error("User not found.");
-        const secretId = await ctx.db.insert("secrets", { authorId: user._id, publicId: generatePublicId(), message: args.message, recipientName: args.recipientName, publicNote: args.publicNote, fileUrl: args.fileUrl, fileType: args.fileType, withWatermark: args.withWatermark, isRead: false, hiddenForSender: false });
+        const secretId = await ctx.db.insert("secrets", { authorId: user._id, publicId: generatePublicId(), message: args.message, recipientName: args.recipientName, publicNote: args.publicNote, fileUrl: args.fileUrl, fileType: args.fileType, withWatermark: args.withWatermark, isRead: false, hiddenForSender: false,
+            duration: args.duration,
+         });
         const newSecret = await ctx.db.get(secretId);
         return newSecret?.publicId;
     },
@@ -103,9 +107,47 @@ export const deleteAllMySecrets = mutation({
 
 // ... (The rest of your functions remain the same)
 export const getSecretIdFromPublicId = query({ args: { publicId: v.string() }, handler: async (ctx, args) => { const secret = await ctx.db.query("secrets").withIndex("by_publicId", (q) => q.eq("publicId", args.publicId)).unique(); return secret?._id; }, });
-export const readAndReveal = mutation({ args: { secretId: v.id("secrets") }, handler: async (ctx, args) => { const secret = await ctx.db.get(args.secretId); if (!secret || secret.isRead) return null; await ctx.db.patch(secret._id, { isRead: true }); ctx.scheduler.runAfter(10000, internal.secrets.destroy, { secretId: secret._id }); return secret; }, });
+export const readAndReveal = mutation({ 
+    args: { secretId: v.id("secrets") }, 
+    handler: async (ctx, args) => { 
+        const secret = await ctx.db.get(args.secretId); 
+        if (!secret) return null;
+        
+        // If the secret is already read and has no content (expired), return it
+        // so the frontend can show it as expired
+        if (secret.isRead && !secret.message && !secret.fileUrl) {
+            return secret;
+        }
+        
+        // If the secret is already read but still has content, return null
+        // (this shouldn't happen in normal flow)
+        if (secret.isRead) return null;
+        
+        // Mark as read and set up auto-deletion
+        await ctx.db.patch(secret._id, { isRead: true }); 
+        
+        // Use the stored duration for images/text, or a longer default for videos
+        // (The frontend timer is the one the user sees; this is just a backend cleanup failsafe)
+        const deletionDelay = secret.duration ? secret.duration * 1000 : 300000; // Default to 5 minutes for videos
+        
+        ctx.scheduler.runAfter(deletionDelay, internal.secrets.destroy, { secretId: secret._id }); 
+        
+        return secret; 
+    }, 
+});
+
 export const destroy = internalAction({ args: { secretId: v.id("secrets") }, handler: async (ctx, args) => { const secret = await ctx.runQuery(internal.secrets.getSecretForDeletion, { secretId: args.secretId }); if (secret?.fileUrl) { const fileKey = secret.fileUrl.substring(secret.fileUrl.lastIndexOf("/") + 1); const vercelUrl = process.env.NEXT_PUBLIC_URL; const internalSecret = process.env.INTERNAL_API_SECRET; if (vercelUrl && internalSecret) { await fetch(`${vercelUrl}/api/deleteFile`, { method: "POST", headers: { "Content-Type": "application/json", "x-internal-secret": internalSecret }, body: JSON.stringify({ fileKey }), }); } } await ctx.runMutation(internal.secrets.clearSecretContent, { secretId: args.secretId }); }, });
 export const getSecretForDeletion = internalQuery({ args: { secretId: v.id("secrets") }, handler: async (ctx, args) => { return await ctx.db.get(args.secretId); }, });
-export const clearSecretContent = internalMutation({ args: { secretId: v.id("secrets") }, handler: async (ctx, args) => { await ctx.db.patch(args.secretId, { message: undefined, fileUrl: undefined, fileType: undefined, }); }, });
+export const clearSecretContent = internalMutation({ 
+    args: { secretId: v.id("secrets") }, 
+    handler: async (ctx, args) => { 
+        await ctx.db.patch(args.secretId, { 
+            message: undefined, 
+            fileUrl: undefined, 
+            fileType: undefined,
+            isRead: true, // Add this line to mark the secret as read when content is cleared
+        }); 
+    }, 
+});
 export const getUser = internalQuery({ args: { tokenIdentifier: v.string() }, handler: async (ctx, args) => { return await ctx.db.query("users").withIndex("by_token", (q) => q.eq("tokenIdentifier", args.tokenIdentifier)).unique(); }, });
 export const deleteSecretRecord = internalMutation({ args: { secretId: v.id("secrets") }, handler: async (ctx, args) => { await ctx.db.delete(args.secretId); }, });
