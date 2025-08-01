@@ -27,6 +27,8 @@ export default function SecretPage({ params }: { params: { id: string } }) {
     const hasRevealedRef = useRef(false);
 
     const revealSecret = useMutation(api.secrets.readAndReveal);
+    const expireSecret = useMutation(api.secrets.expireSecret);
+
 
     useEffect(() => {
         if (hasRevealedRef.current) return;
@@ -76,15 +78,23 @@ export default function SecretPage({ params }: { params: { id: string } }) {
         }
     }, [secret?.fileType, secret?.fileUrl, imageLoaded]);
 
-    const handleTimerComplete = () => {
-        if (videoRef.current) {
-            videoRef.current.pause();
-            videoRef.current.src = "";
-            videoRef.current.load();
-        }
-        setShowVideo(false);
-        setSecret(null);
-    };
+   const handleTimerComplete = async () => {
+    if (videoRef.current) {
+        videoRef.current.pause();
+        videoRef.current.src = "";
+        videoRef.current.load();
+    }
+    setShowVideo(false);
+    setSecret(null);
+
+    // ✅ Call backend to mark it as expired
+    try {
+        await expireSecret({ secretId: params.id as Id<"secrets"> });
+    } catch (err) {
+        console.error("Failed to mark secret as expired", err);
+    }
+};
+
 
     const handleMediaLoad = () => {
         setIsMediaLoading(false);
@@ -95,22 +105,29 @@ export default function SecretPage({ params }: { params: { id: string } }) {
     };
 
     useEffect(() => {
-        const handleVisibilityChange = () => {
-            if (document.visibilityState === "hidden") {
-                if (videoRef.current) {
-                    videoRef.current.pause();
-                    videoRef.current.src = "";
-                    videoRef.current.load();
-                }
-                setShowVideo(false);
-                setSecret(null);
+    const handleVisibilityChange = async () => {
+        if (document.visibilityState === "hidden") {
+            if (videoRef.current) {
+                videoRef.current.pause();
+                videoRef.current.src = "";
+                videoRef.current.load();
             }
-        };
-        document.addEventListener("visibilitychange", handleVisibilityChange);
-        return () => {
-            document.removeEventListener("visibilitychange", handleVisibilityChange);
-        };
-    }, []);
+            setShowVideo(false);
+            setSecret(null);
+
+            // ✅ Add this: Call backend to mark it as expired
+            try {
+                await expireSecret({ secretId: params.id as Id<"secrets"> });
+            } catch (err) {
+                console.error("Failed to mark secret as expired", err);
+            }
+        }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+}, [expireSecret, params.id]);
 
     useEffect(() => {
         const preventKey = (e: KeyboardEvent) => {
@@ -149,7 +166,9 @@ export default function SecretPage({ params }: { params: { id: string } }) {
     }
 
     // Check if the secret is expired (read but no content)
-    const isExpired = secret.isRead && !secret.fileUrl && !secret.message;
+    const isExpired = secret.expired || (secret.isRead && !secret.message && !secret.fileUrl);
+
+
     
     if (isExpired) {
         return <p>This secret message has expired and is no longer available.</p>;

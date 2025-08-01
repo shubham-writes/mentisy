@@ -31,15 +31,33 @@ export const getMySecrets = query({
     if (!identity) {
       return { page: [], isDone: true, continueCursor: "" };
     }
-    const user = await ctx.db.query("users").withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier)).unique();
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) =>
+        q.eq("tokenIdentifier", identity.tokenIdentifier)
+      )
+      .unique();
+
     if (!user) {
       return { page: [], isDone: true, continueCursor: "" };
     }
-    return await ctx.db
+
+    const { page, isDone, continueCursor } = await ctx.db
       .query("secrets")
       .withIndex("by_author", (q) => q.eq("authorId", user._id))
       .order("desc")
       .paginate(args.paginationOpts);
+
+    // Ensure `expired` is always present on the frontend
+    return {
+      page: page.map((secret) => ({
+        ...secret,
+        expired: secret.expired ?? false,
+      })),
+      isDone,
+      continueCursor,
+    };
   },
 });
 
@@ -145,9 +163,20 @@ export const clearSecretContent = internalMutation({
             message: undefined, 
             fileUrl: undefined, 
             fileType: undefined,
-            isRead: true, // Add this line to mark the secret as read when content is cleared
+            isRead: true,
+             expired: true,
         }); 
     }, 
 });
+
+export const expireSecret = mutation({
+  args: { secretId: v.id("secrets") },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.secretId, {
+      expired: true,
+    });
+  },
+});
+
 export const getUser = internalQuery({ args: { tokenIdentifier: v.string() }, handler: async (ctx, args) => { return await ctx.db.query("users").withIndex("by_token", (q) => q.eq("tokenIdentifier", args.tokenIdentifier)).unique(); }, });
 export const deleteSecretRecord = internalMutation({ args: { secretId: v.id("secrets") }, handler: async (ctx, args) => { await ctx.db.delete(args.secretId); }, });

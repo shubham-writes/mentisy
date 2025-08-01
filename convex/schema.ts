@@ -19,7 +19,8 @@ export default defineSchema({
         fileType: v.optional(v.union(v.literal("image"), v.literal("video"))),
         withWatermark: v.optional(v.boolean()),
         hiddenForSender: v.optional(v.boolean()), 
-         duration: v.optional(v.number()),
+        duration: v.optional(v.number()),
+        expired: v.optional(v.boolean()),
     })
         .index("by_author", ["authorId"])
         .index("by_publicId", ["publicId"]),
