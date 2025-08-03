@@ -4,8 +4,12 @@ import { v } from "convex/values";
 
 export default defineSchema({
     users: defineTable({
-        tokenIdentifier: v.string(), clerkUserId: v.string(), imageUrl: v.string(),
-        email: v.string(), username: v.string(), wallet: v.optional(v.string()),
+        tokenIdentifier: v.string(), 
+        clerkUserId: v.string(), 
+        imageUrl: v.string(),
+        email: v.string(), 
+        username: v.string(), 
+        wallet: v.optional(v.string()),
     }).index("by_token", ["tokenIdentifier"]).index("username", ["username"]),
 
     secrets: defineTable({
@@ -21,6 +25,9 @@ export default defineSchema({
         hiddenForSender: v.optional(v.boolean()), 
         duration: v.optional(v.number()),
         expired: v.optional(v.boolean()),
+        // New analytics fields
+        viewedAt: v.optional(v.number()),
+        
     })
         .index("by_author", ["authorId"])
         .index("by_publicId", ["publicId"]),

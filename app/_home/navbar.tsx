@@ -37,21 +37,12 @@ export const Navbar = () => {
                             </Button>
                         </SignInButton>
                         <SignUpButton mode="modal" fallbackRedirectUrl="/hello" forceRedirectUrl="/hello">
-                            <Button size="sm">
-                                Get Bolt free
-                                <Zap className="h-4 w-4 ml-2" />
-                            </Button>
+                        
                         </SignUpButton>
                     </>
                 )}
                 {isAuthenticated && !isLoading && (
                     <>
-                        <Button asChild>
-                            <Link href="https://github.com/bitcraft3r/bolt-boilerplate-nextjs/" target="_blank" rel="noopener noreferrer">
-                                Get Boilerplate
-                                <GithubIcon className="h-4 w-4 ml-2" />
-                            </Link>
-                        </Button>
                         <UserButton />
                     </>
                 )}
