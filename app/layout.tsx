@@ -10,9 +10,17 @@ import { Footer } from "./_home/footer";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Bolt Boilerplate: Supercharge Your Next.js Projects",
-  description: "Accelerate your web development with Bolt Boilerplate: Next.js framework integrated with Convex for seamless interactions, Clerk for authentication, and Shadcn for stunning UI. Setup in minutes.",
+  title: "Secret Messages - Share Self-Destructing Messages Securely",
+  description: "Create and share self-destructing secret messages and files that disappear after viewing. Secure, private, and easy to use.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_URL!),
+  manifest: "/manifest.json",
+  themeColor: "#000000",
+  applicationName: "Secret Messages",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "SecretMsg",
+  },
   icons: {
     icon: [
       {
@@ -25,8 +33,15 @@ export const metadata: Metadata = {
         url: "/logo-dark.png",
         href: "/logo-dark.png",
       }
-    ]
+    ],
+    apple: [
+      { url: "/icon-152x152.png", sizes: "152x152", type: "image/png" },
+      { url: "/icon-180x180.png", sizes: "180x180", type: "image/png" },
+    ],
   },
+  other: {
+    "mobile-web-app-capable": "yes",
+  }
 };
 
 export default function RootLayout({
@@ -36,6 +51,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Additional PWA meta tags that can't be set via metadata */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="mobile-web-app-capable" content="yes" />
+      </head>
       <body className={inter.className}>
         <ConvexClientProvider>
           <ThemeProvider
