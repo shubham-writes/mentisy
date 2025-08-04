@@ -2,7 +2,7 @@
 
 import { usePaginatedQuery, useMutation, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Check, CheckCheck, Trash2, ShieldX, Clock, Monitor } from "lucide-react";
+import { Check, CheckCheck, Trash2, ShieldX, Clock, Monitor, ChevronDown, ChevronUp } from "lucide-react";
 import { ShareButton } from "./share-button";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -82,116 +82,227 @@ export function MySecretsList() {
     };
 
     return (
-        <div className="w-full max-w-md p-4 border rounded-lg bg-card mt-8">
-            <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold">Your Generated Links</h3>
-                {visibleSecrets.length > 0 && <DialogDeleteAll />}
+        <div className="w-full max-w-4xl mx-auto">
+            {/* Header Section */}
+            <div className="mb-8 text-center">
+                <h3 className="text-4xl font-bold mb-3 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    Your Secret Links
+                </h3>
+                <p className="text-xl text-gray-600 dark:text-gray-300">
+                    Track your moments in the void
+                </p>
             </div>
-      
-            {status === "LoadingFirstPage" && (
-                <p className="text-sm text-muted-foreground text-center">Loading your links...</p>
-            )}
-            
-            <div ref={scrollContainerRef} className="space-y-3 max-h-72 overflow-y-auto pr-2">
-                {visibleSecrets.length === 0 && status !== "LoadingFirstPage" && (
-                    <p className="text-sm text-muted-foreground text-center">You haven&apos;t created any secrets yet.</p>
+
+            <div className="bg-white dark:bg-gray-800 border-0 rounded-3xl p-8 shadow-xl">
+                {/* Header with delete all button */}
+                <div className="flex justify-between items-center mb-8">
+                    <div className="flex items-center space-x-3">
+                        <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center">
+                            <span className="text-xl">🔗</span>
+                        </div>
+                        <div>
+                            <h4 className="text-2xl font-bold text-gray-800 dark:text-gray-200">Your Links</h4>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                                {visibleSecrets.length} {visibleSecrets.length === 1 ? 'secret' : 'secrets'} in the wild
+                            </p>
+                        </div>
+                    </div>
+                    {visibleSecrets.length > 0 && <DialogDeleteAll />}
+                </div>
+
+                {/* Loading State */}
+                {status === "LoadingFirstPage" && (
+                    <div className="text-center py-16">
+                        <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                        </div>
+                        <p className="text-lg text-gray-600 dark:text-gray-400">Loading your secrets...</p>
+                    </div>
                 )}
-                {visibleSecrets.map((secret) => {
-                    const link = `${window.location.origin}/redirect/${secret.publicId}`;
-                    const isExpired = secret.expired === true || (secret.isRead && !secret.message && !secret.fileUrl);
-                    const isExpanded = expandedSecrets.has(secret._id);
-                    const hasAnalytics = secret.isRead && secret.viewedAt;
-
-                    return (
-                        <div key={secret._id} className="p-3 bg-muted rounded-md text-left">
-                            <div className="flex justify-between items-start">
-                                <div className="flex-1">
-                                    <p className="text-sm font-medium">To: {secret.recipientName || "Anyone"}</p>
-                                    <p className="text-xs text-muted-foreground italic">Note: {secret.publicNote || "No note"}</p>
-                                    <p className="text-xs text-muted-foreground">Created {dayjs(secret._creationTime).fromNow()}</p>
-                                    
-                                    {/* Analytics preview - Only shows time and device */}
-                                    {hasAnalytics && (
-                                        <div className="flex items-center gap-2 mt-1">
-                                            <TooltipProvider>
-                                                <Tooltip>
-                                                    <TooltipTrigger>
-                                                        <div className="flex items-center gap-1 text-xs text-green-600">
-                                                            <Clock className="h-3 w-3" />
-                                                            {dayjs(secret.viewedAt).format("MMM D, h:mm A")}
-                                                        </div>
-                                                    </TooltipTrigger>
-                                                    <TooltipContent>
-                                                        <p>Viewed on {dayjs(secret.viewedAt).format("MMMM D, YYYY [at] h:mm A")}</p>
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
-                                            
-                                           
-                                        </div>
-                                    )}
-                                </div>
-                                
-                                <div className="flex items-center gap-x-2">
-                                    {isExpired ? ( 
-                                        <span className="text-xs font-semibold text-red-500">EXPIRED</span> 
-                                    ) : ( 
-                                        secret.isRead ? ( 
-                                            <CheckCheck className="h-5 w-5 text-blue-500" /> 
-                                        ) : ( 
-                                            <Check className="h-5 w-5 text-gray-400" /> 
-                                        )
-                                    )}
-                                    
-                                    <Button 
-                                        variant="ghost" 
-                                        size="icon" 
-                                        className="h-6 w-6" 
-                                        onClick={() => hideSecret({ secretId: secret._id as Id<"secrets"> })}
-                                    >
-                                        <Trash2 className="h-4 w-4 text-muted-foreground" />
-                                    </Button>
-                                </div>
+                
+                {/* Scrollable Secrets List */}
+                <div ref={scrollContainerRef} className="space-y-4 max-h-96 overflow-y-auto pr-2">
+                    {/* Empty State */}
+                    {visibleSecrets.length === 0 && status !== "LoadingFirstPage" && (
+                        <div className="text-center py-16">
+                            <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                                <span className="text-3xl">🤷‍♀️</span>
                             </div>
+                            <h5 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">
+                                No secrets yet
+                            </h5>
+                            <p className="text-gray-600 dark:text-gray-400">
+                                Create your first secret above to get started!
+                            </p>
+                        </div>
+                    )}
 
-                            {/* Analytics Details - Collapsible (Privacy Compliant) */}
-                            {hasAnalytics && (
-                                <Collapsible open={isExpanded} onOpenChange={() => toggleExpanded(secret._id)}>
-                                    <CollapsibleTrigger asChild>
-                                        <Button variant="ghost" size="sm" className="h-6 p-0 text-xs text-muted-foreground hover:text-foreground mt-2">
-                                            {isExpanded ? "Hide" : "Show"} Analytics Details
-                                        </Button>
-                                    </CollapsibleTrigger>
-                                    <CollapsibleContent className="mt-2 p-2 bg-background rounded border text-xs space-y-2">
-                                        <div className="grid grid-cols-1 gap-2">
-                                            {secret.viewedAt && (
-                                                <div className="flex items-center gap-2">
-                                                    <Clock className="h-3 w-3 text-muted-foreground" />
-                                                    <span className="font-medium">Viewed:</span>
-                                                   <span>{dayjs(secret.viewedAt).format("MMMM D, YYYY")} at {dayjs(secret.viewedAt).format("h:mm:ss A")}</span>
+                    {/* Secret Items */}
+                    {visibleSecrets.map((secret) => {
+                        const link = `${window.location.origin}/redirect/${secret.publicId}`;
+                        const isExpired = secret.expired === true || (secret.isRead && !secret.message && !secret.fileUrl);
+                        const isExpanded = expandedSecrets.has(secret._id);
+                        const hasAnalytics = secret.isRead && secret.viewedAt;
 
+                        return (
+                            <div key={secret._id} className="group">
+                                <div className="bg-gradient-to-br from-gray-50 to-purple-50/30 dark:from-gray-800 dark:to-purple-900/10 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 hover:shadow-lg transition-all duration-200">
+                                    {/* Main Content Row */}
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div className="flex-1 space-y-2">
+                                            {/* Recipient */}
+                                            <div className="flex items-center space-x-2">
+                                                <span className="text-purple-500">👤</span>
+                                                <span className="font-semibold text-gray-800 dark:text-gray-200">
+                                                    To: {secret.recipientName || "Anyone"}
+                                                </span>
+                                            </div>
+                                            
+                                            {/* Public Note */}
+                                            <div className="flex items-center space-x-2">
+                                                <span className="text-purple-500">💭</span>
+                                                <span className="text-sm text-gray-600 dark:text-gray-400 italic">
+                                                    {secret.publicNote || "No teaser message"}
+                                                </span>
+                                            </div>
+                                            
+                                            {/* Creation Time */}
+                                            <div className="flex items-center space-x-2">
+                                                <span className="text-purple-500">📅</span>
+                                                <span className="text-xs text-gray-500 dark:text-gray-500">
+                                                    Created {dayjs(secret._creationTime).fromNow()}
+                                                </span>
+                                            </div>
+                                            
+                                            {/* Analytics Preview */}
+                                            {hasAnalytics && (
+                                                <div className="flex items-center space-x-2">
+                                                    <TooltipProvider>
+                                                        <Tooltip>
+                                                            <TooltipTrigger>
+                                                                <div className="flex items-center space-x-2 px-3 py-1 bg-green-100 dark:bg-green-900/30 rounded-full">
+                                                                    <Clock className="h-3 w-3 text-green-600 dark:text-green-400" />
+                                                                    <span className="text-xs font-medium text-green-700 dark:text-green-300">
+                                                                        Viewed {dayjs(secret.viewedAt).format("MMM D, h:mm A")}
+                                                                    </span>
+                                                                </div>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent>
+                                                                <p>Viewed on {dayjs(secret.viewedAt).format("MMMM D, YYYY [at] h:mm A")}</p>
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                    </TooltipProvider>
                                                 </div>
                                             )}
                                         </div>
-                                    </CollapsibleContent>
-                                </Collapsible>
-                            )}
-                            
-                            {!isExpired && (
-                                <div className="mt-2 flex items-center justify-between">
-                                    <ShareButton title="A Secret Message" text={`${secret.publicNote || ""} ${link}`} url={link} />
+                                        
+                                        {/* Status Icons */}
+                                        <div className="flex items-center space-x-3">
+                                            {isExpired ? (
+                                                <div className="px-3 py-1 bg-red-100 dark:bg-red-900/30 rounded-full">
+                                                    <span className="text-xs font-bold text-red-600 dark:text-red-400">EXPIRED</span>
+                                                </div>
+                                            ) : secret.isRead ? (
+                                                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                                                    <CheckCheck className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                                                </div>
+                                            ) : (
+                                                <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-full">
+                                                    <Check className="h-5 w-5 text-gray-400" />
+                                                </div>
+                                            )}
+                                            
+                                            <Button 
+                                                variant="ghost" 
+                                                size="icon" 
+                                                className="h-9 w-9 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 opacity-0 group-hover:opacity-100 transition-opacity" 
+                                                onClick={() => hideSecret({ secretId: secret._id as Id<"secrets"> })}
+                                            >
+                                                <Trash2 className="h-4 w-4 text-red-500" />
+                                            </Button>
+                                        </div>
+                                    </div>
+
+                                    {/* Analytics Details - Collapsible */}
+                                    {hasAnalytics && (
+                                        <Collapsible open={isExpanded} onOpenChange={() => toggleExpanded(secret._id)}>
+                                            <CollapsibleTrigger asChild>
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="sm" 
+                                                    className="w-full justify-between p-3 h-auto bg-white/50 dark:bg-gray-700/30 hover:bg-white/80 dark:hover:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600 mb-4"
+                                                >
+                                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                        View Analytics Details
+                                                    </span>
+                                                    {isExpanded ? (
+                                                        <ChevronUp className="h-4 w-4 text-gray-500" />
+                                                    ) : (
+                                                        <ChevronDown className="h-4 w-4 text-gray-500" />
+                                                    )}
+                                                </Button>
+                                            </CollapsibleTrigger>
+                                            <CollapsibleContent className="mb-4">
+                                                <div className="bg-white/80 dark:bg-gray-900/50 backdrop-blur-sm rounded-xl p-4 border border-gray-200 dark:border-gray-600">
+                                                    <h6 className="font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center space-x-2">
+                                                        <span>📊</span>
+                                                        <span>Viewing Details</span>
+                                                    </h6>
+                                                    <div className="space-y-3">
+                                                        {secret.viewedAt && (
+                                                            <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                                                <Clock className="h-4 w-4 text-purple-500 flex-shrink-0" />
+                                                                <div>
+                                                                    <span className="font-medium text-gray-700 dark:text-gray-300">Viewed on:</span>
+                                                                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                                                                        {dayjs(secret.viewedAt).format("MMMM D, YYYY")} at {dayjs(secret.viewedAt).format("h:mm:ss A")}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </CollapsibleContent>
+                                        </Collapsible>
+                                    )}
                                     
-                                    {!secret.isRead && (
-                                        <Button variant="destructive" size="sm" onClick={() => expireSecret({ secretId: secret._id as Id<"secrets"> })}>
-                                            <ShieldX className="h-4 w-4 mr-2" /> Expire It!
-                                        </Button>
+                                    {/* Action Buttons */}
+                                    {!isExpired && (
+                                        <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+                                            <ShareButton 
+                                                title="A Secret Message" 
+                                                text={`${secret.publicNote || ""} ${link}`} 
+                                                url={link} 
+                                            />
+                                            
+                                            {!secret.isRead && (
+                                                <Button 
+                                                    variant="destructive" 
+                                                    size="sm" 
+                                                    onClick={() => expireSecret({ secretId: secret._id as Id<"secrets"> })}
+                                                    className="rounded-xl bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 border-0"
+                                                >
+                                                    <ShieldX className="h-4 w-4 mr-2" /> 
+                                                    Expire Now
+                                                </Button>
+                                            )}
+                                        </div>
                                     )}
                                 </div>
-                            )}
+                            </div>
+                        );
+                    })}
+
+                    {/* Loading More Indicator */}
+                    {status === "LoadingMore" && (
+                        <div className="text-center py-8">
+                            <div className="flex items-center justify-center space-x-3 text-purple-600 dark:text-purple-400">
+                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-purple-500"></div>
+                                <span className="font-medium">Loading more secrets...</span>
+                            </div>
                         </div>
-                    );
-                })}
-                {status === "LoadingMore" && <p className="text-sm text-muted-foreground text-center mt-4">Loading more...</p>}
+                    )}
+                </div>
             </div>
         </div>
     );
