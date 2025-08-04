@@ -1,11 +1,10 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { ConvexClientProvider } from "@/components/convex-provider";
 import { Navbar } from "./_home/navbar";
-import { Footer } from "./_home/footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -14,7 +13,7 @@ export const metadata: Metadata = {
   description: "Create and share self-destructing secret messages and files that disappear after viewing. Secure, private, and easy to use.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_URL!),
   manifest: "/manifest.json",
-  themeColor: "#000000",
+  // Remove themeColor from here
   applicationName: "Secret Messages",
   appleWebApp: {
     capable: true,
@@ -44,6 +43,17 @@ export const metadata: Metadata = {
   }
 };
 
+// Add the new viewport export
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" }
+  ],
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -70,7 +80,7 @@ export default function RootLayout({
               <main className="pt-28 pb-6 px-6 sm:px-12 md:px-16">
                 {children}
               </main>
-              <Footer />
+             
             </div>
           </ThemeProvider>
         </ConvexClientProvider>
