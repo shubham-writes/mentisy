@@ -164,7 +164,7 @@ export function SecretForm({ isLandingPage = false }: SecretFormProps) {
                         </div>
                         
                         <div className="space-y-3">
-                            <SignUpButton mode="modal" fallbackRedirectUrl="/hello" forceRedirectUrl="/">
+                            <SignUpButton mode="modal" >
                                 <Button   
                                     size="lg" 
                                     className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 border-0 shadow-lg transform hover:scale-105 transition-all">
@@ -172,7 +172,7 @@ export function SecretForm({ isLandingPage = false }: SecretFormProps) {
                                 </Button>
                             </SignUpButton>
 
-                            <SignInButton mode="modal" fallbackRedirectUrl="/hello" forceRedirectUrl="/hello">
+                            <SignInButton mode="modal" >
                                 <Button 
                                     size="lg"  
                                     variant="outline"
