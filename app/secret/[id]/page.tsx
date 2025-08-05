@@ -166,44 +166,59 @@ export default function SecretPage({ params }: { params: { id: string } }) {
     const renderContent = () => {
         if (secret === undefined) {
             return (
-                <div className="flex flex-col items-center justify-center py-12">
-                    <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-2xl mb-6 animate-pulse">
+                <div className="flex flex-col items-center justify-center py-16">
+                    <div className="w-16 h-16 bg-gradient-to-br from-[#FF75A0] to-[#FFAA70] rounded-full flex items-center justify-center text-2xl mb-6 animate-pulse shadow-lg">
                         🔍
                     </div>
-                    <p className="text-xl text-gray-600 dark:text-gray-300 font-medium">Revealing your secret...</p>
-                    <div className="mt-4 flex items-center space-x-2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-500"></div>
-                        <span className="text-sm text-gray-500">Almost there...</span>
+                    <p className="text-xl text-gray-700 dark:text-gray-200 font-medium mb-2">Revealing your secret...</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Almost there...</p>
+                    <div className="flex items-center space-x-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-[#FF75A0] border-t-transparent"></div>
+                        <span className="text-sm text-gray-500">Loading...</span>
                     </div>
                 </div>
             );
         }
 
-        if (secret === null) {
+        // Check if the secret is expired (read but no content) - this should show "Secret Not Found"
+        if (secret && (secret.expired || (secret.isRead && !secret.message && !secret.fileUrl))) {
             return (
-                
-                <div className="text-center py-12">
-                    <div className="w-20 h-20 bg-gradient-to-br from-gray-400 to-gray-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-6 animate-pulse">
-                        💨
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-600 dark:text-gray-400 mb-3">Vanished Into Thin Air</h3>
-                    <p className="text-gray-500 dark:text-gray-500 text-lg">This secret message has expired and is no longer available.</p>
-                    <p className="text-sm text-gray-400 dark:text-gray-600 mt-2">Some secrets are meant to disappear forever ✨</p>
-                </div>
-            );
-        }
-
-        // Check if the secret is expired (read but no content)
-        const isExpired = secret.expired || (secret.isRead && !secret.message && !secret.fileUrl);
-
-        if (isExpired) {
-            return (
-                <div className="text-center py-12">
-                    <div className="w-16 h-16 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-6">
+                <div className="text-center py-16">
+                    <div className="w-16 h-16 bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900/30 dark:to-red-800/30 rounded-full flex items-center justify-center text-2xl mx-auto mb-6 shadow-lg">
                         ❌
                     </div>
                     <p className="text-xl text-red-600 dark:text-red-400 font-medium mb-2">Secret Not Found</p>
-                    <p className="text-gray-600 dark:text-gray-400">This secret message could not be found or may have already been viewed.</p>
+                    <p className="text-gray-600 dark:text-gray-400 mb-8">This secret message could not be found or may have already been viewed.</p>
+                    
+                    <Button 
+                        asChild
+                        size="lg"
+                        className="bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-[#FF75A0]/90 hover:to-[#FFAA70]/90 text-white font-medium px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 border-0"
+                    >
+                        <Link href="/">✨ Create Your Own Secret</Link>
+                    </Button>
+                </div>
+            );
+        }
+
+        // This shows "Vanished Into Thin Air" when secret is null (expired during viewing)
+        if (secret === null) {
+            return (
+                <div className="text-center py-16">
+                    <div className="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-6 shadow-lg">
+                        💨
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-700 dark:text-gray-200 mb-3">Vanished Into Thin Air</h3>
+                    <p className="text-gray-500 dark:text-gray-400 text-lg mb-2">This secret message has expired and is no longer available.</p>
+                    <p className="text-sm text-gray-400 dark:text-gray-500 mb-8">Some secrets are meant to disappear forever ✨</p>
+                    
+                    <Button 
+                        asChild
+                        size="lg"
+                        className="bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-[#FF75A0]/90 hover:to-[#FFAA70]/90 text-white font-medium px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 border-0"
+                    >
+                        <Link href="/">✨ Create Your Own Secret</Link>
+                    </Button>
                 </div>
             );
         }
@@ -215,7 +230,7 @@ export default function SecretPage({ params }: { params: { id: string } }) {
             <>
                 {showLoadingIndicator && (
                     <div className="flex flex-col items-center justify-center py-16">
-                        <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-3xl mb-6 animate-bounce">
+                        <div className="w-20 h-20 bg-gradient-to-br from-[#FF75A0] to-[#FFAA70] rounded-full flex items-center justify-center text-3xl mb-6 animate-bounce shadow-lg">
                             📦
                         </div>
                         <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">
@@ -224,9 +239,9 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                         <p className="text-gray-600 dark:text-gray-400 mb-6">
                             {Math.floor(bufferedPercent)}% loaded
                         </p>
-                        <div className="w-64 bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
+                        <div className="w-64 bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden shadow-inner">
                             <div
-                                className="bg-gradient-to-r from-purple-500 to-pink-500 h-3 rounded-full transition-all duration-300 ease-out"
+                                className="bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] h-3 rounded-full transition-all duration-300 ease-out shadow-sm"
                                 style={{ width: `${bufferedPercent}%` }}
                             ></div>
                         </div>
@@ -235,8 +250,8 @@ export default function SecretPage({ params }: { params: { id: string } }) {
 
                 <div style={{ visibility: showLoadingIndicator ? "hidden" : "visible" }}>
                     {secret.fileType === "image" && secret.fileUrl && (
-                        <div className="relative w-full max-w-2xl mx-auto mb-8 rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 p-6">
-                            <div className="relative w-full h-96 rounded-2xl overflow-hidden">
+                        <div className="relative w-full max-w-lg mx-auto mb-8 rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 p-4">
+                            <div className="relative w-full h-80 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700">
                                 <Image
                                     src={secureFileUrl}
                                     alt="Secret Image"
@@ -248,7 +263,7 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                                         setIsMediaLoading(false);
                                     }}
                                     priority
-                                    className="rounded-2xl"
+                                    className="rounded-xl"
                                 />
                                 {secret.withWatermark && (
                                     <Watermark name={secret.recipientName} ip={receiverIp ?? undefined} />
@@ -258,29 +273,30 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                     )}
 
                     {secret.fileType === "video" && secret.fileUrl && (
-                        <div className="w-full max-w-3xl mx-auto mb-8">
-                            <div className="mb-4 p-4 bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 border border-red-200 dark:border-red-800 rounded-2xl">
+                        <div className="w-full max-w-2xl mx-auto mb-8">
+                            <div className="mb-4 p-4 bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 border border-red-200/50 dark:border-red-700/50 rounded-xl">
                                 <div className="flex items-center space-x-3">
                                     <span className="text-2xl">⚠️</span>
                                     <div>
-                                        <p className="font-semibold text-red-800 dark:text-red-200 mb-1">
+                                        <p className="font-semibold text-red-800 dark:text-red-300 mb-1">
                                             One-Time View Only
                                         </p>
-                                        <p className="text-sm text-red-700 dark:text-red-300">
+                                        <p className="text-sm text-red-700 dark:text-red-400">
                                             You cannot pause, replay, or download. Stay focused and watch carefully!
                                         </p>
                                     </div>
                                 </div>
                             </div>
                             
-                            <div className="relative bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-3xl p-6 shadow-2xl">
+                            <div className="relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-4 shadow-xl">
                                 {showVideo && (
                                     <video
                                         ref={videoRef}
                                         src={secureFileUrl}
                                         playsInline
                                         preload="auto"
-                                        className="w-full rounded-2xl pointer-events-none shadow-lg"
+                                        className="w-full max-h-96 rounded-xl pointer-events-none shadow-lg bg-black"
+                                        style={{ objectFit: "contain" }}
                                         onContextMenu={(e) => e.preventDefault()}
                                         onLoadedMetadata={(e) => {
                                             const video = e.currentTarget;
@@ -309,18 +325,18 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                                     <Watermark name={secret.recipientName} ip={receiverIp ?? undefined} animated={true} />
                                 )}
 
-                                <div className="flex items-center justify-between gap-4 mt-6 p-4 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl border border-purple-200 dark:border-purple-800">
+                                <div className="flex items-center justify-between gap-4 mt-4 p-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl border border-gray-200/50 dark:border-gray-700/50 shadow-sm">
                                     {!hasStarted && (
                                         <Button
                                             onClick={handleUserPlay}
                                             size="lg"
-                                            className="h-12 px-8 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 border-0 shadow-lg transform hover:scale-105 transition-all rounded-2xl"
+                                            className="h-12 px-8 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 border-0 shadow-lg transform hover:scale-105 transition-all rounded-xl text-white font-medium"
                                         >
                                             ▶️ Start Watching
                                         </Button>
                                     )}
                                     <div className="flex items-center gap-3">
-                                        <label htmlFor="volume" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                        <label htmlFor="volume" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                             🔊 Volume
                                         </label>
                                         <input
@@ -335,7 +351,7 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                                                     videoRef.current.volume = parseFloat(e.target.value);
                                                 }
                                             }}
-                                            className="w-32 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                                            className="w-32 h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
                                         />
                                     </div>
                                 </div>
@@ -344,11 +360,11 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                     )}
 
                     {secret.message && (
-                        <div className="max-w-2xl mx-auto mb-8 p-8 bg-gradient-to-br from-gray-50 to-purple-50 dark:from-gray-800 dark:to-purple-900/20 rounded-3xl border border-gray-200 dark:border-gray-700 shadow-xl">
+                        <div className="max-w-xl mx-auto mb-8 p-8 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl">
                             <div className="text-center mb-4">
                                 <span className="text-3xl">💌</span>
                             </div>
-                            <blockquote className="text-xl sm:text-2xl font-medium text-gray-800 dark:text-gray-200 text-center leading-relaxed">
+                            <blockquote className="text-lg sm:text-xl font-medium text-gray-800 dark:text-gray-200 text-center leading-relaxed">
                                 &ldquo;{secret.message}&rdquo;
                             </blockquote>
                         </div>
@@ -380,26 +396,26 @@ export default function SecretPage({ params }: { params: { id: string } }) {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-purple-900/10 dark:via-pink-900/10 dark:to-orange-900/10 flex flex-col items-center justify-center py-8 px-4">
-            <div className="w-full max-w-5xl mx-auto">
+        <div className="min-h-screen bg-gradient-to-br from-[#FF75A0]/5 via-white to-[#FFAA70]/5 dark:from-[#FF75A0]/10 dark:via-gray-950 dark:to-[#FFAA70]/10 flex flex-col items-center justify-center py-8 px-4">
+            <div className="w-full max-w-4xl mx-auto">
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-6 shadow-lg">
+                    <div className="w-16 h-16 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] rounded-full flex items-center justify-center text-2xl mx-auto mb-6 shadow-lg">
                         🎁
                     </div>
-                    <h1 className="text-4xl sm:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    <h1 className="text-3xl sm:text-4xl font-bold mb-4 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] bg-clip-text text-transparent">
                         {getHeading()}
                     </h1>
-                    {secret?.publicNote && (
-                        <p className="text-xl text-gray-600 dark:text-gray-300 font-medium">
+                    {secret && !secret.expired && !(secret.isRead && !secret.message && !secret.fileUrl) && secret.publicNote && (
+                        <p className="text-lg text-gray-600 dark:text-gray-300 font-medium max-w-2xl mx-auto">
                             {secret.publicNote}
                         </p>
                     )}
                 </div>
 
                 {/* Content */}
-                <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border-0 overflow-hidden">
-                    <div className="p-8 sm:p-12">
+                <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 dark:border-gray-800/20 overflow-hidden">
+                    <div className="p-6 sm:p-8">
                         {renderContent()}
                     </div>
                 </div>
@@ -416,7 +432,7 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                             asChild
                             size="lg"
                             variant="outline"
-                            className="h-14 px-8 border-2 border-purple-200 dark:border-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-2xl transition-all hover:scale-105"
+                            className="h-12 px-8 border-2 border-[#FF75A0]/30 dark:border-[#FF75A0]/50 hover:bg-[#FF75A0]/10 dark:hover:bg-[#FF75A0]/20 rounded-xl transition-all hover:scale-105 text-gray-700 dark:text-gray-300 hover:text-[#FF75A0] dark:hover:text-[#FF75A0]"
                         >
                             <Link href="/">✨ Create Your Own Secret</Link>
                         </Button>

@@ -60,7 +60,7 @@ export const Navbar = () => {
                                 <SignUpButton mode="modal" fallbackRedirectUrl="/hello" forceRedirectUrl="/hello">
                                     <Button 
                                         size="sm"
-                                        className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 border-0 shadow-lg transform hover:scale-105 transition-all duration-200 px-6"
+                                        className="rounded-full bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-purple-600 hover:to-pink-600 border-0 shadow-lg transform hover:scale-105 transition-all duration-200 px-6"
                                     >
                                         <Sparkles className="w-4 h-4 mr-2" />
                                         Get Started
