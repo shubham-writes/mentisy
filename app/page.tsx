@@ -18,7 +18,7 @@ import FaqSection from "./_sections/FaqSection";
 import LivePreview from "./_sections/LivePreview";
 import FinalCta from "./_sections/FinalCta";
 import UseCasesSection from "./_sections/UseCasesSection";
-
+import AuthenticatedDashboard from "./_sections/AuthenticatedDashboard";
 
 export default function Home() {
   const [userCount, setUserCount] = useState(12300);
@@ -71,7 +71,7 @@ export default function Home() {
 
       <Authenticated>
         
-        
+        <AuthenticatedDashboard />
         <Footer />
       </Authenticated>
     </div>
