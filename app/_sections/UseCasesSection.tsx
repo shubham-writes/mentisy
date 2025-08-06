@@ -1,4 +1,4 @@
-// components/sections/UseCasesSection.tsx
+// app/_sections/UseCasesSection.tsx
 "use client";
 
 import { useState } from "react";
@@ -7,7 +7,7 @@ import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { GraduationCap, Heart, Dumbbell, Smile, Briefcase, MessageCircle, Users, ChevronRight } from "lucide-react";
 
-export default function UseCasesSection() {
+const UseCasesSection = () => {
   const [activeUseCase, setActiveUseCase] = useState(0);
   const { isSignedIn } = useAuth();
   const router = useRouter();
@@ -15,7 +15,7 @@ export default function UseCasesSection() {
   const handleUseCaseAction = (useCaseTitle: string) => {
     if (isSignedIn) {
       // If user is signed in, redirect to hello page with use case context
-      router.push(`/hello?useCase=${encodeURIComponent(useCaseTitle.toLowerCase().replace(' ', '-'))}`);
+      router.push(`/hello?useCase=${encodeURIComponent(useCaseTitle.toLowerCase().replace(/\s+/g, '-'))}`);
     }
     // If not signed in, the SignUpButton will handle the auth flow
   };
@@ -218,8 +218,7 @@ export default function UseCasesSection() {
                   ) : (
                     <SignUpButton 
                       mode="modal"
-                      signInFallbackRedirectUrl={`/hello?useCase=${encodeURIComponent(useCases[activeUseCase].title.toLowerCase().replace(' ', '-'))}`}
-                      
+                      signInFallbackRedirectUrl={`/hello?useCase=${encodeURIComponent(useCases[activeUseCase].title.toLowerCase().replace(/\s+/g, '-'))}`}
                     >
                       <button className={`inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r ${useCases[activeUseCase].gradient} text-white font-medium rounded-xl hover:shadow-lg transition-all duration-200 hover:scale-105`}>
                         Try for {useCases[activeUseCase].title}
@@ -255,4 +254,6 @@ export default function UseCasesSection() {
       </div>
     </div>
   );
-}
+};
+
+export default UseCasesSection;

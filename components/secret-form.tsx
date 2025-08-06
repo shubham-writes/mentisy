@@ -8,6 +8,10 @@ import { Button } from "@/components/ui/button";
 import { FilePreview } from "./file-preview";
 
 // Import our new components
+import { PersonalizedHeader } from "./personalized-header";
+import { UseCaseTips } from "./use-case-tips";
+import { useCaseTemplates } from "./use-case-templates";
+
 import { SignupModal } from "./formComponents/signup-modal";
 import { FileUploadArea } from "./formComponents/file-upload-area";
 import { FormFields } from "./formComponents/form-fields";
@@ -18,9 +22,12 @@ import { GeneratedLinkDisplay } from "./formComponents/generated-link-display";
 
 interface SecretFormProps {
     isLandingPage?: boolean;
+    useCase?: string;
 }
 
-export function SecretForm({ isLandingPage = false }: SecretFormProps) {
+export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) {
+    console.log("SecretForm rendered with:", { isLandingPage, useCase });
+    
     const [message, setMessage] = useState("");
     const [recipientName, setRecipientName] = useState("");
     const [publicNote, setPublicNote] = useState("");
@@ -31,16 +38,46 @@ export function SecretForm({ isLandingPage = false }: SecretFormProps) {
     const [addWatermark, setAddWatermark] = useState(true);
     const [duration, setDuration] = useState("10");
     const [showSignupPrompt, setShowSignupPrompt] = useState(false);
+    const [showTips, setShowTips] = useState(false);
+    const [templateApplied, setTemplateApplied] = useState(false);
     
     const createSecret = useMutation(api.secrets.create);
     const { signIn } = useSignIn();
     const { signUp } = useSignUp();
 
-    // Restore form data from localStorage on authenticated page
+    // Pre-fill form with use case template - FIRST PRIORITY
     useEffect(() => {
-        if (!isLandingPage) {
+        console.log("Template useEffect triggered with useCase:", useCase);
+        
+        if (useCase && useCaseTemplates[useCase as keyof typeof useCaseTemplates] && !templateApplied) {
+            const template = useCaseTemplates[useCase as keyof typeof useCaseTemplates];
+            
+            console.log("Applying template:", template);
+            
+            // Always apply template when use case is provided
+            setRecipientName(template.recipientName);
+            setPublicNote(template.publicNote);
+            setMessage(template.message);
+            setDuration(template.duration);
+            setAddWatermark(template.addWatermark);
+            setTemplateApplied(true);
+            
+            // Show tips for the use case
+            setShowTips(true);
+            
+            console.log("Template applied successfully");
+        }
+    }, [useCase, templateApplied]);
+
+    // Restore form data from localStorage ONLY if no use case
+    useEffect(() => {
+        console.log("LocalStorage useEffect triggered:", { isLandingPage, useCase, templateApplied });
+        
+        if (!isLandingPage && !useCase && !templateApplied) {
             const savedData = localStorage.getItem('secretFormData');
             if (savedData) {
+                console.log("Restoring from localStorage:", savedData);
+                
                 const data = JSON.parse(savedData);
                 setMessage(data.message || "");
                 setRecipientName(data.recipientName || "");
@@ -53,7 +90,12 @@ export function SecretForm({ isLandingPage = false }: SecretFormProps) {
                 localStorage.removeItem('secretFormData');
             }
         }
-    }, [isLandingPage]);
+        // If there's a use case, clear any saved data without restoring it
+        else if (!isLandingPage && useCase) {
+            console.log("Clearing localStorage due to useCase");
+            localStorage.removeItem('secretFormData');
+        }
+    }, [isLandingPage, useCase, templateApplied]);
 
     const saveFormData = () => {
         const formData = {
@@ -144,19 +186,20 @@ export function SecretForm({ isLandingPage = false }: SecretFormProps) {
         addWatermark
     };
 
+    console.log("Current form state:", { recipientName, publicNote, message, useCase, templateApplied });
+
     return (
         <div className="w-full max-w-6xl mx-auto">
-            <div className="mb-8 text-center">
-                <h3 className="text-3xl font-bold mb-3 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] bg-clip-text text-transparent">
-                    Share Your Moment
-                </h3>
-                <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
-                    {isLandingPage 
-                        ? "Configure your secret below — then create an account to actually send it!" 
-                        : "Upload something real, write something honest, set it free"
-                    }
-                </p>
-            </div>
+            <PersonalizedHeader useCase={useCase} isLandingPage={isLandingPage} />
+
+            {/* Use Case Tips */}
+            <UseCaseTips 
+                useCase={useCase}
+                isVisible={showTips}
+                onClose={() => setShowTips(false)}
+            />
+
+          
 
             {/* Responsive Layout */}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
@@ -203,6 +246,7 @@ export function SecretForm({ isLandingPage = false }: SecretFormProps) {
                             onRecipientNameChange={setRecipientName}
                             onPublicNoteChange={setPublicNote}
                             onMessageChange={setMessage}
+                            useCase={useCase}
                         />
 
                         {/* Timer Settings */}

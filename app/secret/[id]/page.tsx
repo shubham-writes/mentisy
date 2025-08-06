@@ -21,6 +21,7 @@ export default function SecretPage({ params }: { params: { id: string } }) {
     const [showVideo, setShowVideo] = useState(true);
     const [imageLoaded, setImageLoaded] = useState(false);
     const [receiverIp, setReceiverIp] = useState<string | null>(null);
+    const [hasExpiredDuringViewing, setHasExpiredDuringViewing] = useState(false);
 
     const videoRef = useRef<HTMLVideoElement | null>(null);
     const hasRevealedRef = useRef(false);
@@ -91,7 +92,7 @@ export default function SecretPage({ params }: { params: { id: string } }) {
             videoRef.current.load();
         }
         setShowVideo(false);
-        setSecret(null);
+        setHasExpiredDuringViewing(true); // Mark as expired during viewing
 
         // Call backend to mark it as expired
         try {
@@ -118,7 +119,7 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                     videoRef.current.load();
                 }
                 setShowVideo(false);
-                setSecret(null);
+                setHasExpiredDuringViewing(true); // Mark as expired during viewing
 
                 // Call backend to mark it as expired
                 try {
@@ -163,6 +164,21 @@ export default function SecretPage({ params }: { params: { id: string } }) {
         video.play();
     };
 
+    const isSecretExpiredOrAlreadyViewed = (secret: Doc<"secrets"> | null) => {
+        if (!secret) return true;
+        
+        // Check if it's explicitly expired
+        if (secret.expired) return true;
+        
+        // Check if it's been read and has no content (already consumed)
+        if (secret.isRead && !secret.message && !secret.fileUrl) return true;
+        
+        // For videos specifically, if it's been read, it should be expired
+        if (secret.fileType === "video" && secret.isRead) return true;
+        
+        return false;
+    };
+
     const renderContent = () => {
         if (secret === undefined) {
             return (
@@ -180,8 +196,8 @@ export default function SecretPage({ params }: { params: { id: string } }) {
             );
         }
 
-        // Check if the secret is expired (read but no content) - this should show "Secret Not Found"
-        if (secret && (secret.expired || (secret.isRead && !secret.message && !secret.fileUrl))) {
+        // Check if the secret is expired or already viewed (this should show "Secret Not Found")
+        if (secret === null || isSecretExpiredOrAlreadyViewed(secret)) {
             return (
                 <div className="text-center py-16">
                     <div className="w-16 h-16 bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900/30 dark:to-red-800/30 rounded-full flex items-center justify-center text-2xl mx-auto mb-6 shadow-lg">
@@ -201,8 +217,8 @@ export default function SecretPage({ params }: { params: { id: string } }) {
             );
         }
 
-        // This shows "Vanished Into Thin Air" when secret is null (expired during viewing)
-        if (secret === null) {
+        // This shows "Vanished Into Thin Air" ONLY when secret expired during viewing
+        if (hasExpiredDuringViewing) {
             return (
                 <div className="text-center py-16">
                     <div className="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-6 shadow-lg">
@@ -389,11 +405,19 @@ export default function SecretPage({ params }: { params: { id: string } }) {
     };
 
     const getHeading = () => {
-        if (secret && secret.recipientName) {
-            return `A Secret Message For ${secret.recipientName}`;
-        }
-        return "A Secret Message For You";
-    };
+    // Don't show name if secret is expired, not found, or expired during viewing
+    if (secret === null || 
+        secret === undefined || 
+        hasExpiredDuringViewing || 
+        isSecretExpiredOrAlreadyViewed(secret)) {
+        return "Secret Message";
+    }
+    
+    if (secret && secret.recipientName) {
+        return `A Secret Message For ${secret.recipientName}`;
+    }
+    return "A Secret Message For You";
+};
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-[#FF75A0]/5 via-white to-[#FFAA70]/5 dark:from-[#FF75A0]/10 dark:via-gray-950 dark:to-[#FFAA70]/10 flex flex-col items-center justify-center py-8 px-4">
@@ -406,11 +430,7 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                     <h1 className="text-3xl sm:text-4xl font-bold mb-4 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] bg-clip-text text-transparent">
                         {getHeading()}
                     </h1>
-                    {secret && !secret.expired && !(secret.isRead && !secret.message && !secret.fileUrl) && secret.publicNote && (
-                        <p className="text-lg text-gray-600 dark:text-gray-300 font-medium max-w-2xl mx-auto">
-                            {secret.publicNote}
-                        </p>
-                    )}
+                   
                 </div>
 
                 {/* Content */}
@@ -421,21 +441,10 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                 </div>
 
                 {/* Actions */}
-                {secret && !secret.expired && (
+                {secret && !isSecretExpiredOrAlreadyViewed(secret) && !hasExpiredDuringViewing && (
                     <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-2xl mx-auto">
-                        <ShareButton
-                            title="A Secret Message"
-                            text={secret.publicNote || "Someone sent you a secret message!"}
-                            url={window.location.href}
-                        />
-                        <Button 
-                            asChild
-                            size="lg"
-                            variant="outline"
-                            className="h-12 px-8 border-2 border-[#FF75A0]/30 dark:border-[#FF75A0]/50 hover:bg-[#FF75A0]/10 dark:hover:bg-[#FF75A0]/20 rounded-xl transition-all hover:scale-105 text-gray-700 dark:text-gray-300 hover:text-[#FF75A0] dark:hover:text-[#FF75A0]"
-                        >
-                            <Link href="/">✨ Create Your Own Secret</Link>
-                        </Button>
+                        
+                        
                     </div>
                 )}
             </div>

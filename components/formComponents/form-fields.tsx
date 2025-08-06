@@ -1,5 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useCaseTemplates } from '../use-case-templates';
 
 interface FormFieldsProps {
     recipientName: string;
@@ -8,6 +9,7 @@ interface FormFieldsProps {
     onRecipientNameChange: (value: string) => void;
     onPublicNoteChange: (value: string) => void;
     onMessageChange: (value: string) => void;
+    useCase?: string;
 }
 
 export function FormFields({ 
@@ -16,8 +18,11 @@ export function FormFields({
     message, 
     onRecipientNameChange, 
     onPublicNoteChange, 
-    onMessageChange 
+    onMessageChange,
+    useCase 
 }: FormFieldsProps) {
+    const template = useCase ? useCaseTemplates[useCase as keyof typeof useCaseTemplates] : null;
+    
     return (
         <div className="space-y-8">
             <div>
@@ -26,7 +31,7 @@ export function FormFields({
                 </Label>
                 <Input
                     id="recipient"
-                    placeholder="Their name, their vibe, whatever..."
+                    placeholder={template?.placeholder.recipient || "Their name, their vibe, whatever..."}
                     value={recipientName}
                     onChange={(e) => onRecipientNameChange(e.target.value)}
                     className="h-14 text-base rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-[#FF75A0] dark:focus:border-[#FF75A0] focus:ring-[#FF75A0] px-4"
@@ -39,7 +44,7 @@ export function FormFields({
                 </Label>
                 <Input
                     id="public-note"
-                    placeholder="'you're not ready for this...' or whatever fits the vibe"
+                    placeholder={template?.placeholder.publicNote || "'you're not ready for this...' or whatever fits the vibe"}
                     value={publicNote}
                     onChange={(e) => onPublicNoteChange(e.target.value)}
                     className="h-14 text-base rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-[#FF75A0] dark:focus:border-[#FF75A0] focus:ring-[#FF75A0] px-4"
@@ -52,7 +57,7 @@ export function FormFields({
                 </Label>
                 <Input
                     id="secret-message"
-                    placeholder="That thing you've been wanting to say..."
+                    placeholder={template?.placeholder.message || "That thing you've been wanting to say..."}
                     value={message}
                     onChange={(e) => onMessageChange(e.target.value)}
                     className="h-14 text-base rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-[#FF75A0] dark:focus:border-[#FF75A0] focus:ring-[#FF75A0] px-4"

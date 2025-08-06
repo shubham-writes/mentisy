@@ -3,31 +3,34 @@
 import { SecretForm } from "@/components/secret-form";
 import { MySecretsList } from "@/components/my-secrets-list";
 import { Authenticated, Unauthenticated } from "convex/react";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, Suspense } from "react";
+import { useAuth } from "@clerk/nextjs";
 
-export default function HelloPage() {
+function HelloPageContent() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const useCase = searchParams.get('useCase');
+    const { isSignedIn, isLoaded } = useAuth();
 
-    // Auto-redirect unauthenticated users after a short delay
+    // Only redirect unauthenticated users after auth has loaded
     useEffect(() => {
-        const timer = setTimeout(() => {
-            // This will only run if the user is still on this page after 2 seconds
-            // and is unauthenticated (meaning the Authenticated component didn't render)
-            const isAuthenticated = document.querySelector('[data-authenticated]');
-            if (!isAuthenticated) {
+        if (!isLoaded) return; // Wait for auth to load
+        
+        if (!isSignedIn) {
+            const timer = setTimeout(() => {
                 router.push('/');
-            }
-        }, 2000);
-
-        return () => clearTimeout(timer);
-    }, [router]);
+            }, 2000);
+            
+            return () => clearTimeout(timer);
+        }
+    }, [router, isSignedIn, isLoaded]);
 
     return (
         <div className="flex flex-col items-center justify-start text-center gap-y-8 flex-1">
             <Authenticated>
                 <div data-authenticated="true">
-                    <SecretForm />
+                    <SecretForm useCase={useCase || undefined} />
                     <MySecretsList />
                 </div>
             </Authenticated>
@@ -48,5 +51,18 @@ export default function HelloPage() {
                 </div>
             </Unauthenticated>
         </div>
+    );
+}
+
+export default function HelloPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex flex-col items-center justify-center gap-y-4 mb-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                <p>Loading...</p>
+            </div>
+        }>
+            <HelloPageContent />
+        </Suspense>
     );
 }
