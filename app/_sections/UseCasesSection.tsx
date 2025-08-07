@@ -37,7 +37,7 @@ const UseCasesSection = () => {
       id: "personal",
       title: "Personal Moments",
       icon: Heart,
-      description: "Sharing intimate videos with my partner safely. One view only, then it's gone forever.",
+      description: "Sending special videos to my partner—just once, and then they disappear.",
       popularWith: "Couples, close friends, family",
       color: "pink",
       gradient: "from-pink-500 to-rose-500",
@@ -232,25 +232,7 @@ const UseCasesSection = () => {
           </div>
         </div>
 
-        {/* Bottom Stats */}
-        <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6">
-          <div className="text-center p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-            <div className="text-2xl font-bold text-gray-900 dark:text-white mb-1">45%</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Students</div>
-          </div>
-          <div className="text-center p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-            <div className="text-2xl font-bold text-gray-900 dark:text-white mb-1">28%</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Couples</div>
-          </div>
-          <div className="text-center p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-            <div className="text-2xl font-bold text-gray-900 dark:text-white mb-1">18%</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Professionals</div>
-          </div>
-          <div className="text-center p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-            <div className="text-2xl font-bold text-gray-900 dark:text-white mb-1">9%</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Others</div>
-          </div>
-        </div>
+       
       </div>
     </div>
   );

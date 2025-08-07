@@ -38,7 +38,7 @@ export function PersonalizedHeader({ useCase, isLandingPage }: PersonalizedHeade
     if (isLandingPage) {
         return (
             <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold mb-4 text-gray-800 dark:text-white">
+                <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
                     Create Your Secret Link
                 </h2>
                 <p className="text-lg text-gray-600 dark:text-gray-400">

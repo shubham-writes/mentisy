@@ -22,7 +22,7 @@ export default function AuthenticatedDashboard() {
           </div>
           
           {/* Compact form for authenticated users */}
-          <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6 mb-6 shadow-sm">
+          <div className="bg-white dark:bg-black rounded-xl border border-gray-200 dark:border-gray-800 p-6 mb-6 shadow-sm">
             <SecretForm isLandingPage={false} />
           </div>
           

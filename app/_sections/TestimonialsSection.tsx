@@ -23,7 +23,7 @@ export default function TestimonialsSection() {
     <div className="px-6 py-16">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Why Thousands Are Using OnlyForYou</h2>
+          <h2 className="text-3xl font-bold mb-4">What Early Users Are Saying</h2>
           <p className="text-xl text-gray-600 dark:text-gray-400">Real stories from real users</p>
         </div>
         
@@ -45,33 +45,7 @@ export default function TestimonialsSection() {
           ))}
         </div>
         
-        {/* Feature Highlights */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12">
-          <div className="text-center">
-            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <Lock className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-            </div>
-            <h4 className="font-semibold text-sm">🔐 One-Time View</h4>
-          </div>
-          <div className="text-center">
-            <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <Shield className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-            </div>
-            <h4 className="font-semibold text-sm">🧊 Watermark Protection</h4>
-          </div>
-          <div className="text-center">
-            <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <Timer className="w-6 h-6 text-red-600 dark:text-red-400" />
-            </div>
-            <h4 className="font-semibold text-sm">📉 Auto Delete</h4>
-          </div>
-          <div className="text-center">
-            <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <Zap className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
-            </div>
-            <h4 className="font-semibold text-sm">🌍 Works Anywhere</h4>
-          </div>
-        </div>
+        
       </div>
     </div>
   );

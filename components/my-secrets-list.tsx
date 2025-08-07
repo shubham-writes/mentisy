@@ -93,7 +93,7 @@ export function MySecretsList() {
                 </p>
             </div>
 
-            <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-8 shadow-sm">
+            <div className="bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-xl p-8 shadow-sm">
                 {/* Header with delete all button */}
                 <div className="flex justify-between items-center mb-8">
                     <div className="flex items-center space-x-3">

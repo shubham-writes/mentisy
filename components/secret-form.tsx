@@ -245,7 +245,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
             />
 
             {/* Main Form Container */}
-            <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/20 dark:border-gray-800/20 overflow-hidden">
+            <div className="bg-white/80 dark:bg-gray-900/50 dark:border backdrop-blur-sm rounded-3xl shadow-2xl border border-white/20 dark:border-gray-800 overflow-hidden">
                 <div className="p-6 sm:p-8 lg:p-10">
                     
                     {/* Landing Page Notice */}

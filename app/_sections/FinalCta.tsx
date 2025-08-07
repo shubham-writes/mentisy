@@ -10,10 +10,10 @@ interface FinalCtaProps {
 
 export default function FinalCta({ userCount }: FinalCtaProps) {
   return (
-    <div className="px-6 py-16">
+    <div className="px-6 py-16 bg-gray-50 dark:bg-gray-900/50">
       <div className="max-w-lg mx-auto text-center">
         <div className="space-y-6">
-          <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto">
+          <div className="w-16 h-16 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] rounded-2xl flex items-center justify-center mx-auto">
             <Heart className="w-8 h-8 text-white" />
           </div>
           <h3 className="text-3xl font-bold">Ready to share authentically?</h3>
@@ -24,7 +24,7 @@ export default function FinalCta({ userCount }: FinalCtaProps) {
           <div className="pt-4">
             <SignUpButton mode="modal">
               <button className="inline-flex items-center gap-2 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] text-white font-medium py-4 px-8 rounded-xl hover:shadow-lg hover:shadow-[#FF75A0]/25 transition-all duration-200 hover:scale-105 text-lg">
-                🎉 Start Your #JustOneView Challenge
+                🎉 Share Your First #JustOneView Moment
                 <ArrowRight className="w-5 h-5" />
               </button>
             </SignUpButton>

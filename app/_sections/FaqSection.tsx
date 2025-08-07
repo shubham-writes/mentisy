@@ -22,7 +22,7 @@ export default function FaqSection() {
     },
     {
       question: "Do I need an app?",
-      answer: "No! OnlyForYou works directly in your browser. Just share the link through any messaging app."
+      answer: "No app required. OnlyForYou works directly in your browser and is optimized as a Progressive Web App (PWA) — meaning you can add it to your home screen like a native app."
     },
     {
       question: "Can I delete the file before they view it?",
@@ -31,7 +31,7 @@ export default function FaqSection() {
   ];
 
   return (
-    <div className="px-6 py-16 bg-gray-50 dark:bg-gray-900/50">
+    <div className="px-6 py-16 bg-white dark:bg-gray-900/50">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4">Frequently Asked Questions</h2>
