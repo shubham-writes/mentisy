@@ -34,7 +34,7 @@ export function FormFields({
                     placeholder={template?.placeholder.recipient || "Their name, their vibe, whatever..."}
                     value={recipientName}
                     onChange={(e) => onRecipientNameChange(e.target.value)}
-                    className="h-14 text-base rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-[#FF75A0] dark:focus:border-[#FF75A0] focus:ring-[#FF75A0] px-4"
+                    className="h-14 text-base rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-[#FF75A0] dark:focus:border-[#FF75A0] focus:ring-[#FF75A0] focus:outline-none px-4"
                 />
             </div>
 
@@ -47,7 +47,7 @@ export function FormFields({
                     placeholder={template?.placeholder.publicNote || "'you're not ready for this...' or whatever fits the vibe"}
                     value={publicNote}
                     onChange={(e) => onPublicNoteChange(e.target.value)}
-                    className="h-14 text-base rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-[#FF75A0] dark:focus:border-[#FF75A0] focus:ring-[#FF75A0] px-4"
+                    className="h-14 text-base rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-[#FF75A0] dark:focus:border-[#FF75A0] focus:ring-[#FF75A0] focus:outline-none px-4"
                 />
             </div>
 
@@ -60,7 +60,7 @@ export function FormFields({
                     placeholder={template?.placeholder.message || "That thing you've been wanting to say..."}
                     value={message}
                     onChange={(e) => onMessageChange(e.target.value)}
-                    className="h-14 text-base rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-[#FF75A0] dark:focus:border-[#FF75A0] focus:ring-[#FF75A0] px-4"
+                    className="h-14 text-base rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-[#FF75A0] dark:focus:border-[#FF75A0] focus:ring-[#FF75A0] focus:outline-none px-4"
                 />
             </div>
         </div>

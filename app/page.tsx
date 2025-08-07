@@ -44,7 +44,7 @@ export default function Home() {
         
         {/* Streamlined Form Section */}
         <div className="px-6 pb-16">
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-7xl mx-auto">
             <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm p-6">
               <div className="mb-4">
                 <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
@@ -56,6 +56,27 @@ export default function Home() {
             </div>
           </div>
         </div>
+        {/* Trust Indicators */}
+            <div className="mt-12 text-center">
+              <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-gray-500 dark:text-gray-400">
+                <div className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                  <span>SSL Encrypted</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                  <span>Auto-Delete</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                  <span>Zero Logs</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
+                  <span>One-Time View</span>
+                </div>
+              </div>
+            </div>
 
         <PricingSection />
         <FeaturesComparison />

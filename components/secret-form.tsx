@@ -45,6 +45,13 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     const { signIn } = useSignIn();
     const { signUp } = useSignUp();
 
+    // Clear generated link when user starts creating a new secret
+    const clearGeneratedLink = () => {
+        if (generatedLink) {
+            setGeneratedLink("");
+        }
+    };
+
     // Pre-fill form with use case template - FIRST PRIORITY
     useEffect(() => {
         console.log("Template useEffect triggered with useCase:", useCase);
@@ -53,6 +60,9 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
             const template = useCaseTemplates[useCase as keyof typeof useCaseTemplates];
             
             console.log("Applying template:", template);
+            
+            // Clear any existing generated link when applying template
+            clearGeneratedLink();
             
             // Always apply template when use case is provided
             setRecipientName(template.recipientName);
@@ -67,7 +77,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
             
             console.log("Template applied successfully");
         }
-    }, [useCase, templateApplied]);
+    }, [useCase, templateApplied, generatedLink]);
 
     // Restore form data from localStorage ONLY if no use case
     useEffect(() => {
@@ -77,6 +87,9 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
             const savedData = localStorage.getItem('secretFormData');
             if (savedData) {
                 console.log("Restoring from localStorage:", savedData);
+                
+                // Clear any existing generated link when restoring form data
+                clearGeneratedLink();
                 
                 const data = JSON.parse(savedData);
                 setMessage(data.message || "");
@@ -95,7 +108,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
             console.log("Clearing localStorage due to useCase");
             localStorage.removeItem('secretFormData');
         }
-    }, [isLandingPage, useCase, templateApplied]);
+    }, [isLandingPage, useCase, templateApplied, generatedLink]);
 
     const saveFormData = () => {
         const formData = {
@@ -145,6 +158,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                 setGeneratedLink(link);
             }
 
+            // Clear the form for next secret
             setMessage("");
             setUploadedFile(null);
         } catch (error) {
@@ -155,18 +169,49 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
         }
     };
 
+    // Enhanced form field handlers that clear generated link
+    const handleMessageChange = (value: string) => {
+        if (value !== message && generatedLink) {
+            clearGeneratedLink();
+        }
+        setMessage(value);
+    };
+
+    const handleRecipientNameChange = (value: string) => {
+        if (value !== recipientName && generatedLink) {
+            clearGeneratedLink();
+        }
+        setRecipientName(value);
+    };
+
+    const handlePublicNoteChange = (value: string) => {
+        if (value !== publicNote && generatedLink) {
+            clearGeneratedLink();
+        }
+        setPublicNote(value);
+    };
+
+    const handleFileUpload = (file: { url: string; type: "image" | "video" }) => {
+        clearGeneratedLink(); // Clear link when new file is uploaded
+        setUploadedFile(file);
+        setIsUploading(false);
+    };
+
+    const handleFileRemove = () => {
+        clearGeneratedLink(); // Clear link when file is removed
+        setUploadedFile(null);
+    };
+
     // Upload handlers
     const handleImageUploadComplete = (res: any) => {
         if (res) {
-            setUploadedFile({ url: res[0].url, type: "image" });
-            setIsUploading(false);
+            handleFileUpload({ url: res[0].url, type: "image" });
         }
     };
 
     const handleVideoUploadComplete = (res: any) => {
         if (res) {
-            setUploadedFile({ url: res[0].url, type: "video" });
-            setIsUploading(false);
+            handleFileUpload({ url: res[0].url, type: "video" });
         }
     };
 
@@ -189,7 +234,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     console.log("Current form state:", { recipientName, publicNote, message, useCase, templateApplied });
 
     return (
-        <div className="w-full max-w-6xl mx-auto">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <PersonalizedHeader useCase={useCase} isLandingPage={isLandingPage} />
 
             {/* Use Case Tips */}
@@ -199,85 +244,95 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                 onClose={() => setShowTips(false)}
             />
 
-          
+            {/* Main Form Container */}
+            <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/20 dark:border-gray-800/20 overflow-hidden">
+                <div className="p-6 sm:p-8 lg:p-10">
+                    
+                    {/* Landing Page Notice */}
+                    {isLandingPage && <LandingPageNotice />}
 
-            {/* Responsive Layout */}
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                
-                {/* File Preview Section */}
-                <div className={`${uploadedFile ? 'xl:order-1' : 'xl:col-span-2'} space-y-6`}>
-                    {uploadedFile ? (
-                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-[#FF75A0]/20 dark:border-[#FF75A0]/30 shadow-xl">
-                            <FilePreview 
-                                file={uploadedFile} 
-                                onRemove={() => setUploadedFile(null)}
-                                recipientName={recipientName}
-                                showWatermark={addWatermark}
-                            />
+                    {/* Two Column Layout - Desktop */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+                        
+                        {/* Left Column - File Upload & Watermark */}
+                        <div className="space-y-8">
+                            {/* File Upload Area or Preview */}
+                            {uploadedFile ? (
+                                <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 border border-[#FF75A0]/20 dark:border-[#FF75A0]/30 shadow-lg">
+                                    <FilePreview 
+                                        file={uploadedFile} 
+                                        onRemove={handleFileRemove}
+                                        recipientName={recipientName}
+                                        showWatermark={addWatermark}
+                                    />
+                                </div>
+                            ) : (
+                                <FileUploadArea
+                                    isLandingPage={isLandingPage}
+                                    isUploading={isUploading}
+                                    onSaveFormData={saveFormData}
+                                    onShowSignupPrompt={() => setShowSignupPrompt(true)}
+                                    onImageUploadBegin={() => setIsUploading(true)}
+                                    onImageUploadComplete={handleImageUploadComplete}
+                                    onImageUploadError={handleUploadError}
+                                    onVideoUploadBegin={() => setIsUploading(true)}
+                                    onVideoUploadComplete={handleVideoUploadComplete}
+                                    onVideoUploadError={handleUploadError}
+                                />
+                            )}
+
+                            {/* Watermark Settings */}
+                            <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
+                                <WatermarkSettings
+                                    addWatermark={addWatermark}
+                                    onWatermarkChange={setAddWatermark}
+                                />
+                            </div>
                         </div>
-                    ) : (
-                        <FileUploadArea
-                            isLandingPage={isLandingPage}
-                            isUploading={isUploading}
-                            onSaveFormData={saveFormData}
-                            onShowSignupPrompt={() => setShowSignupPrompt(true)}
-                            onImageUploadBegin={() => setIsUploading(true)}
-                            onImageUploadComplete={handleImageUploadComplete}
-                            onImageUploadError={handleUploadError}
-                            onVideoUploadBegin={() => setIsUploading(true)}
-                            onVideoUploadComplete={handleVideoUploadComplete}
-                            onVideoUploadError={handleUploadError}
-                        />
-                    )}
-                </div>
 
-                {/* Form Section */}
-                <div className={`${uploadedFile ? 'xl:order-2' : 'xl:col-span-2 max-w-2xl mx-auto'} space-y-8`}>
-                    <div className="bg-white dark:bg-gray-800 border-0 rounded-xl p-8 shadow-xl">
-                        
-                        {/* Landing Page Notice */}
-                        {isLandingPage && <LandingPageNotice />}
-                        
-                        {/* Form Fields */}
-                        <FormFields
-                            recipientName={recipientName}
-                            publicNote={publicNote}
-                            message={message}
-                            onRecipientNameChange={setRecipientName}
-                            onPublicNoteChange={setPublicNote}
-                            onMessageChange={setMessage}
-                            useCase={useCase}
-                        />
+                        {/* Right Column - Form Fields & Timer */}
+                        <div className="space-y-8">
+                            {/* Form Fields */}
+                            <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
+                                <FormFields
+                                    recipientName={recipientName}
+                                    publicNote={publicNote}
+                                    message={message}
+                                    onRecipientNameChange={handleRecipientNameChange}
+                                    onPublicNoteChange={handlePublicNoteChange}
+                                    onMessageChange={handleMessageChange}
+                                    useCase={useCase}
+                                />
+                            </div>
 
-                        {/* Timer Settings */}
-                        <TimerSettings
-                            duration={duration}
-                            onDurationChange={setDuration}
-                            isTimerDisabled={isTimerDisabled}
-                        />
+                            {/* Timer Settings */}
+                            <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
+                                <TimerSettings
+                                    duration={duration}
+                                    onDurationChange={setDuration}
+                                    isTimerDisabled={isTimerDisabled}
+                                />
+                            </div>
+                        </div>
+                    </div>
 
-                        {/* Watermark Settings */}
-                        <WatermarkSettings
-                            addWatermark={addWatermark}
-                            onWatermarkChange={setAddWatermark}
-                        />
-
-                        {/* Generate Button */}
+                    {/* Generate Button - Full Width Center */}
+                    <div className="mt-12 flex justify-center">
                         <Button 
                             onClick={handleGenerate} 
                             disabled={isLoading || isUploading} 
-                            className="w-full mt-10 h-16 text-lg font-semibold rounded-xl bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-[#e65a85] hover:to-[#e6955a] border-0 shadow-xl transform hover:scale-105 transition-all"
+                            className="w-full max-w-md h-16 text-lg font-bold rounded-2xl bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-[#e65a85] hover:to-[#e6955a] border-0 shadow-2xl transform hover:scale-105 transition-all duration-200"
                             size="lg"
                             type="button"
                         >
                             {isUploading ? (
                                 <>
-                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mr-3"></div>
                                     Your moment is uploading...
                                 </>
                             ) : isLoading ? (
                                 <>
-                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mr-3"></div>
                                     Creating your secret link...
                                 </>
                             ) : isLandingPage ? (
@@ -287,16 +342,18 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                             )}
                         </Button>
                     </div>
-
-                    {/* Generated Link Section */}
-                    {!isLandingPage && generatedLink && (
-                        <GeneratedLinkDisplay
-                            generatedLink={generatedLink}
-                            publicNote={publicNote}
-                        />
-                    )}
                 </div>
             </div>
+
+            {/* Generated Link Section - Below Main Container */}
+            {!isLandingPage && generatedLink && (
+                <div className="mt-8">
+                    <GeneratedLinkDisplay
+                        generatedLink={generatedLink}
+                        publicNote={publicNote}
+                    />
+                </div>
+            )}
 
             {/* Signup Modal */}
             <SignupModal
