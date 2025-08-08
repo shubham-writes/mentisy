@@ -234,31 +234,32 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     console.log("Current form state:", { recipientName, publicNote, message, useCase, templateApplied });
 
     return (
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
             <PersonalizedHeader useCase={useCase} isLandingPage={isLandingPage} />
 
-            {/* Use Case Tips */}
+            {/* Use Case Tips - Mobile Optimized */}
             <UseCaseTips 
                 useCase={useCase}
                 isVisible={showTips}
                 onClose={() => setShowTips(false)}
             />
 
-            {/* Main Form Container */}
-            <div className="bg-white/80 dark:bg-gray-900/50 dark:border backdrop-blur-sm rounded-3xl shadow-2xl border border-white/20 dark:border-gray-800 overflow-hidden">
-                <div className="p-6 sm:p-8 lg:p-10">
+            {/* Main Form Container - Mobile First Responsive */}
+            <div className="bg-white/80 dark:bg-gray-900/50 dark:border backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-xl sm:shadow-2xl border border-white/20 dark:border-gray-800 overflow-hidden">
+                <div className="p-4 sm:p-6 md:p-8 lg:p-10">
                     
                     {/* Landing Page Notice */}
                     {isLandingPage && <LandingPageNotice />}
 
-                    {/* Two Column Layout - Desktop */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+                    {/* Mobile: Single Column Layout, Desktop: Two Column Layout */}
+                    <div className="space-y-6 sm:space-y-8 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-8 xl:gap-12">
                         
-                        {/* Left Column - File Upload & Watermark */}
-                        <div className="space-y-8">
+                        {/* Mobile: File Upload First (Most Important Action), Desktop: Left Column */}
+                        <div className="space-y-4 sm:space-y-6 lg:space-y-8 order-1 lg:order-1">
+                            
                             {/* File Upload Area or Preview */}
                             {uploadedFile ? (
-                                <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 border border-[#FF75A0]/20 dark:border-[#FF75A0]/30 shadow-lg">
+                                <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-[#FF75A0]/20 dark:border-[#FF75A0]/30 shadow-lg">
                                     <FilePreview 
                                         file={uploadedFile} 
                                         onRemove={handleFileRemove}
@@ -281,8 +282,8 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                 />
                             )}
 
-                            {/* Watermark Settings */}
-                            <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
+                            {/* Watermark Settings - Mobile: Compact Layout */}
+                            <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
                                 <WatermarkSettings
                                     addWatermark={addWatermark}
                                     onWatermarkChange={setAddWatermark}
@@ -290,10 +291,11 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                             </div>
                         </div>
 
-                        {/* Right Column - Form Fields & Timer */}
-                        <div className="space-y-8">
-                            {/* Form Fields */}
-                            <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
+                        {/* Mobile: Form Fields Second, Desktop: Right Column */}
+                        <div className="space-y-4 sm:space-y-6 lg:space-y-8 order-2 lg:order-2">
+                            
+                            {/* Form Fields - Mobile: Optimized Input Sizes */}
+                            <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
                                 <FormFields
                                     recipientName={recipientName}
                                     publicNote={publicNote}
@@ -305,8 +307,8 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                 />
                             </div>
 
-                            {/* Timer Settings */}
-                            <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
+                            {/* Timer Settings - Mobile: Touch Optimized */}
+                            <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
                                 <TimerSettings
                                     duration={duration}
                                     onDurationChange={setDuration}
@@ -316,38 +318,69 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                         </div>
                     </div>
 
-                    {/* Generate Button - Full Width Center */}
-                    <div className="mt-12 flex justify-center">
-                        <Button 
-                            onClick={handleGenerate} 
-                            disabled={isLoading || isUploading} 
-                            className="w-full max-w-md h-16 text-lg font-bold rounded-2xl bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-[#e65a85] hover:to-[#e6955a] border-0 shadow-2xl transform hover:scale-105 transition-all duration-200"
-                            size="lg"
-                            type="button"
-                        >
-                            {isUploading ? (
-                                <>
-                                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mr-3"></div>
-                                    Your moment is uploading...
-                                </>
-                            ) : isLoading ? (
-                                <>
-                                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mr-3"></div>
-                                    Creating your secret link...
-                                </>
-                            ) : isLandingPage ? (
-                                "🚀 Create Account & Send This Secret"
-                            ) : (
-                                "✨ Generate Secret Link"
-                            )}
-                        </Button>
+                    {/* Generate Button - Mobile: Fixed Bottom Area, Desktop: Center */}
+                    {/* Mobile: Sticky bottom button for easy thumb reach */}
+                    <div className="mt-6 sm:mt-8 lg:mt-12">
+                        {/* Mobile: Full width bottom button */}
+                        <div className="sm:hidden">
+                            <Button 
+                                onClick={handleGenerate} 
+                                disabled={isLoading || isUploading} 
+                                className="w-full h-14 text-base font-bold rounded-xl bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-[#e65a85] hover:to-[#e6955a] border-0 shadow-xl transform active:scale-98 transition-all duration-150"
+                                size="lg"
+                                type="button"
+                            >
+                                {isUploading ? (
+                                    <>
+                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                                        Uploading...
+                                    </>
+                                ) : isLoading ? (
+                                    <>
+                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                                        Creating...
+                                    </>
+                                ) : isLandingPage ? (
+                                    "🚀 Create Account & Send"
+                                ) : (
+                                    "✨ Generate Secret Link"
+                                )}
+                            </Button>
+                        </div>
+                        
+                        {/* Tablet and Desktop: Centered button */}
+                        <div className="hidden sm:flex sm:justify-center">
+                            <Button 
+                                onClick={handleGenerate} 
+                                disabled={isLoading || isUploading} 
+                                className="w-full max-w-md h-14 sm:h-16 text-base sm:text-lg font-bold rounded-xl sm:rounded-2xl bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-[#e65a85] hover:to-[#e6955a] border-0 shadow-xl sm:shadow-2xl transform hover:scale-105 active:scale-98 transition-all duration-200"
+                                size="lg"
+                                type="button"
+                            >
+                                {isUploading ? (
+                                    <>
+                                        <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-white mr-2 sm:mr-3"></div>
+                                        Your moment is uploading...
+                                    </>
+                                ) : isLoading ? (
+                                    <>
+                                        <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-white mr-2 sm:mr-3"></div>
+                                        Creating your secret link...
+                                    </>
+                                ) : isLandingPage ? (
+                                    "🚀 Create Account & Send This Secret"
+                                ) : (
+                                    "✨ Generate Secret Link"
+                                )}
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* Generated Link Section - Below Main Container */}
+            {/* Generated Link Section - Mobile: Full Width Card, Desktop: Below Main Container */}
             {!isLandingPage && generatedLink && (
-                <div className="mt-8">
+                <div className="mt-4 sm:mt-6 lg:mt-8">
                     <GeneratedLinkDisplay
                         generatedLink={generatedLink}
                         publicNote={publicNote}

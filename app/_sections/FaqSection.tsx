@@ -31,26 +31,26 @@ export default function FaqSection() {
   ];
 
   return (
-    <div className="px-6 py-16 bg-white dark:bg-gray-900/50">
+    <div className="px-4 sm:px-6 py-12 sm:py-16 bg-white dark:bg-gray-900/50">
       <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Frequently Asked Questions</h2>
-          <p className="text-xl text-gray-600 dark:text-gray-400">Everything you need to know</p>
+        <div className="text-center mb-8 sm:mb-12">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">Frequently Asked Questions</h2>
+          <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400">Everything you need to know</p>
         </div>
         
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {faqData.map((faq, index) => (
-            <div key={index} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+            <div key={index} className="bg-white dark:bg-gray-900 rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-700">
               <button
-                className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors"
+                className="w-full px-4 sm:px-6 py-4 text-left flex items-start sm:items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg sm:rounded-xl transition-colors touch-manipulation"
                 onClick={() => setExpandedFaq(expandedFaq === index ? null : index)}
               >
-                <span className="font-medium text-gray-900 dark:text-white">{faq.question}</span>
-                <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${expandedFaq === index ? 'rotate-180' : ''}`} />
+                <span className="font-medium text-gray-900 dark:text-white text-sm sm:text-base pr-4 leading-relaxed">{faq.question}</span>
+                <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform flex-shrink-0 mt-0.5 sm:mt-0 ${expandedFaq === index ? 'rotate-180' : ''}`} />
               </button>
               {expandedFaq === index && (
-                <div className="px-6 pb-4">
-                  <p className="text-gray-600 dark:text-gray-400">{faq.answer}</p>
+                <div className="px-4 sm:px-6 pb-4">
+                  <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base leading-relaxed">{faq.answer}</p>
                 </div>
               )}
             </div>

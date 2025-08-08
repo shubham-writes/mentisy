@@ -45,7 +45,7 @@ export default function Home() {
         {/* Streamlined Form Section */}
         <div className="pb-16">
           <div className="max-w-7xl mx-auto">
-            <div className="bg-white dark:bg-black  shadow-sm p-20">
+            <div className="bg-white dark:bg-black  shadow-sm">
               <div className="mb-4">
                 <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
                   Try it now
