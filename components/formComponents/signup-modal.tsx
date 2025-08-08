@@ -24,7 +24,7 @@ export function SignupModal({ isVisible, onClose, formData }: SignupModalProps) 
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-end justify-center pb-2 bg-white/30 backdrop-blur-md">
+        <div className="fixed inset-0 z-50 flex items-end justify-center pb-2 bg-white/10 backdrop-blur-lg">
             <div className="w-full max-w-xl mx-4">
                 <Card className="border-0 bg-gradient-to-br from-[#FF75A0]/5 to-[#FFAA70]/5 dark:from-[#FF75A0]/10 dark:to-[#FFAA70]/10 shadow-2xl">
                     <CardHeader className="text-center pb-4">

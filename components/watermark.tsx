@@ -3,82 +3,72 @@
 interface WatermarkProps {
   name?: string;
   ip?: string;
-  animated?: boolean; // Add the 'animated' prop
+  animated?: boolean;
+  mode?: "image" | "video"; // 👈 new prop
 }
 
-export function Watermark({ name, ip, animated = false }: WatermarkProps) {
-  const watermarkText = `For ${name || 'user'} from IP: ${ip || '...'} • `;
-  const repeatedText = Array(10).fill(watermarkText).join('');
+export function Watermark({
+  name,
+  ip,
+  animated = false,
+  mode = "video",
+}: WatermarkProps) {
+  const watermarkText = `${name || "user"} ; IP: ${ip || "..."} • `;
+  const repeatedText = Array(20).fill(watermarkText).join("");
 
-  // Conditionally set the animation style
-  const animationStyle = animated 
-    ? { animation: 'scrollWatermark 40s linear infinite' }
+  const animationStyle = animated
+    ? { animation: "scrollWatermark 40s linear infinite" }
     : {};
-    
   const reverseAnimationStyle = animated
-    ? { animation: 'scrollWatermark 40s linear infinite reverse' }
+    ? { animation: "scrollWatermark 40s linear infinite reverse" }
     : {};
+
+  // Number of lines & vertical gap based on mode
+  const numLines = mode === "image" ? 3 : 3;
+  const lineGap = mode === "image" ? 32 : 35;
+
+  const lines = Array.from({ length: numLines }, (_, i) => {
+    const top = `${i * lineGap}%`;
+    const isEven = i % 2 === 0;
+
+    // ✅ For images: wider lines + staggered positioning
+    const width = mode === "image" ? "120%" : "140%";
+    const translateX =
+      mode === "image"
+        ? isEven
+          ? "translateX(-30%)"
+          : "translateX(-70%)"
+        : "translateX(-25%)";
+
+    return (
+      <div
+        key={i}
+        className="absolute"
+        style={{
+          top,
+          width,
+          transform: `rotate(-25deg) ${translateX}`,
+        }}
+      >
+        <div
+          className="whitespace-nowrap opacity-25"
+          style={{
+            color: "white",
+            fontSize: "1rem",
+            fontWeight: "bold",
+            textShadow: "0 0 5px rgba(0,0,0,0.8)",
+            ...(isEven ? animationStyle : reverseAnimationStyle),
+          }}
+        >
+          {repeatedText}
+        </div>
+      </div>
+    );
+  });
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
-      
-      {/* Line 1 */}
-      <div 
-        className="absolute" 
-        style={{ top: '20%', width: '200%', transform: 'rotate(-25deg) translateX(-25%)' }}
-      >
-        <div
-          className="whitespace-nowrap opacity-25"
-          style={{
-            color: 'white',
-            fontSize: '2rem',
-            fontWeight: 'bold',
-            textShadow: '0 0 5px rgba(0,0,0,0.8)',
-            ...animationStyle // Apply conditional animation
-          }}
-        >
-          {repeatedText}
-        </div>
-      </div>
-      
-      {/* Line 2 */}
-      <div 
-        className="absolute" 
-        style={{ top: '50%', width: '200%', transform: 'rotate(-25deg) translateX(-25%)' }}
-      >
-        <div
-          className="whitespace-nowrap opacity-25"
-          style={{
-            color: 'white',
-            fontSize: '2rem',
-            fontWeight: 'bold',
-            textShadow: '0 0 5px rgba(0,0,0,0.8)',
-            ...reverseAnimationStyle // Apply conditional animation
-          }}
-        >
-          {repeatedText}
-        </div>
-      </div>
-      
-      {/* Line 3 */}
-      <div 
-        className="absolute" 
-        style={{ top: '80%', width: '200%', transform: 'rotate(-25deg) translateX(-25%)' }}
-      >
-        <div
-          className="whitespace-nowrap opacity-25"
-          style={{
-            color: 'white',
-            fontSize: '2rem',
-            fontWeight: 'bold',
-            textShadow: '0 0 5px rgba(0,0,0,0.8)',
-            ...animationStyle // Apply conditional animation
-          }}
-        >
-          {repeatedText}
-        </div>
-      </div>
-
+      {lines}
     </div>
   );
 }

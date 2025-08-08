@@ -22,12 +22,33 @@ export default function SecretPage({ params }: { params: { id: string } }) {
     const [imageLoaded, setImageLoaded] = useState(false);
     const [receiverIp, setReceiverIp] = useState<string | null>(null);
     const [hasExpiredDuringViewing, setHasExpiredDuringViewing] = useState(false);
+    const [videoRenderedSize, setVideoRenderedSize] = useState({ width: 0, height: 0 });
+    const [isVideoSized, setIsVideoSized] = useState(false);
 
     const videoRef = useRef<HTMLVideoElement | null>(null);
     const hasRevealedRef = useRef(false);
 
     const revealSecret = useMutation(api.secrets.readAndReveal);
     const expireSecret = useMutation(api.secrets.expireSecret);
+
+    const [videoBox, setVideoBox] = useState({ width: 0, height: 0, top: 0, left: 0 });
+
+const updateVideoBox = () => {
+  if (videoRef.current) {
+    const rect = videoRef.current.getBoundingClientRect();
+    // position relative to the wrapper
+    const wrapperRect = videoRef.current.parentElement?.getBoundingClientRect();
+    if (wrapperRect) {
+      setVideoBox({
+        width: rect.width,
+        height: rect.height,
+        top: rect.top - wrapperRect.top,
+        left: rect.left - wrapperRect.left
+      });
+    }
+  }
+};
+
 
     useEffect(() => {
         if (hasRevealedRef.current) return;
@@ -108,6 +129,15 @@ export default function SecretPage({ params }: { params: { id: string } }) {
             setImageLoaded(true);
             setBufferedPercent(100);
         }
+    };
+
+    const handleVideoSizeCalculation = (video: HTMLVideoElement) => {
+        // Use a small delay to ensure the video is fully rendered
+        setTimeout(() => {
+            const rect = video.getBoundingClientRect();
+            setVideoRenderedSize({ width: rect.width, height: rect.height });
+            setIsVideoSized(true);
+        }, 100);
     };
 
     useEffect(() => {
@@ -304,74 +334,91 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                                 </div>
                             </div>
                             
-                            <div className="relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-4 shadow-xl">
-                                {showVideo && (
-                                    <video
-                                        ref={videoRef}
-                                        src={secureFileUrl}
-                                        playsInline
-                                        preload="auto"
-                                        className="w-full max-h-96 rounded-xl pointer-events-none shadow-lg bg-black"
-                                        style={{ objectFit: "contain" }}
-                                        onContextMenu={(e) => e.preventDefault()}
-                                        onLoadedMetadata={(e) => {
-                                            const video = e.currentTarget;
-                                            const handleFullyBuffered = () => {
-                                                handleMediaLoad();
-                                                setDuration(Math.ceil(video.duration));
-                                                video.removeEventListener("canplaythrough", handleFullyBuffered);
-                                            };
-                                            video.addEventListener("canplaythrough", handleFullyBuffered);
-                                        }}
-                                        onProgress={(e) => {
-                                            const video = e.currentTarget;
-                                            if (video.buffered.length > 0) {
-                                                const bufferedEnd = video.buffered.end(video.buffered.length - 1);
-                                                const duration = video.duration;
-                                                if (duration > 0) {
-                                                    const percent = Math.min((bufferedEnd / duration) * 100, 100);
-                                                    setBufferedPercent(percent);
-                                                }
-                                            }
-                                        }}
-                                        onEnded={handleTimerComplete}
-                                    />
-                                )}
-                                {secret.withWatermark && (
-                                    <Watermark name={secret.recipientName} ip={receiverIp ?? undefined} animated={true} />
-                                )}
+                            {/* --- video area (replace the old block) --- */}
+<div className="relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-4 shadow-xl">
+  {/* inner wrapper: no extra padding, this will be the reference for the watermark */}
+  <div className="relative w-full max-w-full rounded-xl overflow-hidden">
+    {/* video centered inside the wrapper — the wrapper itself clips overflow */}
+    {showVideo && (
+      <video
+        ref={videoRef}
+        src={secureFileUrl}
+        playsInline
+        preload="auto"
+        className="w-full max-h-96 rounded-xl pointer-events-none shadow-lg bg-black block"
+        style={{ objectFit: "contain" }}
+        onContextMenu={(e) => e.preventDefault()}
+        onLoadedMetadata={(e) => {
+          const video = e.currentTarget;
+          const handleFullyBuffered = () => {
+            handleMediaLoad();
+            setDuration(Math.ceil(video.duration));
+            video.removeEventListener("canplaythrough", handleFullyBuffered);
+          };
+          video.addEventListener("canplaythrough", handleFullyBuffered);
+          // (removed handleVideoSizeCalculation — not needed with this wrapper)
+        }}
+        onProgress={(e) => {
+          const video = e.currentTarget;
+          if (video.buffered.length > 0) {
+            const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+            const duration = video.duration;
+            if (duration > 0) {
+              const percent = Math.min((bufferedEnd / duration) * 100, 100);
+              setBufferedPercent(percent);
+            }
+          }
+        }}
+        onEnded={handleTimerComplete}
+      />
+    )}
 
-                                <div className="flex items-center justify-between gap-4 mt-4 p-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl border border-gray-200/50 dark:border-gray-700/50 shadow-sm">
-                                    {!hasStarted && (
-                                        <Button
-                                            onClick={handleUserPlay}
-                                            size="lg"
-                                            className="h-12 px-8 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 border-0 shadow-lg transform hover:scale-105 transition-all rounded-xl text-white font-medium"
-                                        >
-                                            ▶️ Start Watching
-                                        </Button>
-                                    )}
-                                    <div className="flex items-center gap-3">
-                                        <label htmlFor="volume" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                            🔊 Volume
-                                        </label>
-                                        <input
-                                            id="volume"
-                                            type="range"
-                                            min="0"
-                                            max="1"
-                                            step="0.05"
-                                            defaultValue="1"
-                                            onChange={(e) => {
-                                                if (videoRef.current) {
-                                                    videoRef.current.volume = parseFloat(e.target.value);
-                                                }
-                                            }}
-                                            className="w-32 h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
+    {/* watermark overlay — now inset-0 inside the exact same wrapper as the video */}
+    {secret.withWatermark && (
+      <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-xl">
+        <Watermark
+          name={secret.recipientName}
+          ip={receiverIp ?? undefined}
+          animated={true}
+          mode="video"
+        />
+      </div>
+    )}
+  </div>
+
+  {/* controls panel (unchanged) */}
+  <div className="flex items-center justify-between gap-4 mt-4 p-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl border border-gray-200/50 dark:border-gray-700/50 shadow-sm">
+    {!hasStarted && (
+      <Button
+        onClick={handleUserPlay}
+        size="lg"
+        className="h-12 px-8 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 border-0 shadow-lg transform hover:scale-105 transition-all rounded-xl text-white font-medium"
+      >
+        ▶️ Start Watching
+      </Button>
+    )}
+    <div className="flex items-center gap-3">
+      <label htmlFor="volume" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+        🔊 Volume
+      </label>
+      <input
+        id="volume"
+        type="range"
+        min="0"
+        max="1"
+        step="0.05"
+        defaultValue="1"
+        onChange={(e) => {
+          if (videoRef.current) {
+            videoRef.current.volume = parseFloat(e.target.value);
+          }
+        }}
+        className="w-32 h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
+      />
+    </div>
+  </div>
+</div>
+
                         </div>
                     )}
 

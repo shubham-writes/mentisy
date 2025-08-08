@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Button } from "./ui/button";
 import { X, FileImage, Play } from "lucide-react";
 import { Watermark } from "./watermark";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 interface FilePreviewProps {
   file: {
@@ -18,25 +18,25 @@ interface FilePreviewProps {
 export function FilePreview({ file, onRemove, recipientName, showWatermark = false }: FilePreviewProps) {
   const [isFileLoaded, setIsFileLoaded] = useState(false);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [renderedSize, setRenderedSize] = useState({ width: 0, height: 0 });
+
+  const imageRef = useRef<HTMLImageElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const img = e.currentTarget;
     setDimensions({ width: img.naturalWidth, height: img.naturalHeight });
+    const rect = img.getBoundingClientRect();
+    setRenderedSize({ width: rect.width, height: rect.height });
     setIsFileLoaded(true);
   };
 
   const handleVideoLoad = (e: React.SyntheticEvent<HTMLVideoElement>) => {
     const video = e.currentTarget;
     setDimensions({ width: video.videoWidth, height: video.videoHeight });
+    const rect = video.getBoundingClientRect();
+    setRenderedSize({ width: rect.width, height: rect.height });
     setIsFileLoaded(true);
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   return (
@@ -46,7 +46,7 @@ export function FilePreview({ file, onRemove, recipientName, showWatermark = fal
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-gradient-to-br from-[#FF75A0]/20 to-[#FFAA70]/20 rounded-xl flex items-center justify-center">
             {file.type === "image" ? (
-              <FileImage className="w-5 h-5   text-[#FF75A0]" />
+              <FileImage className="w-5 h-5 text-[#FF75A0]" />
             ) : (
               <Play className="w-5 h-5 text-[#FFAA70]" />
             )}
@@ -71,33 +71,39 @@ export function FilePreview({ file, onRemove, recipientName, showWatermark = fal
         </Button>
       </div>
 
-      {/* Fixed Size Preview Container */}
+      {/* Preview Container */}
       <div className="relative w-full aspect-video bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
-        
-        {/* Content Container */}
         <div className="absolute inset-0 flex items-center justify-center p-4">
           {file.type === "image" ? (
             <div className="relative w-full h-full">
               <Image
+                ref={imageRef}
                 src={file.url}
                 alt="Uploaded preview"
                 fill
-                style={{ 
-                  objectFit: "contain"
-                }}
+                style={{ objectFit: "contain" }}
                 onLoad={handleImageLoad}
                 className={`transition-all duration-500 ${
-                  isFileLoaded ? 'opacity-100' : 'opacity-0'
+                  isFileLoaded ? "opacity-100" : "opacity-0"
                 }`}
                 priority
               />
-              {/* Watermark overlay - only on the image */}
               {showWatermark && isFileLoaded && (
-                <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                  <Watermark 
-                    name={recipientName || 'Preview User'} 
-                    ip="123.456.789.011" 
-                    animated={false} 
+                <div
+                  className="absolute pointer-events-none overflow-hidden"
+                  style={{
+                    width: renderedSize.width,
+                    height: renderedSize.height,
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                  }}
+                >
+                  <Watermark
+                    name={recipientName || "Preview User"}
+                    ip="123.456.789.011"
+                    animated={false}
+                    mode="image"
                   />
                 </div>
               )}
@@ -105,19 +111,20 @@ export function FilePreview({ file, onRemove, recipientName, showWatermark = fal
           ) : (
             <div className="relative w-full h-full flex items-center justify-center">
               <video
+                ref={videoRef}
                 src={file.url}
                 controls
                 playsInline
                 preload="metadata"
                 muted
-                style={{ 
+                style={{
                   maxWidth: "100%",
                   maxHeight: "100%",
                   width: "auto",
-                  height: "auto"
+                  height: "auto",
                 }}
                 className={`rounded-xl shadow-lg transition-all duration-500 ${
-                  isFileLoaded ? 'opacity-100' : 'opacity-0'
+                  isFileLoaded ? "opacity-100" : "opacity-0"
                 }`}
                 onLoadedMetadata={(e) => {
                   e.currentTarget.volume = 0.5;
@@ -126,13 +133,21 @@ export function FilePreview({ file, onRemove, recipientName, showWatermark = fal
               >
                 Your browser does not support the video tag.
               </video>
-              {/* Watermark overlay - only on the video */}
               {showWatermark && isFileLoaded && (
-                <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-xl">
-                  <Watermark 
-                    name={recipientName || 'Preview User'} 
-                    ip="123.456.789.011" 
-                    animated={true} 
+                <div
+                  className="absolute pointer-events-none overflow-hidden"
+                  style={{
+                    width: renderedSize.width,
+                    height: renderedSize.height,
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                  }}
+                >
+                  <Watermark
+                    name={recipientName || "Preview User"}
+                    ip="123.456.789.011"
+                    animated={true}
                   />
                 </div>
               )}
@@ -140,7 +155,7 @@ export function FilePreview({ file, onRemove, recipientName, showWatermark = fal
           )}
         </div>
 
-        {/* Professional Loading State */}
+        {/* Loading State */}
         {!isFileLoaded && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
             <div className="relative">
@@ -153,7 +168,7 @@ export function FilePreview({ file, onRemove, recipientName, showWatermark = fal
           </div>
         )}
 
-        {/* Subtle Corner Badge */}
+        {/* File Type Badge */}
         {isFileLoaded && (
           <div className="absolute top-4 left-4">
             <div className="px-3 py-1 bg-black/10 dark:bg-white/10 backdrop-blur-sm rounded-full">
@@ -165,7 +180,7 @@ export function FilePreview({ file, onRemove, recipientName, showWatermark = fal
         )}
       </div>
 
-      {/* Professional File Info Panel */}
+      {/* Info Panel */}
       {isFileLoaded && (
         <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl p-4 border border-gray-100 dark:border-gray-800">
           <div className="grid grid-cols-2 gap-4">
@@ -190,7 +205,7 @@ export function FilePreview({ file, onRemove, recipientName, showWatermark = fal
               </p>
             </div>
           </div>
-          
+
           {showWatermark && (
             <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
               <div className="flex items-center space-x-2">
