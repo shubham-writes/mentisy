@@ -8,7 +8,6 @@ body {
   height: 100%;
 }
 
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -56,17 +55,34 @@ body {
   }
 }
 
-
 @layer base {
   * {
     @apply border-border;
   }
 
+  html {
+    overflow-x: hidden;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  html::-webkit-scrollbar {
+    display: none;
+  }
+
   body {
     @apply bg-background text-foreground;
+    overflow-x: hidden;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  body::-webkit-scrollbar {
+    display: none;
   }
 }
 
+/* Video controls styling */
 video::-webkit-media-controls-volume-slider,
 video::-webkit-media-controls-mute-button {
   display: block !important;
@@ -74,13 +90,40 @@ video::-webkit-media-controls-mute-button {
   pointer-events: auto !important;
 }
 
-
-
+/* Scrolling animation keyframes */
 @keyframes scrollWatermark {
   0% {
     transform: translateX(0);
   }
   100% {
     transform: translateX(-50%);
+  }
+}
+
+/* Utility classes */
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Additional scroll utilities */
+  .scroll-smooth {
+    scroll-behavior: smooth;
+  }
+
+  /* Prevent horizontal scrolling globally */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    overflow-x: hidden;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 }

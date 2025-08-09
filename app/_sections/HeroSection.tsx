@@ -1,11 +1,14 @@
 // components/sections/HeroSection.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { SignUpButton } from "@clerk/nextjs";
+import { Authenticated, Unauthenticated } from "convex/react";
+
+import React, { useState, useEffect } from "react";
 import { Eye, Shield, Zap, ArrowRight, Upload, Users, Timer, ExternalLink } from "lucide-react";
 
 interface HeroSectionProps {
-  userCount: number;
+  userCount?: number;
 }
 
 export default function HeroSection({ userCount = 2847 }: HeroSectionProps) {
@@ -26,20 +29,11 @@ export default function HeroSection({ userCount = 2847 }: HeroSectionProps) {
     return () => clearInterval(demoInterval);
   }, []);
 
-  // Mock components for demo
-  const SignUpButton = ({ children, mode }: { children: React.ReactNode; mode: string }) => (
-    <div onClick={() => console.log('Sign up clicked')}>{children}</div>
-  );
-
-  const Authenticated = ({ children }: { children: React.ReactNode }) => 
-    isAuthenticated ? <>{children}</> : null;
-
-  const Unauthenticated = ({ children }: { children: React.ReactNode }) => 
-    !isAuthenticated ? <>{children}</> : null;
+ 
 
   return (
     <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-      <div className="relative pt-8 sm:pt-12 md:pt-16 lg:pt-20 pb-8 sm:pb-12 md:pb-16 overflow-hidden">
+      <div className="relative pt-6 sm:pt-14 md:pt-6 pb-20 sm:pb-12 md:pb-16 overflow-hidden">
         {/* Enhanced Background with Multiple Layers */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#FF75A0]/8 to-[#FFAA70]/8 dark:from-[#FF75A0]/15 dark:to-[#FFAA70]/15" />
         
@@ -49,11 +43,11 @@ export default function HeroSection({ userCount = 2847 }: HeroSectionProps) {
         
         <div className="relative px-4 sm:px-6 mx-auto max-w-7xl">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 md:gap-16 items-center">
-            {/* Left Side - Content */}
-            <div className="text-center lg:text-left space-y-4 sm:space-y-6 lg:space-y-1 order-2 lg:order-1">
+            {/* Left Side - Content - Always first on mobile, first on desktop */}
+            <div className="text-center lg:text-left space-y-4 sm:space-y-6 lg:space-y-1">
               {/* Premium Badge */}
-              <div className="relative inline-block">
-                <span className="text-base sm:text-lg md:text-xl font-bold tracking-[0.2em] bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] bg-clip-text text-transparent">
+              <div className="relative inline-block pt-4 sm:pt-0">
+                <span className="text-base sm:text-xs mt-12 md:text-lg lg:text-xl font-bold tracking-[0.2em] bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] bg-clip-text text-transparent">
                   FOR REAL MOMENTS
                 </span>
               </div>
@@ -66,13 +60,11 @@ export default function HeroSection({ userCount = 2847 }: HeroSectionProps) {
                     <span className="bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] bg-clip-text text-transparent">
                       Last forever
                     </span>
-                    {/* Subtle underline effect */}
-                    <div className="absolute -bottom-1 sm:-bottom-2 left-0 right-0 h-0.5 sm:h-1 bg-gradient-to-r from-[#FF75A0]/30 to-[#FFAA70]/30 rounded-full" />
                   </span>
                 </h1>
                 
                 <div className="space-y-3 sm:space-y-4">
-                  <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-600 dark:text-gray-300 max-w-2xl leading-relaxed font-light mx-auto lg:mx-0">
+                  <p className="sm:text-xl md:text-xl lg:text-2xl text-gray-600 dark:text-gray-300 max-w-2xl leading-relaxed font-light mx-auto lg:mx-0">
                     <strong className="font-bold text-gray-900 dark:text-white">Say it once.</strong> Feel it fully share your most authentic moments that disappear after one view.
                   </p>
                 </div>
@@ -81,13 +73,15 @@ export default function HeroSection({ userCount = 2847 }: HeroSectionProps) {
               {/* Enhanced CTA Buttons */}
               <div className="flex justify-center lg:justify-start pt-4 sm:pt-6">
                 <Unauthenticated>
-                  <SignUpButton mode="modal">
+                  
                     <button className="group relative inline-flex items-center justify-center gap-2 sm:gap-3 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] text-white font-bold py-3 sm:py-4 lg:py-5 px-8 sm:px-12 lg:px-16 rounded-xl sm:rounded-2xl hover:shadow-2xl hover:shadow-[#FF75A0]/30 transition-all duration-300 hover:scale-105 text-base sm:text-lg overflow-hidden min-w-[280px] sm:min-w-[320px] touch-manipulation">
                       <div className="absolute inset-0 bg-gradient-to-r from-[#e65a85] to-[#e6955a] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <SignUpButton mode="modal">
                       <span className="relative z-10">🎁 Try Free (5 Uploads)</span>
+                      </SignUpButton>
                       <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 relative z-10 group-hover:translate-x-1 transition-transform duration-300" />
                     </button>
-                  </SignUpButton>
+                  
                 </Unauthenticated>
                 <Authenticated>
                   <button className="group relative inline-flex items-center justify-center gap-2 sm:gap-3 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] text-white font-bold py-3 sm:py-4 lg:py-5 px-8 sm:px-12 lg:px-16 rounded-xl sm:rounded-2xl hover:shadow-2xl hover:shadow-[#FF75A0]/30 transition-all duration-300 hover:scale-105 text-base sm:text-lg overflow-hidden min-w-[280px] sm:min-w-[320px] touch-manipulation">
@@ -113,32 +107,15 @@ export default function HeroSection({ userCount = 2847 }: HeroSectionProps) {
                   <span className="text-xs font-semibold text-orange-600 dark:text-orange-400 whitespace-nowrap">No app required</span>
                 </div>
               </div>
-
-              {/* Mobile Social Proof - Only shown on mobile */}
-              <div className="mt-6 text-center lg:hidden">
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Trusted by {userCount.toLocaleString()}+ users</p>
-                <div className="flex items-center justify-center space-x-1">
-                  <div className="flex -space-x-1">
-                    {[1,2,3,4,5].map((i) => (
-                      <div key={i} className="w-6 h-6 rounded-full bg-gradient-to-r from-pink-400 to-purple-400 border-2 border-white dark:border-gray-900 flex items-center justify-center text-xs font-bold text-white">
-                        {String.fromCharCode(65 + i)}
-                      </div>
-                    ))}
-                  </div>
-                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400 ml-2">
-                    4.9⭐ rating
-                  </span>
-                </div>
-              </div>
             </div>
 
-            {/* Right Side - Enhanced Live Demo */}
-            <div className="flex justify-center lg:justify-end lg:items-start order-1 lg:order-2">
-              <div className="relative mt-0 lg:-mt-8">
+            {/* Right Side - Enhanced Live Demo - Second on mobile, second on desktop */}
+            <div className="flex justify-center lg:justify-end pt-8 sm:pt-6 lg:pt-0 lg:items-start">
+              <div className="relative sm:mt-0 lg:-mt-8">
                 {/* Glowing background effect */}
                 <div className="absolute -inset-2 sm:-inset-4 bg-gradient-to-r from-[#FF75A0]/30 to-[#FFAA70]/30 rounded-2xl sm:rounded-3xl blur-xl sm:blur-2xl animate-pulse" />
                 
-                <div className="relative w-72 h-80 sm:w-80 sm:h-96 bg-gradient-to-br from-gray-100/95 to-gray-200/95 dark:from-gray-800/95 dark:to-gray-900/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-2xl border border-white/30 dark:border-gray-700/30">
+                <div className="relative w-52 h-56 sm:w-80 sm:h-80 bg-gradient-to-br from-gray-100/95 to-gray-200/95 dark:from-gray-800/95 dark:to-gray-900/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-2xl border border-white/30 dark:border-gray-700/30">
                   <div className="bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl rounded-xl sm:rounded-2xl h-full p-4 sm:p-6 flex flex-col items-center justify-center border border-gray-200/50 dark:border-gray-700/50">
                     {demoStep === 0 && (
                       <div className="text-center space-y-4 sm:space-y-6 animate-fadeIn">
@@ -182,9 +159,10 @@ export default function HeroSection({ userCount = 2847 }: HeroSectionProps) {
                     )}
                   </div>
                 </div>
-                <div className="absolute -bottom-6 sm:-bottom-8 left-1/2 transform -translate-x-1/2 text-center">
-                  <span className="bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] text-white px-4 sm:px-6 py-1.5 sm:py-2 rounded-full font-bold text-xs sm:text-sm shadow-lg whitespace-nowrap">
-                    ⚡Takes less than 30 seconds
+                <div className="absolute mt-2 sm:-bottom-8 left-1/2 transform -translate-x-1/2 text-center mb-8 sm:mb-0">
+                  <span className="relative inline-flex items-center gap-1.5 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-semibold text-xs sm:text-sm border-2 border-purple-200 dark:border-purple-800 shadow-lg whitespace-nowrap hover:scale-105 transition-transform duration-200">
+                    <Timer className="w-3 h-3 text-purple-600" />
+                    Takes less than 30 seconds
                   </span>
                 </div>
               </div>

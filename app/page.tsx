@@ -43,7 +43,7 @@ export default function Home() {
         <HeroSection userCount={userCount} />
         
         {/* Streamlined Form Section */}
-        <div className="pb-16">
+        <div className="pt-12 sm:pt-16 md:pt-20 pb-16">
           <div className="max-w-7xl mx-auto">
             <div className="bg-white dark:bg-black  shadow-sm">
               <div className="mb-4">

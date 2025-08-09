@@ -1,8 +1,22 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { useTheme } from "next-themes";
 import { useConvexAuth } from "convex/react";
 import { SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
-import { GithubIcon, LoaderCircle, Zap, Sparkles, User, LogIn } from "lucide-react";
+import { 
+    GithubIcon, 
+    LoaderCircle, 
+    Zap, 
+    Sparkles, 
+    User, 
+    LogIn,
+    Menu,
+    X,
+    Sun,
+    Moon,
+    Monitor
+} from "lucide-react";
 import Link from "next/link";
 
 import useStoreUserEffect from "@/hooks/useStoreUserEffect";
@@ -12,98 +26,301 @@ import { ModeToggle } from "@/components/ui/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { Logo } from "./logo";
 
+// Enhanced Theme Toggle Component
+const EnhancedModeToggle = () => {
+    const { theme, setTheme, systemTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+
+    // Handle hydration
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    const themes = [
+        { key: "light", icon: Sun, label: "Light" },
+        { key: "dark", icon: Moon, label: "Dark" },
+        { key: "system", icon: Monitor, label: "System" }
+    ];
+
+    if (!mounted) {
+        return (
+            <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 animate-pulse" />
+        );
+    }
+
+    const currentTheme = theme || "system";
+    
+    return (
+        <div className="relative">
+            <button
+                className="w-9 h-9 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 hover:from-[#FF75A0]/20 hover:to-[#FFAA70]/20 dark:hover:from-[#FF75A0]/20 dark:hover:to-[#FFAA70]/20 transition-all duration-300 flex items-center justify-center shadow-sm hover:shadow-md border border-gray-200 dark:border-gray-600 group"
+                onClick={() => {
+                    const currentIndex = themes.findIndex(t => t.key === currentTheme);
+                    const nextTheme = themes[(currentIndex + 1) % themes.length];
+                    setTheme(nextTheme.key);
+                }}
+            >
+                {currentTheme === "light" && <Sun className="w-4 h-4 text-amber-500 group-hover:text-amber-600 transition-colors" />}
+                {currentTheme === "dark" && <Moon className="w-4 h-4 text-blue-400 group-hover:text-blue-500 transition-colors" />}
+                {currentTheme === "system" && <Monitor className="w-4 h-4 text-gray-600 dark:text-gray-300 group-hover:text-[#FF75A0] transition-colors" />}
+            </button>
+        </div>
+    );
+};
+
 export const Navbar = () => {
     const userId = useStoreUserEffect();
     const { isAuthenticated, isLoading } = useConvexAuth();
     const scrolled = useScrollTop();
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const { theme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+
+    // Handle hydration
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     return (
-        <nav className={cn(
-            "z-50 fixed top-0 w-full transition-all duration-300",
-            scrolled 
-                ? "bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 shadow-lg" 
-                : "bg-transparent"
-        )}>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-16">
-                    {/* Logo Section */}
-                    <div className="flex items-center space-x-4">
-                        <div className="hidden sm:block">
+        <>
+            <nav className={cn(
+                "z-50 fixed top-0 w-full transition-all duration-300",
+                scrolled 
+                    ? "bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 shadow-lg" 
+                    : "bg-transparent"
+            )}>
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center justify-between h-16">
+                        {/* Logo Section - Always visible */}
+                        <div className="flex items-center space-x-4">
                             <Logo />
                         </div>
-                    </div>
 
-                    {/* Right Side - Auth & Settings */}
-                    <div className="flex items-center space-x-4">
-                        {/* Loading State */}
-                        {isLoading && (
-                            <div className="flex items-center space-x-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-full">
-                                <LoaderCircle className="w-4 h-4 animate-spin text-purple-500" />
-                                <span className="text-sm text-gray-600 dark:text-gray-300">Loading...</span>
-                            </div>
-                        )}
+                        {/* Desktop Right Side - Auth & Settings */}
+                        <div className="hidden md:flex items-center space-x-4">
+                            {/* Loading State */}
+                            {isLoading && (
+                                <div className="flex items-center space-x-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-full">
+                                    <LoaderCircle className="w-4 h-4 animate-spin text-purple-500" />
+                                    <span className="text-sm text-gray-600 dark:text-gray-300">Loading...</span>
+                                </div>
+                            )}
 
-                        {/* Unauthenticated State */}
-                        {!isAuthenticated && !isLoading && (
-                            <div className="flex items-center space-x-3">
-                                <SignInButton mode="modal" fallbackRedirectUrl="/hello" forceRedirectUrl="/hello">
-                                    <Button 
-                                        variant="ghost" 
-                                        size="sm"
-                                        className="rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 px-6"
-                                    >
-                                        <LogIn className="w-4 h-4 mr-2" />
-                                        Sign In
-                                    </Button>
-                                </SignInButton>
-                                
-                                <SignUpButton mode="modal" fallbackRedirectUrl="/hello" forceRedirectUrl="/hello">
-                                    <Button 
-                                        size="sm"
-                                        className="rounded-full bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-purple-600 hover:to-pink-600 border-0 shadow-lg transform hover:scale-105 transition-all duration-200 px-6"
-                                    >
-                                        <Sparkles className="w-4 h-4 mr-2" />
-                                        Get Started
-                                    </Button>
-                                </SignUpButton>
-                            </div>
-                        )}
+                            {/* Unauthenticated State */}
+                            {!isAuthenticated && !isLoading && (
+                                <div className="flex items-center space-x-3">
+                                    <SignInButton mode="modal" fallbackRedirectUrl="/hello" forceRedirectUrl="/hello">
+                                        <Button 
+                                            variant="ghost" 
+                                            size="sm"
+                                            className="rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 px-6"
+                                        >
+                                            <LogIn className="w-4 h-4 mr-2" />
+                                            Sign In
+                                        </Button>
+                                    </SignInButton>
+                                    
+                                    <SignUpButton mode="modal" fallbackRedirectUrl="/hello" forceRedirectUrl="/hello">
+                                        <Button 
+                                            size="sm"
+                                            className="rounded-full bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-purple-600 hover:to-pink-600 border-0 shadow-lg transform hover:scale-105 transition-all duration-200 px-6"
+                                        >
+                                            <Sparkles className="w-4 h-4 mr-2" />
+                                            Get Started
+                                        </Button>
+                                    </SignUpButton>
+                                </div>
+                            )}
 
-                        {/* Authenticated State */}
-                        {isAuthenticated && !isLoading && (
-                            <div className="flex items-center space-x-4">
-                                {/* User Profile Section */}
-                                <div className="flex items-center space-x-3 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-full p-2 border border-purple-200 dark:border-purple-800">
-                                    <div className="flex items-center space-x-2 px-3">
-                                        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Online</span>
+                            {/* Authenticated State */}
+                            {isAuthenticated && !isLoading && (
+                                <div className="flex items-center space-x-4">
+                                    {/* User Profile Section */}
+                                    <div className="flex items-center space-x-3 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-full p-2 border border-purple-200 dark:border-purple-800">
+                                        <div className="flex items-center space-x-2 px-3">
+                                            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Online</span>
+                                        </div>
+                                        <UserButton 
+                                            afterSignOutUrl="/"
+                                            appearance={{
+                                                elements: {
+                                                    avatarBox: "w-8 h-8 rounded-full ring-2 ring-purple-300 dark:ring-purple-600"
+                                                }
+                                            }}
+                                        />
                                     </div>
+                                </div>
+                            )}
+
+                            {/* Enhanced Theme Toggle */}
+                            <div className="border-l border-gray-200 dark:border-gray-700 pl-4 ml-4">
+                                <EnhancedModeToggle />
+                            </div>
+                        </div>
+
+                        {/* Mobile Right Side - Compact */}
+                        <div className="md:hidden flex items-center space-x-2">
+                            {/* Loading State Mobile */}
+                            {isLoading && (
+                                <LoaderCircle className="w-5 h-5 animate-spin text-[#FF75A0]" />
+                            )}
+
+                            {/* Authenticated State Mobile - Compact */}
+                            {isAuthenticated && !isLoading && (
+                                <div className="flex items-center space-x-2">
+                                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                                     <UserButton 
                                         afterSignOutUrl="/"
                                         appearance={{
                                             elements: {
-                                                avatarBox: "w-8 h-8 rounded-full ring-2 ring-purple-300 dark:ring-purple-600"
+                                                avatarBox: "w-8 h-8 rounded-full ring-2 ring-[#FF75A0]"
                                             }
                                         }}
                                     />
                                 </div>
+                            )}
+
+                            {/* Mobile Menu Toggle */}
+                            <button
+                                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                aria-label="Toggle menu"
+                            >
+                                {isMobileMenuOpen ? (
+                                    <X className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                                ) : (
+                                    <Menu className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            {/* Mobile Menu Overlay */}
+            {isMobileMenuOpen && (
+                <div className="md:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" 
+                     onClick={() => setIsMobileMenuOpen(false)} />
+            )}
+
+            {/* Mobile Menu Slide-out */}
+            <div className={cn(
+                "md:hidden fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white dark:bg-gray-900 z-50 transform transition-transform duration-300 ease-in-out border-l border-gray-200 dark:border-gray-800",
+                isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
+            )}>
+                <div className="flex flex-col h-full">
+                    {/* Mobile Menu Header */}
+                    <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
+                        <div className="flex items-center space-x-2">
+                            <div className="w-8 h-8 bg-gradient-to-br from-[#FF75A0] to-[#FFAA70] rounded-lg flex items-center justify-center">
+                                <Zap className="w-5 h-5 text-white" />
+                            </div>
+                            <span className="font-semibold text-lg">Menu</span>
+                        </div>
+                        <button
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                        >
+                            <X className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                        </button>
+                    </div>
+
+                    {/* Mobile Menu Content */}
+                    <div className="flex-1 p-4 space-y-6">
+                        {/* Authentication Section */}
+                        {!isAuthenticated && !isLoading && (
+                            <div className="space-y-3">
+                                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                                    Account
+                                </h3>
+                                <div className="space-y-3">
+                                    <SignInButton mode="modal" fallbackRedirectUrl="/hello" forceRedirectUrl="/hello">
+                                        <Button 
+                                            variant="ghost" 
+                                            className="w-full justify-start rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 h-12"
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                        >
+                                            <LogIn className="w-5 h-5 mr-3" />
+                                            Sign In
+                                        </Button>
+                                    </SignInButton>
+                                    
+                                    <SignUpButton mode="modal" fallbackRedirectUrl="/hello" forceRedirectUrl="/hello">
+                                        <Button 
+                                            className="w-full justify-start rounded-xl bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-purple-600 hover:to-pink-600 border-0 shadow-lg h-12"
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                        >
+                                            <Sparkles className="w-5 h-5 mr-3" />
+                                            Get Started
+                                        </Button>
+                                    </SignUpButton>
+                                </div>
                             </div>
                         )}
 
-                        {/* Mode Toggle */}
-                        <div className="border-l border-gray-200 dark:border-gray-700 pl-4 ml-4">
-                            <ModeToggle />
+                        {/* Settings Section */}
+                        <div className="space-y-3">
+                            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                                Settings
+                            </h3>
+                            <div className="flex items-center justify-between p-3 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-[#FF75A0]/30 transition-all duration-200">
+                                <div className="flex items-center space-x-3">
+                                    <div className="w-8 h-8 bg-gradient-to-br from-[#FF75A0]/20 to-[#FFAA70]/20 rounded-lg flex items-center justify-center border border-[#FF75A0]/20">
+                                        {mounted && theme === "light" && <Sun className="w-4 h-4 text-amber-500" />}
+                                        {mounted && theme === "dark" && <Moon className="w-4 h-4 text-blue-400" />}
+                                        {mounted && (theme === "system" || !theme) && <Monitor className="w-4 h-4 text-gray-600 dark:text-gray-300" />}
+                                        {!mounted && <div className="w-4 h-4 bg-gray-300 dark:bg-gray-600 rounded animate-pulse" />}
+                                    </div>
+                                    <div>
+                                        <span className="text-sm font-medium">Theme</span>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">
+                                            {mounted ? (theme || "system") : "Loading..."}
+                                        </p>
+                                    </div>
+                                </div>
+                                <EnhancedModeToggle />
+                            </div>
+                        </div>
+
+                        {/* Quick Actions (when authenticated) */}
+                        {isAuthenticated && (
+                            <div className="space-y-3">
+                                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                                    Quick Actions
+                                </h3>
+                                <div className="space-y-2">
+                                    <Button 
+                                        variant="ghost" 
+                                        className="w-full justify-start rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 h-12"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                    >
+                                        <Zap className="w-5 h-5 mr-3 text-[#FF75A0]" />
+                                        Upload Secret
+                                    </Button>
+                                    <Button 
+                                        variant="ghost" 
+                                        className="w-full justify-start rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 h-12"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                    >
+                                        <User className="w-5 h-5 mr-3 text-purple-500" />
+                                        My Secrets
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Mobile Menu Footer */}
+                    <div className="p-4 border-t border-gray-200 dark:border-gray-800">
+                        <div className="text-center">
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                                OnlyForYou • Privacy First
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
-
-            {/* Mobile Logo (when main logo is hidden) */}
-            <div className="sm:hidden absolute left-4 top-1/2 transform -translate-y-1/2">
-                <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                    <Zap className="w-5 h-5 text-white" />
-                </div>
-            </div>
-        </nav>
-    )
+        </>
+    );
 }

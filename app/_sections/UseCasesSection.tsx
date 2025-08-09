@@ -1,14 +1,17 @@
 // app/_sections/UseCasesSection.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { SignUpButton } from "@clerk/nextjs";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { GraduationCap, Heart, Dumbbell, Smile, Briefcase, MessageCircle, Users, ChevronRight, ChevronDown } from "lucide-react";
+import { GraduationCap, Heart, Dumbbell, Smile, Briefcase, MessageCircle, Users, ChevronRight, ChevronDown, ChevronLeft } from "lucide-react";
 
 const UseCasesSection = () => {
   const [activeUseCase, setActiveUseCase] = useState(0);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const { isSignedIn } = useAuth();
   const router = useRouter();
 
@@ -18,6 +21,28 @@ const UseCasesSection = () => {
       router.push(`/hello?useCase=${encodeURIComponent(useCaseTitle.toLowerCase().replace(/\s+/g, '-'))}`);
     }
     // If not signed in, the SignUpButton will handle the auth flow
+  };
+
+  const checkScrollButtons = () => {
+    if (scrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+      setCanScrollLeft(scrollLeft > 0);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 1);
+    }
+  };
+
+  const scrollLeft = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: -200, behavior: 'smooth' });
+      setTimeout(checkScrollButtons, 100);
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+      setTimeout(checkScrollButtons, 100);
+    }
   };
 
   const useCases = [
@@ -105,35 +130,85 @@ const UseCasesSection = () => {
         
         {/* Mobile Layout - Stack vertically */}
         <div className="block lg:hidden space-y-6">
-          {/* Mobile: Horizontal scrollable use case tabs */}
-          <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide">
-            {useCases.map((useCase, index) => {
-              const IconComponent = useCase.icon;
-              return (
-                <button
-                  key={useCase.id}
-                  className={`flex-shrink-0 flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all duration-300 min-w-[100px] ${
-                    activeUseCase === index
-                      ? `${useCase.bgColor} ${useCase.borderColor} shadow-lg`
-                      : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+          {/* Mobile: Horizontal scrollable use case tabs with arrow controls */}
+          <div className="relative">
+            {/* Left Arrow */}
+            <button
+              onClick={scrollLeft}
+              className={`absolute left-0 top-12 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center transition-all duration-200 ${
+                canScrollLeft 
+                  ? 'opacity-100 hover:scale-125' 
+                  : 'opacity-30 cursor-not-allowed'
+              }`}
+              disabled={!canScrollLeft}
+              aria-label="Scroll left"
+            >
+              <ChevronLeft className="w-7 h-7 text-gray-500 dark:text-gray-300 drop-shadow-lg" />
+            </button>
+
+            {/* Right Arrow */}
+            <button
+              onClick={scrollRight}
+              className={`absolute right-0 top-12 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center transition-all duration-200 ${
+                canScrollRight 
+                  ? 'opacity-100 hover:scale-125' 
+                  : 'opacity-30 cursor-not-allowed'
+              }`}
+              disabled={!canScrollRight}
+              aria-label="Scroll right"
+            >
+              <ChevronRight className="w-7 h-7 text-gray-500 dark:text-gray-300 drop-shadow-lg" />
+            </button>
+
+            {/* Scrollable container */}
+            <div 
+              ref={scrollRef}
+              className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide px-12"
+              onScroll={checkScrollButtons}
+              onLoad={checkScrollButtons}
+            >
+              {useCases.map((useCase, index) => {
+                const IconComponent = useCase.icon;
+                return (
+                  <button
+                    key={useCase.id}
+                    className={`flex-shrink-0 flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all duration-300 min-w-[100px] ${
+                      activeUseCase === index
+                        ? `${useCase.bgColor} ${useCase.borderColor} shadow-lg`
+                        : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+                    }`}
+                    onClick={() => setActiveUseCase(index)}
+                  >
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                      activeUseCase === index ? useCase.bgColor : 'bg-gray-100 dark:bg-gray-700'
+                    }`}>
+                      <IconComponent className={`w-5 h-5 ${
+                        activeUseCase === index ? useCase.iconColor : 'text-gray-600 dark:text-gray-400'
+                      }`} />
+                    </div>
+                    <span className={`text-xs font-medium text-center leading-tight ${
+                      activeUseCase === index ? useCase.iconColor : 'text-gray-700 dark:text-gray-300'
+                    }`}>
+                      {useCase.title}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Scroll indicator dots */}
+            <div className="flex justify-center gap-1 mt-2">
+              {Array.from({ length: Math.ceil(useCases.length / 3) }).map((_, dotIndex) => (
+                <div
+                  key={dotIndex}
+                  className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                    Math.floor(activeUseCase / 3) === dotIndex
+                      ? 'bg-gray-400 dark:bg-gray-500'
+                      : 'bg-gray-200 dark:bg-gray-700'
                   }`}
-                  onClick={() => setActiveUseCase(index)}
-                >
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                    activeUseCase === index ? useCase.bgColor : 'bg-gray-100 dark:bg-gray-700'
-                  }`}>
-                    <IconComponent className={`w-5 h-5 ${
-                      activeUseCase === index ? useCase.iconColor : 'text-gray-600 dark:text-gray-400'
-                    }`} />
-                  </div>
-                  <span className={`text-xs font-medium text-center leading-tight ${
-                    activeUseCase === index ? useCase.iconColor : 'text-gray-700 dark:text-gray-300'
-                  }`}>
-                    {useCase.title}
-                  </span>
-                </button>
-              );
-            })}
+                />
+              ))}
+            </div>
           </div>
 
           {/* Mobile: Active use case details card */}

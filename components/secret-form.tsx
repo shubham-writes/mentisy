@@ -245,7 +245,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
             />
 
             {/* Main Form Container - Mobile First Responsive */}
-            <div className="bg-white/80 dark:bg-gray-900/50 dark:border backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-xl sm:shadow-2xl border border-white/20 dark:border-gray-800 overflow-hidden">
+            <div className="bg-white/80 dark:bg-gray-900/50 dark:border mb-20 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-xl sm:shadow-2xl border border-white/20 dark:border-gray-800 overflow-hidden">
                 <div className="p-4 sm:p-6 md:p-8 lg:p-10">
                     
                     {/* Landing Page Notice */}

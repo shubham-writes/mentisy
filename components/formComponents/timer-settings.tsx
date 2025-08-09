@@ -46,7 +46,7 @@ export function TimerSettings({ duration, onDurationChange, isTimerDisabled }: T
                     >
                         <span className="text-lg sm:text-2xl lg:text-3xl mb-1 sm:mb-2">⚡</span>
                         <span className="font-semibold text-sm sm:text-base lg:text-lg">3 Sec</span>
-                        <span className="text-xs text-gray-500 mt-0.5 sm:mt-1 text-center leading-tight">Quick peek</span>
+                        <span className="text-xs text-gray-500 mt-0.5 sm:mt-1 text-center leading-tight">Quick </span>
                     </Label>
                 </div>
                 

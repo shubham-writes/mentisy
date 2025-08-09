@@ -13,7 +13,6 @@ export const metadata: Metadata = {
   description: "Create and share self-destructing secret messages and files that disappear after viewing. Secure, private, and easy to use.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_URL!),
   manifest: "/manifest.json",
-  // Remove themeColor from here
   applicationName: "Secret Messages",
   appleWebApp: {
     capable: true,
@@ -43,7 +42,6 @@ export const metadata: Metadata = {
   }
 };
 
-// Add the new viewport export
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
@@ -60,14 +58,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className="no-scrollbar">
       <head>
-        {/* Additional PWA meta tags that can't be set via metadata */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
-      <body className={inter.className}>
+      <body className={`${inter.className} no-scrollbar`}>
         <ConvexClientProvider>
           <ThemeProvider
             attribute="class"
@@ -75,12 +72,11 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <div className="min-h-full flex flex-col justify-between">
+            <div className="min-h-full flex flex-col justify-between no-scrollbar">
               <Navbar />
-              <main className="pt-0">
+              <main className="pt-16  flex-1 no-scrollbar">
                 {children}
               </main>
-             
             </div>
           </ThemeProvider>
         </ConvexClientProvider>
