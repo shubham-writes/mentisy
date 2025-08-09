@@ -33,7 +33,7 @@ export default function HeroSection({ userCount = 2847 }: HeroSectionProps) {
 
   return (
     <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-      <div className="relative pt-6 sm:pt-14 md:pt-6 pb-20 sm:pb-12 md:pb-16 overflow-hidden">
+      <div className="relative pt-16 sm:pt-20 md:pt-28 pb-20 sm:pb-12 md:pb-16 overflow-hidden">
         {/* Enhanced Background with Multiple Layers */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#FF75A0]/8 to-[#FFAA70]/8 dark:from-[#FF75A0]/15 dark:to-[#FFAA70]/15" />
         

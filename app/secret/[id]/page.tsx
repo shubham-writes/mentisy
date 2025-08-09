@@ -24,6 +24,7 @@ export default function SecretPage({ params }: { params: { id: string } }) {
     const [hasExpiredDuringViewing, setHasExpiredDuringViewing] = useState(false);
     const [videoRenderedSize, setVideoRenderedSize] = useState({ width: 0, height: 0 });
     const [isVideoSized, setIsVideoSized] = useState(false);
+    const [expandedMessages, setExpandedMessages] = useState<{[key: string]: boolean}>({});
 
     const videoRef = useRef<HTMLVideoElement | null>(null);
     const hasRevealedRef = useRef(false);
@@ -225,6 +226,18 @@ export default function SecretPage({ params }: { params: { id: string } }) {
             );
         }
 
+        const toggleMessageExpansion = (messageId: string) => {
+    setExpandedMessages(prev => ({
+        ...prev,
+        [messageId]: !prev[messageId]
+    }));
+};
+
+const truncateMessage = (message: string, maxLength: number = 100) => {
+    if (message.length <= maxLength) return message;
+    return message.substring(0, maxLength) + '...';
+};
+
         // Check if the secret is expired or already viewed (this should show "Secret Not Found")
         if (secret === null || isSecretExpiredOrAlreadyViewed(secret)) {
             return (
@@ -296,7 +309,7 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                 <div style={{ visibility: showLoadingIndicator ? "hidden" : "visible" }}>
                     {secret.fileType === "image" && secret.fileUrl && (
                         <div className="relative w-full max-w-full sm:max-w-lg mx-auto mb-6 sm:mb-8 rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 p-2 sm:p-4">
-                            <div className="relative w-full h-screen sm:h-80 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700">
+                            <div className="relative w-full h-[80vh] sm:max-h-96 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700">
                                 <Image
                                     src={secureFileUrl}
                                     alt="Secret Image"
@@ -313,6 +326,26 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                                 {secret.withWatermark && (
                                     <Watermark name={secret.recipientName} ip={receiverIp ?? undefined} />
                                 )}
+                                
+                               {/* Message overlay for images */}
+{secret.message && (
+    <div className="absolute bottom-0 left-0 right-0 bg-black/40 backdrop-blur-xm text-white p-3 sm:p-4">
+        <p className="text-sm sm:text-base font-medium text-center leading-relaxed">
+            {expandedMessages['image'] || secret.message.length <= 100 
+                ? secret.message 
+                : truncateMessage(secret.message)
+            }
+        </p>
+        {secret.message.length > 100 && (
+            <button
+                onClick={() => toggleMessageExpansion('image')}
+                className="text-blue-300 hover:text-blue-200 text-xs sm:text-sm font-medium mt-1 block mx-auto transition-colors"
+            >
+                {expandedMessages['image'] ? 'Read less' : 'Read more'}
+            </button>
+        )}
+    </div>
+)}
                             </div>
                         </div>
                     )}
@@ -344,7 +377,7 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                                             src={secureFileUrl}
                                             playsInline
                                             preload="auto"
-                                            className="w-full max-h-screen sm:max-h-96 rounded-lg sm:rounded-xl pointer-events-none shadow-lg bg-black block"
+                                            className="w-full h-[80vh] sm:max-h-96 rounded-lg sm:rounded-xl pointer-events-none shadow-lg bg-black block"
                                             style={{ objectFit: "contain" }}
                                             onContextMenu={(e) => e.preventDefault()}
                                             onLoadedMetadata={(e) => {
@@ -382,6 +415,26 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                                             />
                                         </div>
                                     )}
+
+                                    {/* Message overlay for videos */}
+{secret.message && (
+    <div className="absolute bottom-0 left-0 right-0 bg-black/70 backdrop-blur-sm text-white p-3 sm:p-4 z-10">
+        <p className="text-sm sm:text-base font-medium text-center leading-relaxed">
+            {expandedMessages['video'] || secret.message.length <= 100 
+                ? secret.message 
+                : truncateMessage(secret.message)
+            }
+        </p>
+        {secret.message.length > 100 && (
+            <button
+                onClick={() => toggleMessageExpansion('video')}
+                className="text-blue-300 hover:text-blue-200 text-xs sm:text-sm font-medium mt-1 block mx-auto transition-colors"
+            >
+                {expandedMessages['video'] ? 'Read less' : 'Read more'}
+            </button>
+        )}
+    </div>
+)}
                                 </div>
 
                                 {/* Mobile-optimized controls panel */}
@@ -420,19 +473,31 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                         </div>
                     )}
 
-                    {secret.message && (
-                        <div className="max-w-sm sm:max-w-xl mx-auto mb-6 sm:mb-8 p-6 sm:p-8 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl">
-                            <div className="text-center mb-4">
-                                <span className="text-2xl sm:text-3xl">💌</span>
-                            </div>
-                            <blockquote className="text-base sm:text-lg md:text-xl font-medium text-gray-800 dark:text-gray-200 text-center leading-relaxed px-2">
-                                &ldquo;{secret.message}&rdquo;
-                            </blockquote>
-                        </div>
-                    )}
+                    {/* Standalone message (only when no file) */}
+{secret.message && !secret.fileUrl && (
+    <div className="max-w-sm sm:max-w-xl mx-auto mb-6 sm:mb-8 p-6 sm:p-8 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl">
+        <div className="text-center mb-4">
+            <span className="text-2xl sm:text-3xl">💌</span>
+        </div>
+        <blockquote className="text-base sm:text-lg md:text-xl font-medium text-gray-800 dark:text-gray-200 text-center leading-relaxed px-2">
+            &ldquo;{expandedMessages['standalone'] || secret.message.length <= 100 
+                ? secret.message 
+                : truncateMessage(secret.message)
+            }&rdquo;
+        </blockquote>
+        {secret.message.length > 100 && (
+            <button
+                onClick={() => toggleMessageExpansion('standalone')}
+                className="text-[#FF75A0] hover:text-[#FF75A0]/80 text-sm font-medium mt-3 block mx-auto transition-colors"
+            >
+                {expandedMessages['standalone'] ? 'Read less' : 'Read more'}
+            </button>
+        )}
+    </div>
+)}
 
                     {!isMediaLoading && (
-                        <div className="mt-6 sm:mt-8">
+                        <div >
                             {(!secret.fileType || secret.fileType === "image") && (
                                 <CountdownTimer initialSeconds={secret.duration || 10} onComplete={handleTimerComplete} />
                             )}
@@ -465,8 +530,8 @@ export default function SecretPage({ params }: { params: { id: string } }) {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[#FF75A0]/5 via-white to-[#FFAA70]/5 dark:from-[#FF75A0]/10 dark:via-gray-950 dark:to-[#FFAA70]/10 flex flex-col items-center justify-center py-4 sm:py-8 px-2 sm:px-4">
-            <div className="w-full max-w-full sm:max-w-4xl mx-auto">
+        <div className="min-h-screen bg-gradient-to-br from-[#FF75A0]/5 via-white to-[#FFAA70]/5 dark:from-[#FF75A0]/10 dark:via-gray-950 dark:to-[#FFAA70]/10 flex flex-col items-center justify-center  sm:py-8 px-2 sm:px-4">
+            <div className="w-full max-w-full mt-16 sm:max-w-4xl mx-auto">
                 {/* Mobile-optimized Header */}
                 <div className="text-center mb-6 sm:mb-8">
                     <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] rounded-full flex items-center justify-center text-xl sm:text-2xl mx-auto mb-4 sm:mb-6 shadow-lg">

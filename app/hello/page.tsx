@@ -11,7 +11,52 @@ function HelloPageContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const useCase = searchParams.get('useCase');
+    const scrollTo = searchParams.get('scrollTo');
     const { isSignedIn, isLoaded } = useAuth();
+
+    // Handle scrolling based on URL parameter
+    useEffect(() => {
+        if (scrollTo && isSignedIn) {
+            const timer = setTimeout(() => {
+                let elementId = '';
+                let scrollOptions = {
+                    behavior: 'smooth' as ScrollBehavior,
+                    block: 'start' as ScrollLogicalPosition
+                };
+                
+                if (scrollTo === 'form') {
+                    elementId = 'secret-form';
+                    // For form, scroll to center to avoid awkward top positioning
+                    scrollOptions.block = 'center';
+                } else if (scrollTo === 'secrets') {
+                    elementId = 'my-secrets-list';
+                    scrollOptions.block = 'start';
+                }
+                
+                if (elementId) {
+                    const element = document.getElementById(elementId);
+                    if (element) {
+                        // Check if element is already in view to avoid unnecessary scrolling
+                        const rect = element.getBoundingClientRect();
+                        const isInView = rect.top >= 0 && rect.top <= window.innerHeight;
+                        
+                        if (!isInView || scrollTo === 'form') {
+                            element.scrollIntoView(scrollOptions);
+                        }
+                        
+                        // Clean up the URL after a short delay
+                        setTimeout(() => {
+                            const newUrl = new URL(window.location.href);
+                            newUrl.searchParams.delete('scrollTo');
+                            router.replace(newUrl.pathname + newUrl.search);
+                        }, 1000);
+                    }
+                }
+            }, 800); // Reduced timeout for better UX
+            
+            return () => clearTimeout(timer);
+        }
+    }, [scrollTo, isSignedIn, router]);
 
     // Only redirect unauthenticated users after auth has loaded
     useEffect(() => {
@@ -29,9 +74,16 @@ function HelloPageContent() {
     return (
         <div className="flex flex-col items-center justify-start text-center gap-y-8 flex-1">
             <Authenticated>
-                <div data-authenticated="true">
-                    <SecretForm useCase={useCase || undefined} />
-                    <MySecretsList />
+                <div data-authenticated="true" className="w-full">
+                    {/* Secret Form Section with better scroll positioning */}
+                    <section id="secret-form" data-secret-form className="w-full scroll-mt-24 py-4">
+                        <SecretForm useCase={useCase || undefined} />
+                    </section>
+                    
+                    {/* My Secrets List Section */}
+                    <section id="my-secrets-list" data-secrets-list className="w-full mt-12 scroll-mt-20 py-4 mr-6">
+                        <MySecretsList />
+                    </section>
                 </div>
             </Authenticated>
             

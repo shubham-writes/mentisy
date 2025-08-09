@@ -81,8 +81,10 @@ export function MySecretsList() {
         return "💻 Desktop Browser";
     };
 
+ 
+
     return (
-        <div className="w-full max-w-4xl mx-auto">
+        <div className="w-full max-w-4xl mx-auto p-3">
             {/* Header Section */}
             <div className="mb-8 text-center">
                 <h3 className="text-4xl font-bold mb-3 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] bg-clip-text text-transparent">

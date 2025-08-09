@@ -18,6 +18,7 @@ import {
     Monitor
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import useStoreUserEffect from "@/hooks/useStoreUserEffect";
 import { useScrollTop } from "@/hooks/use-scroll-top";
@@ -75,11 +76,33 @@ export const Navbar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const { theme } = useTheme();
     const [mounted, setMounted] = useState(false);
+    const router = useRouter();
 
     // Handle hydration
     useEffect(() => {
         setMounted(true);
     }, []);
+
+    // Function to handle navigation and close mobile menu
+    const handleNavigation = (path: string) => {
+        setIsMobileMenuOpen(false);
+        router.push(path);
+    };
+
+    // Function to scroll to a specific section on the current page
+    const scrollToSection = (sectionId: string) => {
+        setIsMobileMenuOpen(false);
+        // Add a small delay to ensure menu closes before scrolling
+        setTimeout(() => {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                // If element not found, navigate to /hello page first
+                router.push('/hello');
+            }
+        }, 300);
+    };
 
     return (
         <>
@@ -136,11 +159,8 @@ export const Navbar = () => {
                             {isAuthenticated && !isLoading && (
                                 <div className="flex items-center space-x-4">
                                     {/* User Profile Section */}
-                                    <div className="flex items-center space-x-3 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-full p-2 border border-purple-200 dark:border-purple-800">
-                                        <div className="flex items-center space-x-2 px-3">
-                                            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Online</span>
-                                        </div>
+                                    <div className="flex items-center space-x-3 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-full p-1 border border-purple-200 dark:border-purple-800">
+                                        
                                         <UserButton 
                                             afterSignOutUrl="/"
                                             appearance={{
@@ -169,7 +189,7 @@ export const Navbar = () => {
                             {/* Authenticated State Mobile - Compact */}
                             {isAuthenticated && !isLoading && (
                                 <div className="flex items-center space-x-2">
-                                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                                    
                                     <UserButton 
                                         afterSignOutUrl="/"
                                         appearance={{
@@ -293,7 +313,17 @@ export const Navbar = () => {
                                     <Button 
                                         variant="ghost" 
                                         className="w-full justify-start rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 h-12"
-                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        onClick={() => {
+                                            setIsMobileMenuOpen(false);
+                                            // Navigate to hello page and scroll to form
+                                            router.push('/hello');
+                                            setTimeout(() => {
+                                                const element = document.querySelector('[data-secret-form]') || document.getElementById('secret-form');
+                                                if (element) {
+                                                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                                }
+                                            }, 500);
+                                        }}
                                     >
                                         <Zap className="w-5 h-5 mr-3 text-[#FF75A0]" />
                                         Upload Secret
@@ -301,7 +331,17 @@ export const Navbar = () => {
                                     <Button 
                                         variant="ghost" 
                                         className="w-full justify-start rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 h-12"
-                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        onClick={() => {
+                                            setIsMobileMenuOpen(false);
+                                            // Navigate to hello page and scroll to secrets list
+                                            router.push('/hello');
+                                            setTimeout(() => {
+                                                const element = document.querySelector('[data-secrets-list]') || document.getElementById('my-secrets-list');
+                                                if (element) {
+                                                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                                }
+                                            }, 500);
+                                        }}
                                     >
                                         <User className="w-5 h-5 mr-3 text-purple-500" />
                                         My Secrets

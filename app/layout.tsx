@@ -74,7 +74,7 @@ export default function RootLayout({
           >
             <div className="min-h-full flex flex-col justify-between no-scrollbar">
               <Navbar />
-              <main className="pt-16  flex-1 no-scrollbar">
+              <main className="flex-1 no-scrollbar">
                 {children}
               </main>
             </div>

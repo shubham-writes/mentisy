@@ -38,7 +38,7 @@ export function PersonalizedHeader({ useCase, isLandingPage }: PersonalizedHeade
     if (isLandingPage) {
         return (
             <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
+                <h2 className="text-3xl font-bold mb-4 text-gray-800 dark:text-white">
                     Create Your Secret Link
                 </h2>
                 <p className="text-lg text-gray-600 dark:text-gray-400">
@@ -95,7 +95,7 @@ export function PersonalizedHeader({ useCase, isLandingPage }: PersonalizedHeade
 
         if (content) {
             return (
-                <div className={`text-center mb-8 p-6 rounded-2xl bg-gradient-to-r ${content.bgClass} border border-opacity-20`}>
+                <div className={`text-center mt-16 mb-8 p-6 rounded-2xl bg-gradient-to-r ${content.bgClass} border border-opacity-20`}>
                     <div className="flex items-center justify-center gap-3 mb-3">
                         <span className="text-3xl">{emoji}</span>
                         <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
@@ -115,7 +115,7 @@ export function PersonalizedHeader({ useCase, isLandingPage }: PersonalizedHeade
 
     // Default header for authenticated users without specific use case
     return (
-        <div className="text-center mb-8">
+        <div className="text-center mt-16 mb-8">
             <h2 className="text-3xl font-bold mb-4 text-gray-800 dark:text-white">
                 {isNewUser ? "Welcome! 👋" : "Welcome Back! 👋"}
             </h2>
