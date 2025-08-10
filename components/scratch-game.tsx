@@ -17,6 +17,9 @@ interface ScratchGameProps {
     message?: string | undefined;
     expandedMessages?: {[key: string]: boolean};
     onToggleMessage?: (messageId: string) => void;
+    // Auto-completion settings
+    autoCompleteThreshold?: number; // Default 90%
+    autoCompleteDelay?: number; // Default 300ms
 }
 
 // Helper function to truncate message
@@ -37,13 +40,18 @@ export function ScratchGame({
     message,
     expandedMessages = {},
     onToggleMessage,
+    autoCompleteThreshold = 70,
+    autoCompleteDelay = 300,
 }: ScratchGameProps) {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const containerRef = useRef<HTMLDivElement | null>(null);
+    const autoCompleteTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const [isImageLoaded, setIsImageLoaded] = useState(false);
     const [isScratching, setIsScratching] = useState(false);
     const [hasStartedScratching, setHasStartedScratching] = useState(false);
     const [isGameComplete, setIsGameComplete] = useState(false);
+    const [isAutoCompleting, setIsAutoCompleting] = useState(false);
+    const [scratchProgress, setScratchProgress] = useState(0);
     const isReadyFired = useRef(false);
     
     const handleImageLoad = () => {
@@ -91,10 +99,31 @@ export function ScratchGame({
         ctx.fill();
     };
 
+    // Simple auto-completion without animation
+    const autoCompleteReveal = () => {
+        const canvas = canvasRef.current;
+        const ctx = canvas?.getContext('2d');
+        if (!ctx || !canvas || isAutoCompleting || isGameComplete) return;
+
+        setIsAutoCompleting(true);
+        
+        // Clear the scratch overlay completely
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Set completion state first
+        setIsGameComplete(true);
+        
+        // Reset auto-completing state after a brief moment
+        setTimeout(() => {
+            setIsAutoCompleting(false);
+            onScratchComplete();
+        }, 100);
+    };
+
     const checkScratchProgress = () => {
         const canvas = canvasRef.current;
         const ctx = canvas?.getContext('2d');
-        if (!ctx || !canvas) return;
+        if (!ctx || !canvas || isGameComplete || isAutoCompleting) return;
 
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const pixels = imageData.data;
@@ -107,17 +136,26 @@ export function ScratchGame({
         }
 
         const scratchedPercent = (transparentPixels / (canvas.width * canvas.height)) * 100;
+        setScratchProgress(Math.round(scratchedPercent));
         
-        if (scratchedPercent > 60) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            setIsGameComplete(true);
-            onScratchComplete();
+        // Clear any existing auto-complete timeout
+        if (autoCompleteTimeoutRef.current) {
+            clearTimeout(autoCompleteTimeoutRef.current);
+        }
+
+        // Check if we've reached the auto-completion threshold
+        if (scratchedPercent >= autoCompleteThreshold) {
+            // Add a small delay before auto-completing for better UX
+            autoCompleteTimeoutRef.current = setTimeout(() => {
+                autoCompleteReveal();
+            }, autoCompleteDelay);
         }
     };
 
     useEffect(() => {
         const canvas = canvasRef.current;
-        if (!canvas || !isImageLoaded) return;
+        // Don't initialize canvas if game is already complete
+        if (!canvas || !isImageLoaded || isGameComplete) return;
 
         const ctx = initCanvas();
         if (!ctx) return;
@@ -126,6 +164,7 @@ export function ScratchGame({
         let lastPoint: { x: number; y: number } | null = null;
 
         const handleStart = (e: MouseEvent | TouchEvent) => {
+            if (isAutoCompleting || isGameComplete) return;
             e.preventDefault();
             const pos = getCanvasPosition(e, canvas);
             isDrawing = true;
@@ -136,7 +175,7 @@ export function ScratchGame({
         };
 
         const handleMove = (e: MouseEvent | TouchEvent) => {
-            if (!isDrawing) return;
+            if (!isDrawing || isAutoCompleting || isGameComplete) return;
             e.preventDefault();
             
             const pos = getCanvasPosition(e, canvas);
@@ -160,7 +199,7 @@ export function ScratchGame({
         };
 
         const handleEnd = () => {
-            if (!isDrawing) return;
+            if (!isDrawing || isAutoCompleting || isGameComplete) return;
             isDrawing = false;
             lastPoint = null;
             setIsScratching(false);
@@ -199,6 +238,11 @@ export function ScratchGame({
         canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
         return () => {
+            // Clear any pending auto-complete timeout
+            if (autoCompleteTimeoutRef.current) {
+                clearTimeout(autoCompleteTimeoutRef.current);
+            }
+
             // Remove canvas listeners
             canvas.removeEventListener('mousedown', handleStart);
             canvas.removeEventListener('mousemove', handleMove);
@@ -213,19 +257,29 @@ export function ScratchGame({
             document.removeEventListener('touchend', handleDocumentEnd);
             document.removeEventListener('touchcancel', handleDocumentEnd);
         };
-    }, [isImageLoaded, overlayColor, scratchSize]);
+    }, [isImageLoaded, overlayColor, scratchSize, autoCompleteThreshold, autoCompleteDelay, isAutoCompleting, isGameComplete]);
 
     // Handle window resize
     useEffect(() => {
         const handleResize = () => {
-            if (isImageLoaded && !isGameComplete) {
+            // Don't reinitialize canvas if game is complete
+            if (isImageLoaded && !isGameComplete && !isAutoCompleting) {
                 initCanvas();
             }
         };
 
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
-    }, [isImageLoaded, overlayColor, isGameComplete]);
+    }, [isImageLoaded, overlayColor, isGameComplete, isAutoCompleting]);
+
+    // Cleanup timeout on unmount
+    useEffect(() => {
+        return () => {
+            if (autoCompleteTimeoutRef.current) {
+                clearTimeout(autoCompleteTimeoutRef.current);
+            }
+        };
+    }, []);
 
     return (
         <div 
@@ -253,16 +307,28 @@ export function ScratchGame({
                 </div>
             )}
             
-            {/* Scratch Canvas */}
+            {/* Scratch Canvas - Hide completely when game is complete */}
             <canvas
                 ref={canvasRef}
-                className="absolute top-0 left-0 w-full h-full cursor-crosshair touch-none z-20"
+                className={`absolute top-0 left-0 w-full h-full touch-none z-20 ${
+                    isGameComplete ? 'hidden' : isAutoCompleting ? 'cursor-wait' : 'cursor-crosshair'
+                }`}
                 style={{ 
                     touchAction: 'none',
                     userSelect: 'none',
                     WebkitUserSelect: 'none'
                 }}
             />
+            
+            {/* Progress Indicator - Shows during scratching */}
+            {hasStartedScratching && !isGameComplete && (
+                <div className="absolute top-2 right-2 bg-black/70 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-medium z-30">
+                    {scratchProgress}%
+                    {scratchProgress >= autoCompleteThreshold && isAutoCompleting && (
+                        <span className="ml-1 animate-pulse">✨</span>
+                    )}
+                </div>
+            )}
             
             {/* Instructions Overlay - Only shown before scratching starts */}
             {isImageLoaded && !hasStartedScratching && (
@@ -271,6 +337,19 @@ export function ScratchGame({
                         <p className="text-3xl mb-2">🐾</p>
                         <h3 className="font-bold text-xl drop-shadow-lg">Scratch to Reveal!</h3>
                         <p className="text-sm drop-shadow-md">Click and drag to scratch off the coating</p>
+                        <p className="text-xs drop-shadow-md mt-1 opacity-75">Auto-completes at {autoCompleteThreshold}%</p>
+                    </div>
+                </div>
+            )}
+
+            {/* Auto-completion notification - smaller and less intrusive */}
+            {isAutoCompleting && (
+                <div className="absolute top-4 left-1/2 transform -translate-x-1/2 pointer-events-none z-40">
+                    <div className="bg-green-500/90 backdrop-blur-sm text-white px-3 py-1 rounded-full shadow-lg">
+                        <p className="text-xs font-medium flex items-center">
+                            <span className="mr-1">✨</span>
+                            Auto-completing...
+                        </p>
                     </div>
                 </div>
             )}
