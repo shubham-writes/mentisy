@@ -35,7 +35,7 @@ export function QAFormFields({
                 <span className="text-xl sm:text-2xl mb-2 block">🤔</span>
                 <h3 className="font-semibold text-purple-800 dark:text-purple-200 mb-1">Q&A Challenge Setup</h3>
                 <p className="text-sm text-purple-600 dark:text-purple-300">
-                    They'll need to answer correctly to reveal your secret!
+                    They&apos;ll need to answer correctly to reveal your secret!
                 </p>
             </div>
 
@@ -118,7 +118,7 @@ export function QAFormFields({
                             Case Sensitive
                         </Label>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            "Blue" ≠ "blue"
+                           &ldquo;Blue&ldquo; ≠ &ldquo;blue&ldquo;
                         </p>
                     </div>
                     <button
@@ -176,7 +176,7 @@ export function QAFormFields({
                                 Q&A Challenge Ready!
                             </p>
                             <p className="text-xs sm:text-sm text-green-600 dark:text-green-400 mt-1">
-                                They'll get {qaMaxAttempts} attempt{qaMaxAttempts > 1 ? 's' : ''} to answer: "{qaQuestion.length > 50 ? qaQuestion.substring(0, 50) + '...' : qaQuestion}"
+                                They&apos;ll get {qaMaxAttempts} attempt{qaMaxAttempts > 1 ? 's' : ''} to answer: &ldquo;{qaQuestion.length > 50 ? qaQuestion.substring(0, 50) + '...' : qaQuestion}&ldquo;
                             </p>
                         </div>
                     </div>
