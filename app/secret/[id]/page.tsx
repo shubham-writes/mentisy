@@ -11,6 +11,7 @@ import { ShareButton } from "@/components/share-button";
 import Image from "next/image";
 import { LoaderCircle } from "lucide-react";
 import { Watermark } from "@/components/watermark";
+import { QAGame } from "@/components/qa-game";
 
 // --- IMPORT THE NEW GAME COMPONENT ---
 import { ScratchGame } from "@/components/scratch-game";
@@ -325,25 +326,77 @@ const truncateMessage = (message: string, maxLength: number = 100) => {
                 <div style={{ visibility: showLoadingIndicator ? "hidden" : "visible" }}>
 
                     {/* --- UPDATED GAME LOGIC --- */}
-                    {secret.fileType === "image" && secret.fileUrl && secret.gameMode === 'scratch_and_see' && (
-     <div className="relative w-full max-w-full sm:max-w-lg mx-auto mb-6 sm:mb-8 rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 p-2 sm:p-4">
-        <ScratchGame
-            imageUrl={secureFileUrl}
-            onImageReady={handleMediaLoad}
-            onScratchComplete={() => console.log("Game completed!")}
-            recipientName={secret.recipientName}
-            receiverIp={receiverIp}
-            withWatermark={secret.withWatermark}
-            message={secret.message}
-            expandedMessages={expandedMessages}
-            onToggleMessage={(messageId: string) => {
-                setExpandedMessages(prev => ({
-                    ...prev,
-                    [messageId]: !prev[messageId]
-                }));
-            }}
-        />
-     </div>
+                     {secret.fileType === "image" && secret.fileUrl && secret.gameMode === 'scratch_and_see' && (
+                        <>
+                            <div className="relative w-full max-w-full sm:max-w-lg mx-auto mb-4 rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 p-2 sm:p-4">
+                                <ScratchGame
+                                    imageUrl={secureFileUrl}
+                                    onImageReady={handleMediaLoad}
+                                    onScratchComplete={() => console.log("Game completed!")}
+                                    recipientName={secret.recipientName}
+                                    receiverIp={receiverIp}
+                                    withWatermark={secret.withWatermark}
+                                    // Remove message from scratch game - we'll show it separately
+                                    // message={secret.message}
+                                    // expandedMessages={expandedMessages}
+                                    // onToggleMessage={(messageId: string) => {
+                                    //     setExpandedMessages(prev => ({
+                                    //         ...prev,
+                                    //         [messageId]: !prev[messageId]
+                                    //     }));
+                                    // }}
+                                />
+                            </div>
+                            
+                            {/* Message below the scratch game - much better UX! */}
+                            {secret.message && (
+                                <div className="max-w-full sm:max-w-lg mx-auto mb-6 sm:mb-8 p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl border border-blue-200/50 dark:border-blue-700/50 shadow-lg">
+                                    <div className="text-center mb-3">
+                                        <span className="text-xl sm:text-2xl">💌</span>
+                                    </div>
+                                    <blockquote className="text-sm sm:text-base font-medium text-gray-800 dark:text-gray-200 text-center leading-relaxed">
+                                        &ldquo;{expandedMessages['scratch'] || secret.message.length <= 100
+                                            ? secret.message
+                                            : truncateMessage(secret.message)
+                                        }&rdquo;
+                                    </blockquote>
+                                    {secret.message.length > 100 && (
+                                        <button
+                                            onClick={() => toggleMessageExpansion('scratch')}
+                                            className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 text-xs sm:text-sm font-medium mt-3 block mx-auto transition-colors"
+                                        >
+                                            {expandedMessages['scratch'] ? 'Read less' : 'Read more'}
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+                        </>
+                    )}
+
+                    {secret.fileType === "image" && secret.fileUrl && secret.gameMode === 'qa_challenge' && (
+    <>
+        <div className="relative w-full max-w-full sm:max-w-lg mx-auto mb-4 rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 p-2 sm:p-4">
+            <QAGame
+                imageUrl={secureFileUrl}
+                question={secret.qaQuestion || "What's the answer?"}
+                correctAnswer={secret.qaAnswer || "answer"}
+                onImageReady={handleMediaLoad}
+                onAnswerCorrect={() => {
+                    console.log("Q&A Challenge completed!");
+                    // You can add analytics here later
+                }}
+                recipientName={secret.recipientName}
+                receiverIp={receiverIp}
+                withWatermark={secret.withWatermark}
+                message={secret.message}
+                expandedMessages={expandedMessages}
+                onToggleMessage={toggleMessageExpansion}
+                maxAttempts={secret.qaMaxAttempts || 3}
+                caseSensitive={secret.qaCaseSensitive || false}
+                showHints={secret.qaShowHints ?? true}
+            />
+        </div>
+    </>
 )}
 
                     {/* --- ORIGINAL IMAGE LOGIC (FALLBACK) --- */}

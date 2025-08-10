@@ -354,25 +354,7 @@ export function ScratchGame({
                 </div>
             )}
             
-            {/* Message Overlay - Shows after scratching is complete or during scratching */}
-            {message && hasStartedScratching && (
-                <div className="absolute bottom-0 left-0 right-0 bg-black/70 backdrop-blur-sm text-white p-3 sm:p-4 z-30 rounded-b-xl">
-                    <p className="text-sm sm:text-base font-medium text-center leading-relaxed">
-                        {expandedMessages['scratch'] || message.length <= 100
-                            ? message
-                            : truncateMessage(message)
-                        }
-                    </p>
-                    {message.length > 100 && onToggleMessage && (
-                        <button
-                            onClick={() => onToggleMessage('scratch')}
-                            className="text-blue-300 hover:text-blue-200 text-xs sm:text-sm font-medium mt-1 block mx-auto transition-colors"
-                        >
-                            {expandedMessages['scratch'] ? 'Read less' : 'Read more'}
-                        </button>
-                    )}
-                </div>
-            )}
+
         </div>
     );
 }

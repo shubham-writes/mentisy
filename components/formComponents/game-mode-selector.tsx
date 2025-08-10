@@ -1,7 +1,7 @@
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
-type GameMode = "none" | "scratch_and_see" | "mystery_reveal" | "emoji_curtain";
+type GameMode = "none" | "scratch_and_see" | "mystery_reveal" | "emoji_curtain" | "qa_challenge";
 
 interface GameModeSelectorProps {
     selectedMode: GameMode;
@@ -12,10 +12,9 @@ interface GameModeSelectorProps {
 const gameOptions = [
     { id: "none", icon: "✨", title: "Classic", description: "The original one-time view" },
     { id: "scratch_and_see", icon: "🐾", title: "Scratch & See", description: "Make them work for it" },
+    { id: "qa_challenge", icon: "🤔", title: "Q & A", description: "Quiz them to unlock" },
     { id: "mystery_reveal", icon: "❓", title: "Mystery Reveal", description: "A slow, blurry reveal" },
-    { id: "emoji_curtain", icon: "🎉", title: "Emoji Curtain", description: "Hype it up with emojis" },
 ] as const;
-
 
 export function GameModeSelector({ selectedMode, onModeChange, isGameModeDisabled }: GameModeSelectorProps) {
     return (

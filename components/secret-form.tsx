@@ -19,11 +19,11 @@ import { TimerSettings } from "./formComponents/timer-settings";
 import { WatermarkSettings } from "./formComponents/watermark-settings";
 import { LandingPageNotice } from "./formComponents/landing-page-notice";
 import { GeneratedLinkDisplay } from "./formComponents/generated-link-display";
-// --- IMPORT THE NEW COMPONENT ---
 import { GameModeSelector } from "./formComponents/game-mode-selector";
+import { QAFormFields } from "./qa-form-fields";
 
-
-type GameMode = "none" | "scratch_and_see" | "mystery_reveal" | "emoji_curtain";
+// Updated GameMode type to match backend expectations
+type GameMode = "none" | "scratch_and_see" | "qa_challenge" | "mystery_reveal" | "emoji_curtain";
 
 interface SecretFormProps {
     isLandingPage?: boolean;
@@ -45,8 +45,16 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     const [showSignupPrompt, setShowSignupPrompt] = useState(false);
     const [showTips, setShowTips] = useState(false);
     const [templateApplied, setTemplateApplied] = useState(false);
-    // --- NEW STATE FOR GAME MODE ---
+    
+    // Game mode state
     const [gameMode, setGameMode] = useState<GameMode>("none");
+    
+    // QA Game state
+    const [qaQuestion, setQaQuestion] = useState("");
+    const [qaAnswer, setQaAnswer] = useState("");
+    const [qaMaxAttempts, setQaMaxAttempts] = useState(3);
+    const [qaCaseSensitive, setQaCaseSensitive] = useState(false);
+    const [qaShowHints, setQaShowHints] = useState(true);
     
     const createSecret = useMutation(api.secrets.create);
     const { signIn } = useSignIn();
@@ -105,6 +113,14 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                 setAddWatermark(data.addWatermark ?? true);
                 setDuration(data.duration || "10");
                 setUploadedFile(data.uploadedFile || null);
+                setGameMode(data.gameMode || "none");
+                
+                // Restore QA fields
+                setQaQuestion(data.qaQuestion || "");
+                setQaAnswer(data.qaAnswer || "");
+                setQaMaxAttempts(data.qaMaxAttempts || 3);
+                setQaCaseSensitive(data.qaCaseSensitive || false);
+                setQaShowHints(data.qaShowHints ?? true);
                 
                 // Clear the saved data after restoring
                 localStorage.removeItem('secretFormData');
@@ -125,7 +141,13 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
             addWatermark,
             duration,
             uploadedFile,
-            gameMode, // --- SAVE GAME MODE ---
+            gameMode,
+            // Save QA fields
+            qaQuestion,
+            qaAnswer,
+            qaMaxAttempts,
+            qaCaseSensitive,
+            qaShowHints,
         };
         localStorage.setItem('secretFormData', JSON.stringify(formData));
     };
@@ -142,6 +164,14 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
             return;
         }
 
+        // Validate QA fields if QA mode is selected
+        if (gameMode === 'qa_challenge' && uploadedFile?.type === 'image') {
+            if (!qaQuestion.trim() || !qaAnswer.trim()) {
+                alert("Please provide both a question and answer for the Q&A challenge.");
+                return;
+            }
+        }
+
         if (isLandingPage) {
             // Save form data and show signup prompt
             saveFormData();
@@ -151,7 +181,8 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
 
         setIsLoading(true);
         try {
-            const publicId = await createSecret({
+            // Prepare the mutation parameters
+            const mutationParams: any = {
                 message: message || undefined,
                 recipientName,
                 publicNote,
@@ -159,9 +190,26 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                 fileType: uploadedFile?.type,
                 withWatermark: addWatermark,
                 duration: uploadedFile?.type === 'video' ? undefined : parseInt(duration),
-                // --- PASS GAME MODE TO MUTATION ---
-                gameMode: uploadedFile?.type === 'image' ? gameMode : 'none',
-            });
+            };
+
+            // Only add game mode and QA fields for images
+            if (uploadedFile?.type === 'image') {
+                mutationParams.gameMode = gameMode;
+                
+                // Add QA fields only if QA mode is selected
+                if (gameMode === 'qa_challenge') {
+                    mutationParams.qaQuestion = qaQuestion;
+                    mutationParams.qaAnswer = qaAnswer;
+                    mutationParams.qaMaxAttempts = qaMaxAttempts;
+                    mutationParams.qaCaseSensitive = qaCaseSensitive;
+                    mutationParams.qaShowHints = qaShowHints;
+                }
+            } else {
+                // For videos or no file, always use "none"
+                mutationParams.gameMode = "none";
+            }
+
+            const publicId = await createSecret(mutationParams);
 
             if (publicId) {
                 const link = `${window.location.origin}/redirect/${publicId}`;
@@ -171,6 +219,12 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
             // Clear the form for next secret
             setMessage("");
             setUploadedFile(null);
+            setGameMode("none");
+            setQaQuestion("");
+            setQaAnswer("");
+            setQaMaxAttempts(3);
+            setQaCaseSensitive(false);
+            setQaShowHints(true);
         } catch (error) {
             console.error(error);
             alert("Failed to create secret message.");
@@ -214,6 +268,50 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     const handleFileRemove = () => {
         clearGeneratedLink(); // Clear link when file is removed
         setUploadedFile(null);
+        setGameMode('none'); // Reset game mode when file is removed
+    };
+
+    // Game mode change handler
+    const handleGameModeChange = (newMode: GameMode) => {
+        if (generatedLink) {
+            clearGeneratedLink();
+        }
+        setGameMode(newMode);
+        
+        // Clear QA fields when switching away from QA mode
+        if (newMode !== 'qa_challenge') {
+            setQaQuestion("");
+            setQaAnswer("");
+            setQaMaxAttempts(3);
+            setQaCaseSensitive(false);
+            setQaShowHints(true);
+        }
+    };
+
+    // QA field change handlers
+    const handleQaQuestionChange = (value: string) => {
+        if (generatedLink) clearGeneratedLink();
+        setQaQuestion(value);
+    };
+
+    const handleQaAnswerChange = (value: string) => {
+        if (generatedLink) clearGeneratedLink();
+        setQaAnswer(value);
+    };
+
+    const handleQaMaxAttemptsChange = (value: number) => {
+        if (generatedLink) clearGeneratedLink();
+        setQaMaxAttempts(value);
+    };
+
+    const handleQaCaseSensitiveChange = (value: boolean) => {
+        if (generatedLink) clearGeneratedLink();
+        setQaCaseSensitive(value);
+    };
+
+    const handleQaShowHintsChange = (value: boolean) => {
+        if (generatedLink) clearGeneratedLink();
+        setQaShowHints(value);
     };
 
     // Upload handlers
@@ -235,9 +333,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     };
 
     const isTimerDisabled = uploadedFile?.type === 'video';
-    // --- DISABLE GAMES FOR VIDEOS ---
     const isGameModeDisabled = uploadedFile?.type === 'video';
-
 
     const formData = {
         recipientName,
@@ -246,7 +342,13 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
         uploadedFile,
         duration,
         addWatermark,
-        gameMode, // --- PASS GAME MODE TO SIGNUP ---
+        gameMode,
+        // Include QA fields in form data for signup
+        qaQuestion,
+        qaAnswer,
+        qaMaxAttempts,
+        qaCaseSensitive,
+        qaShowHints,
     };
 
     console.log("Current form state:", { recipientName, publicNote, message, useCase, templateApplied, gameMode });
@@ -300,15 +402,32 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                 />
                             )}
                             
-                            {/* --- ADD THE GAME MODE SELECTOR --- */}
+                            {/* Game Mode Selector */}
                             <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
                                 <GameModeSelector
                                     selectedMode={gameMode}
-                                    onModeChange={setGameMode}
+                                    onModeChange={handleGameModeChange}
                                     isGameModeDisabled={isGameModeDisabled}
                                 />
                             </div>
 
+                            {/* QA Form Fields (Conditional) */}
+                            {gameMode === 'qa_challenge' && uploadedFile?.type === 'image' && (
+                                <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
+                                    <QAFormFields
+                                        qaQuestion={qaQuestion}
+                                        qaAnswer={qaAnswer}
+                                        qaMaxAttempts={qaMaxAttempts}
+                                        qaCaseSensitive={qaCaseSensitive}
+                                        qaShowHints={qaShowHints}
+                                        onQuestionChange={handleQaQuestionChange}
+                                        onAnswerChange={handleQaAnswerChange}
+                                        onMaxAttemptsChange={handleQaMaxAttemptsChange}
+                                        onCaseSensitiveChange={handleQaCaseSensitiveChange}
+                                        onShowHintsChange={handleQaShowHintsChange}
+                                    />
+                                </div>
+                            )}
                         </div>
 
                         {/* Mobile: Form Fields Second, Desktop: Right Column */}
@@ -336,7 +455,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                 />
                             </div>
                             
-                             {/* Watermark Settings */}
+                            {/* Watermark Settings */}
                             <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
                                 <WatermarkSettings
                                     addWatermark={addWatermark}
@@ -347,7 +466,6 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                     </div>
 
                     {/* Generate Button - Mobile: Fixed Bottom Area, Desktop: Center */}
-                    {/* Mobile: Sticky bottom button for easy thumb reach */}
                     <div className="mt-6 sm:mt-8 lg:mt-12">
                         {/* Mobile: Full width bottom button */}
                         <div className="sm:hidden">

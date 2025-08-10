@@ -17,13 +17,20 @@ export const create = mutation({
         fileType: v.optional(v.union(v.literal("image"), v.literal("video"))), 
         withWatermark: v.optional(v.boolean()),
         duration: v.optional(v.number()),
-        // --- NEW ARGUMENT ---
+        // --- UPDATED GAME MODE TO INCLUDE qa_challenge ---
         gameMode: v.optional(v.union(
             v.literal("none"),
             v.literal("scratch_and_see"),
+            v.literal("qa_challenge"),
             v.literal("mystery_reveal"),
             v.literal("emoji_curtain")
         )),
+        // --- ADD Q&A FIELDS ---
+        qaQuestion: v.optional(v.string()),
+        qaAnswer: v.optional(v.string()),
+        qaMaxAttempts: v.optional(v.number()),
+        qaCaseSensitive: v.optional(v.boolean()),
+        qaShowHints: v.optional(v.boolean()),
      },
     handler: async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity(); 
@@ -46,6 +53,12 @@ export const create = mutation({
             duration: args.duration,
             // --- SAVE THE GAME MODE ---
             gameMode: args.gameMode,
+            // --- SAVE Q&A FIELDS ---
+            qaQuestion: args.qaQuestion,
+            qaAnswer: args.qaAnswer,
+            qaMaxAttempts: args.qaMaxAttempts,
+            qaCaseSensitive: args.qaCaseSensitive,
+            qaShowHints: args.qaShowHints,
          });
         
         const newSecret = await ctx.db.get(secretId);

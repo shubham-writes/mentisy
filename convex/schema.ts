@@ -28,14 +28,29 @@ export default defineSchema({
         // New analytics fields
         viewedAt: v.optional(v.number()),
         
-        // --- NEW FIELD FOR MICRO-GAMES ---
+        // --- UPDATED GAME MODE FIELD TO INCLUDE qa_challenge ---
         gameMode: v.optional(v.union(
             v.literal("none"),
             v.literal("scratch_and_see"),
+            v.literal("qa_challenge"),
             v.literal("mystery_reveal"),
             v.literal("emoji_curtain")
         )),
+
+        // Q&A Game specific fields
+        qaQuestion: v.optional(v.string()),
+        qaAnswer: v.optional(v.string()),
+        qaMaxAttempts: v.optional(v.number()), // Default 3
+        qaCaseSensitive: v.optional(v.boolean()), // Default false
+        qaShowHints: v.optional(v.boolean()), // Default true
         
+        // Game Analytics (optional - for streaks/stats later)
+        gameStats: v.optional(v.object({
+            attempts: v.number(),
+            completed: v.boolean(),
+            completedAt: v.optional(v.number()),
+            hintsUsed: v.number(),
+        })),
     })
         .index("by_author", ["authorId"])
         .index("by_publicId", ["publicId"]),
