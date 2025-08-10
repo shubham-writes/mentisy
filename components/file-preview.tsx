@@ -72,7 +72,7 @@ export function FilePreview({ file, onRemove, recipientName, showWatermark = fal
       </div>
 
       {/* Preview Container - Responsive to container context */}
-      <div className="relative w-full aspect-[4/3] sm:aspect-[5/4] md:aspect-[4/3] lg:aspect-[5/4] xl:aspect-video bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
+      <div className="relative h-[70vh] w-full aspect-[4/3] sm:aspect-[5/4] md:aspect-[4/3] lg:aspect-[5/4] xl:aspect-video bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="absolute inset-0 flex items-center justify-center p-2 sm:p-4">
           {file.type === "image" ? (
             <div className="relative w-full h-full">

@@ -12,6 +12,10 @@ import Image from "next/image";
 import { LoaderCircle } from "lucide-react";
 import { Watermark } from "@/components/watermark";
 
+// --- IMPORT THE NEW GAME COMPONENT ---
+import { ScratchGame } from "@/components/scratch-game";
+
+
 export default function SecretPage({ params }: { params: { id: string } }) {
     const [secret, setSecret] = useState<Doc<"secrets"> | null | undefined>(undefined);
     const [isMediaLoading, setIsMediaLoading] = useState(true);
@@ -33,6 +37,18 @@ export default function SecretPage({ params }: { params: { id: string } }) {
     const expireSecret = useMutation(api.secrets.expireSecret);
 
     const [videoBox, setVideoBox] = useState({ width: 0, height: 0, top: 0, left: 0 });
+
+    const toggleMessageExpansion = (messageId: string) => {
+    setExpandedMessages(prev => ({
+        ...prev,
+        [messageId]: !prev[messageId]
+    }));
+};
+
+const truncateMessage = (message: string, maxLength: number = 100) => {
+    if (message.length <= maxLength) return message;
+    return message.substring(0, maxLength) + '...';
+};
 
     const updateVideoBox = () => {
         if (videoRef.current) {
@@ -69,13 +85,13 @@ export default function SecretPage({ params }: { params: { id: string } }) {
                 // Get user agent for basic analytics (no location tracking)
                 const userAgent = navigator.userAgent;
 
-                const revealedSecret = await revealSecret({ 
+                const revealedSecret = await revealSecret({
                     secretId: params.id as Id<"secrets">,
-                   
+
                 });
 
                 setSecret(revealedSecret);
-                
+
                 if (revealedSecret) {
                     fetchIp(); // Still needed for watermark display
                     if (!revealedSecret.fileUrl) {
@@ -196,16 +212,16 @@ export default function SecretPage({ params }: { params: { id: string } }) {
 
     const isSecretExpiredOrAlreadyViewed = (secret: Doc<"secrets"> | null) => {
         if (!secret) return true;
-        
+
         // Check if it's explicitly expired
         if (secret.expired) return true;
-        
+
         // Check if it's been read and has no content (already consumed)
         if (secret.isRead && !secret.message && !secret.fileUrl) return true;
-        
+
         // For videos specifically, if it's been read, it should be expired
         if (secret.fileType === "video" && secret.isRead) return true;
-        
+
         return false;
     };
 
@@ -247,8 +263,8 @@ const truncateMessage = (message: string, maxLength: number = 100) => {
                     </div>
                     <p className="text-lg sm:text-xl text-red-600 dark:text-red-400 font-medium mb-2">Secret Not Found</p>
                     <p className="text-gray-600 dark:text-gray-400 mb-6 sm:mb-8 px-2 text-sm sm:text-base">This secret message could not be found or may have already been viewed.</p>
-                    
-                    <Button 
+
+                    <Button
                         asChild
                         size="lg"
                         className="bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-[#FF75A0]/90 hover:to-[#FFAA70]/90 text-white font-medium px-6 py-3 sm:px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 border-0 text-sm sm:text-base"
@@ -269,8 +285,8 @@ const truncateMessage = (message: string, maxLength: number = 100) => {
                     <h3 className="text-xl sm:text-2xl font-bold text-gray-700 dark:text-gray-200 mb-3">Vanished Into Thin Air</h3>
                     <p className="text-gray-500 dark:text-gray-400 text-base sm:text-lg mb-2 px-2">This secret message has expired and is no longer available.</p>
                     <p className="text-sm text-gray-400 dark:text-gray-500 mb-6 sm:mb-8 px-2">Some secrets are meant to disappear forever ✨</p>
-                    
-                    <Button 
+
+                    <Button
                         asChild
                         size="lg"
                         className="bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-[#FF75A0]/90 hover:to-[#FFAA70]/90 text-white font-medium px-6 py-3 sm:px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 border-0 text-sm sm:text-base"
@@ -307,7 +323,31 @@ const truncateMessage = (message: string, maxLength: number = 100) => {
                 )}
 
                 <div style={{ visibility: showLoadingIndicator ? "hidden" : "visible" }}>
-                    {secret.fileType === "image" && secret.fileUrl && (
+
+                    {/* --- UPDATED GAME LOGIC --- */}
+                    {secret.fileType === "image" && secret.fileUrl && secret.gameMode === 'scratch_and_see' && (
+     <div className="relative w-full max-w-full sm:max-w-lg mx-auto mb-6 sm:mb-8 rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 p-2 sm:p-4">
+        <ScratchGame
+            imageUrl={secureFileUrl}
+            onImageReady={handleMediaLoad}
+            onScratchComplete={() => console.log("Game completed!")}
+            recipientName={secret.recipientName}
+            receiverIp={receiverIp}
+            withWatermark={secret.withWatermark}
+            message={secret.message}
+            expandedMessages={expandedMessages}
+            onToggleMessage={(messageId: string) => {
+                setExpandedMessages(prev => ({
+                    ...prev,
+                    [messageId]: !prev[messageId]
+                }));
+            }}
+        />
+     </div>
+)}
+
+                    {/* --- ORIGINAL IMAGE LOGIC (FALLBACK) --- */}
+                    {secret.fileType === "image" && secret.fileUrl && (!secret.gameMode || secret.gameMode === 'none') && (
                         <div className="relative w-full max-w-full sm:max-w-lg mx-auto mb-6 sm:mb-8 rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 p-2 sm:p-4">
                             <div className="relative w-full h-[80vh] sm:max-h-96 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700">
                                 <Image
@@ -326,26 +366,26 @@ const truncateMessage = (message: string, maxLength: number = 100) => {
                                 {secret.withWatermark && (
                                     <Watermark name={secret.recipientName} ip={receiverIp ?? undefined} />
                                 )}
-                                
+
                                {/* Message overlay for images */}
-{secret.message && (
-    <div className="absolute bottom-0 left-0 right-0 bg-black/40 backdrop-blur-xm text-white p-3 sm:p-4">
-        <p className="text-sm sm:text-base font-medium text-center leading-relaxed">
-            {expandedMessages['image'] || secret.message.length <= 100 
-                ? secret.message 
-                : truncateMessage(secret.message)
-            }
-        </p>
-        {secret.message.length > 100 && (
-            <button
-                onClick={() => toggleMessageExpansion('image')}
-                className="text-blue-300 hover:text-blue-200 text-xs sm:text-sm font-medium mt-1 block mx-auto transition-colors"
-            >
-                {expandedMessages['image'] ? 'Read less' : 'Read more'}
-            </button>
-        )}
-    </div>
-)}
+                                {secret.message && (
+                                    <div className="absolute bottom-0 left-0 right-0 bg-black/40 backdrop-blur-xm text-white p-3 sm:p-4">
+                                        <p className="text-sm sm:text-base font-medium text-center leading-relaxed">
+                                            {expandedMessages['image'] || secret.message.length <= 100
+                                                ? secret.message
+                                                : truncateMessage(secret.message)
+                                            }
+                                        </p>
+                                        {secret.message.length > 100 && (
+                                            <button
+                                                onClick={() => toggleMessageExpansion('image')}
+                                                className="text-blue-300 hover:text-blue-200 text-xs sm:text-sm font-medium mt-1 block mx-auto transition-colors"
+                                            >
+                                                {expandedMessages['image'] ? 'Read less' : 'Read more'}
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}
@@ -366,7 +406,7 @@ const truncateMessage = (message: string, maxLength: number = 100) => {
                                     </div>
                                 </div>
                             </div>
-                            
+
                             {/* Mobile-optimized video container */}
                             <div className="relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-2 sm:p-4 shadow-xl">
                                 {/* Video wrapper - mobile optimized */}
@@ -417,24 +457,24 @@ const truncateMessage = (message: string, maxLength: number = 100) => {
                                     )}
 
                                     {/* Message overlay for videos */}
-{secret.message && (
-    <div className="absolute bottom-0 left-0 right-0 bg-black/70 backdrop-blur-sm text-white p-3 sm:p-4 z-10">
-        <p className="text-sm sm:text-base font-medium text-center leading-relaxed">
-            {expandedMessages['video'] || secret.message.length <= 100 
-                ? secret.message 
-                : truncateMessage(secret.message)
-            }
-        </p>
-        {secret.message.length > 100 && (
-            <button
-                onClick={() => toggleMessageExpansion('video')}
-                className="text-blue-300 hover:text-blue-200 text-xs sm:text-sm font-medium mt-1 block mx-auto transition-colors"
-            >
-                {expandedMessages['video'] ? 'Read less' : 'Read more'}
-            </button>
-        )}
-    </div>
-)}
+                                    {secret.message && (
+                                        <div className="absolute bottom-0 left-0 right-0 bg-black/70 backdrop-blur-sm text-white p-3 sm:p-4 z-10">
+                                            <p className="text-sm sm:text-base font-medium text-center leading-relaxed">
+                                                {expandedMessages['video'] || secret.message.length <= 100
+                                                    ? secret.message
+                                                    : truncateMessage(secret.message)
+                                                }
+                                            </p>
+                                            {secret.message.length > 100 && (
+                                                <button
+                                                    onClick={() => toggleMessageExpansion('video')}
+                                                    className="text-blue-300 hover:text-blue-200 text-xs sm:text-sm font-medium mt-1 block mx-auto transition-colors"
+                                                >
+                                                    {expandedMessages['video'] ? 'Read less' : 'Read more'}
+                                                </button>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Mobile-optimized controls panel */}
@@ -474,27 +514,27 @@ const truncateMessage = (message: string, maxLength: number = 100) => {
                     )}
 
                     {/* Standalone message (only when no file) */}
-{secret.message && !secret.fileUrl && (
-    <div className="max-w-sm sm:max-w-xl mx-auto mb-6 sm:mb-8 p-6 sm:p-8 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl">
-        <div className="text-center mb-4">
-            <span className="text-2xl sm:text-3xl">💌</span>
-        </div>
-        <blockquote className="text-base sm:text-lg md:text-xl font-medium text-gray-800 dark:text-gray-200 text-center leading-relaxed px-2">
-            &ldquo;{expandedMessages['standalone'] || secret.message.length <= 100 
-                ? secret.message 
-                : truncateMessage(secret.message)
-            }&rdquo;
-        </blockquote>
-        {secret.message.length > 100 && (
-            <button
-                onClick={() => toggleMessageExpansion('standalone')}
-                className="text-[#FF75A0] hover:text-[#FF75A0]/80 text-sm font-medium mt-3 block mx-auto transition-colors"
-            >
-                {expandedMessages['standalone'] ? 'Read less' : 'Read more'}
-            </button>
-        )}
-    </div>
-)}
+                    {secret.message && !secret.fileUrl && (
+                        <div className="max-w-sm sm:max-w-xl mx-auto mb-6 sm:mb-8 p-6 sm:p-8 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl">
+                            <div className="text-center mb-4">
+                                <span className="text-2xl sm:text-3xl">💌</span>
+                            </div>
+                            <blockquote className="text-base sm:text-lg md:text-xl font-medium text-gray-800 dark:text-gray-200 text-center leading-relaxed px-2">
+                                &ldquo;{expandedMessages['standalone'] || secret.message.length <= 100
+                                    ? secret.message
+                                    : truncateMessage(secret.message)
+                                }&rdquo;
+                            </blockquote>
+                            {secret.message.length > 100 && (
+                                <button
+                                    onClick={() => toggleMessageExpansion('standalone')}
+                                    className="text-[#FF75A0] hover:text-[#FF75A0]/80 text-sm font-medium mt-3 block mx-auto transition-colors"
+                                >
+                                    {expandedMessages['standalone'] ? 'Read less' : 'Read more'}
+                                </button>
+                            )}
+                        </div>
+                    )}
 
                     {!isMediaLoading && (
                         <div >
@@ -502,9 +542,9 @@ const truncateMessage = (message: string, maxLength: number = 100) => {
                                 <CountdownTimer initialSeconds={secret.duration || 10} onComplete={handleTimerComplete} />
                             )}
                             {secret.fileType === "video" && hasStarted && (
-                                <CountdownTimer 
+                                <CountdownTimer
                                     initialSeconds={duration || 10}
-                                    onComplete={handleTimerComplete} 
+                                    onComplete={handleTimerComplete}
                                 />
                             )}
                         </div>
@@ -516,13 +556,13 @@ const truncateMessage = (message: string, maxLength: number = 100) => {
 
     const getHeading = () => {
         // Don't show name if secret is expired, not found, or expired during viewing
-        if (secret === null || 
-            secret === undefined || 
-            hasExpiredDuringViewing || 
+        if (secret === null ||
+            secret === undefined ||
+            hasExpiredDuringViewing ||
             isSecretExpiredOrAlreadyViewed(secret)) {
             return "Secret Message";
         }
-        
+
         if (secret && secret.recipientName) {
             return `A Secret Message For ${secret.recipientName}`;
         }

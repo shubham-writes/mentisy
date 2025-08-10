@@ -63,7 +63,7 @@ export default function Home() {
         <TestimonialsSection />
         <UseCasesSection />
         
-        {/* Footer with Call to Action */}
+       
         <FaqSection />
         
         <FinalCta userCount={userCount} />
@@ -73,7 +73,7 @@ export default function Home() {
       <Authenticated>
         
         <AuthenticatedDashboard />
-        <Footer />
+        
       </Authenticated>
     </div>
   );

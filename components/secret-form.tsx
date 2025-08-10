@@ -19,6 +19,11 @@ import { TimerSettings } from "./formComponents/timer-settings";
 import { WatermarkSettings } from "./formComponents/watermark-settings";
 import { LandingPageNotice } from "./formComponents/landing-page-notice";
 import { GeneratedLinkDisplay } from "./formComponents/generated-link-display";
+// --- IMPORT THE NEW COMPONENT ---
+import { GameModeSelector } from "./formComponents/game-mode-selector";
+
+
+type GameMode = "none" | "scratch_and_see" | "mystery_reveal" | "emoji_curtain";
 
 interface SecretFormProps {
     isLandingPage?: boolean;
@@ -40,6 +45,8 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     const [showSignupPrompt, setShowSignupPrompt] = useState(false);
     const [showTips, setShowTips] = useState(false);
     const [templateApplied, setTemplateApplied] = useState(false);
+    // --- NEW STATE FOR GAME MODE ---
+    const [gameMode, setGameMode] = useState<GameMode>("none");
     
     const createSecret = useMutation(api.secrets.create);
     const { signIn } = useSignIn();
@@ -117,7 +124,8 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
             publicNote,
             addWatermark,
             duration,
-            uploadedFile
+            uploadedFile,
+            gameMode, // --- SAVE GAME MODE ---
         };
         localStorage.setItem('secretFormData', JSON.stringify(formData));
     };
@@ -151,6 +159,8 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                 fileType: uploadedFile?.type,
                 withWatermark: addWatermark,
                 duration: uploadedFile?.type === 'video' ? undefined : parseInt(duration),
+                // --- PASS GAME MODE TO MUTATION ---
+                gameMode: uploadedFile?.type === 'image' ? gameMode : 'none',
             });
 
             if (publicId) {
@@ -195,6 +205,10 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
         clearGeneratedLink(); // Clear link when new file is uploaded
         setUploadedFile(file);
         setIsUploading(false);
+        // Reset game mode if a video is uploaded
+        if (file.type === 'video') {
+            setGameMode('none');
+        }
     };
 
     const handleFileRemove = () => {
@@ -221,6 +235,9 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     };
 
     const isTimerDisabled = uploadedFile?.type === 'video';
+    // --- DISABLE GAMES FOR VIDEOS ---
+    const isGameModeDisabled = uploadedFile?.type === 'video';
+
 
     const formData = {
         recipientName,
@@ -228,10 +245,11 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
         message,
         uploadedFile,
         duration,
-        addWatermark
+        addWatermark,
+        gameMode, // --- PASS GAME MODE TO SIGNUP ---
     };
 
-    console.log("Current form state:", { recipientName, publicNote, message, useCase, templateApplied });
+    console.log("Current form state:", { recipientName, publicNote, message, useCase, templateApplied, gameMode });
 
     return (
         <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
@@ -281,14 +299,16 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                     onVideoUploadError={handleUploadError}
                                 />
                             )}
-
-                            {/* Watermark Settings - Mobile: Compact Layout */}
+                            
+                            {/* --- ADD THE GAME MODE SELECTOR --- */}
                             <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
-                                <WatermarkSettings
-                                    addWatermark={addWatermark}
-                                    onWatermarkChange={setAddWatermark}
+                                <GameModeSelector
+                                    selectedMode={gameMode}
+                                    onModeChange={setGameMode}
+                                    isGameModeDisabled={isGameModeDisabled}
                                 />
                             </div>
+
                         </div>
 
                         {/* Mobile: Form Fields Second, Desktop: Right Column */}
@@ -313,6 +333,14 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                     duration={duration}
                                     onDurationChange={setDuration}
                                     isTimerDisabled={isTimerDisabled}
+                                />
+                            </div>
+                            
+                             {/* Watermark Settings */}
+                            <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
+                                <WatermarkSettings
+                                    addWatermark={addWatermark}
+                                    onWatermarkChange={setAddWatermark}
                                 />
                             </div>
                         </div>

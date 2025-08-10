@@ -28,6 +28,14 @@ export default defineSchema({
         // New analytics fields
         viewedAt: v.optional(v.number()),
         
+        // --- NEW FIELD FOR MICRO-GAMES ---
+        gameMode: v.optional(v.union(
+            v.literal("none"),
+            v.literal("scratch_and_see"),
+            v.literal("mystery_reveal"),
+            v.literal("emoji_curtain")
+        )),
+        
     })
         .index("by_author", ["authorId"])
         .index("by_publicId", ["publicId"]),

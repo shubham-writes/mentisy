@@ -17,6 +17,13 @@ export const create = mutation({
         fileType: v.optional(v.union(v.literal("image"), v.literal("video"))), 
         withWatermark: v.optional(v.boolean()),
         duration: v.optional(v.number()),
+        // --- NEW ARGUMENT ---
+        gameMode: v.optional(v.union(
+            v.literal("none"),
+            v.literal("scratch_and_see"),
+            v.literal("mystery_reveal"),
+            v.literal("emoji_curtain")
+        )),
      },
     handler: async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity(); 
@@ -37,12 +44,16 @@ export const create = mutation({
             isRead: false, 
             hiddenForSender: false,
             duration: args.duration,
+            // --- SAVE THE GAME MODE ---
+            gameMode: args.gameMode,
          });
         
         const newSecret = await ctx.db.get(secretId);
         return newSecret?.publicId;
     },
 });
+
+// ... (the rest of the file remains the same)
 
 export const getMySecrets = query({
   args: { paginationOpts: paginationOptsValidator },
