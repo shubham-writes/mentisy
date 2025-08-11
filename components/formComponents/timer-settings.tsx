@@ -69,17 +69,17 @@ export function TimerSettings({ duration, onDurationChange, isTimerDisabled }: T
                 
                 {/* MODIFIED 30 Second Option - Touch Optimized */}
                 <div className={`relative ${isTimerDisabled ? 'opacity-50' : ''}`}>
-                    <RadioGroupItem value="30" id="r3" className="sr-only" />
+                    <RadioGroupItem value="60" id="r3" className="sr-only" />
                     <Label 
                         htmlFor="r3" 
                         className={`flex flex-col items-center justify-center p-3 sm:p-4 lg:p-5 border-2 rounded-lg sm:rounded-xl cursor-pointer transition-all active:scale-95 sm:hover:scale-105 min-h-[80px] sm:min-h-[100px] lg:min-h-[120px] ${
-                            duration === '30' 
+                            duration === '60' 
                                 ? 'border-[#FF75A0] bg-gradient-to-br from-[#FF75A0]/10 to-[#FFAA70]/10 text-[#FF75A0] dark:bg-[#FF75A0]/20 dark:text-[#FF75A0]' 
                                 : 'border-gray-200 dark:border-gray-600 hover:border-[#FF75A0]/50'
                         }`}
                     >
                         <span className="text-lg sm:text-2xl lg:text-3xl mb-1 sm:mb-2">🤔</span>
-                        <span className="font-semibold text-sm sm:text-base lg:text-lg">30 Sec</span>
+                        <span className="font-semibold text-sm sm:text-base lg:text-lg">60 Sec</span>
                         <span className="text-xs text-gray-500 mt-0.5 sm:mt-1 text-center leading-tight">Think it over</span>
                     </Label>
                 </div>
