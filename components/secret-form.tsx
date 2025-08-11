@@ -21,9 +21,11 @@ import { LandingPageNotice } from "./formComponents/landing-page-notice";
 import { GeneratedLinkDisplay } from "./formComponents/generated-link-display";
 import { GameModeSelector } from "./formComponents/game-mode-selector";
 import { QAFormFields } from "./qa-form-fields";
+import { MicroQuestFormFields } from "./reveal-rush-form-fields";
 
 // Updated GameMode type to match backend expectations
-type GameMode = "none" | "scratch_and_see" | "qa_challenge" | "mystery_reveal" | "emoji_curtain";
+type GameMode = "none" | "scratch_and_see" | "qa_challenge" | "mystery_reveal" | "emoji_curtain" | "reveal_rush";
+type MicroQuestType = "group_qa" | "rate_my" | "game_suggestion";
 
 interface SecretFormProps {
     isLandingPage?: boolean;
@@ -56,6 +58,13 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     const [qaCaseSensitive, setQaCaseSensitive] = useState(false);
     const [qaShowHints, setQaShowHints] = useState(true);
     
+    const [microQuestType, setMicroQuestType] = useState<MicroQuestType>("group_qa");
+    const [mqGroupQuestion, setMqGroupQuestion] = useState("");
+    const [mqGroupAnswer, setMqGroupAnswer] = useState("");
+    const [mqRateCategory, setMqRateCategory] = useState("");
+    const [mqExpectedRating, setMqExpectedRating] = useState(0); // Use 0 as initial state for "not set"
+    const [mqSuggestionPrompt, setMqSuggestionPrompt] = useState("");
+
     const createSecret = useMutation(api.secrets.create);
     const { signIn } = useSignIn();
     const { signUp } = useSignUp();
@@ -153,85 +162,117 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     };
 
     const handleGenerate = async (e?: React.MouseEvent) => {
-        // Prevent any default behavior that might cause scrolling
-        if (e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
+    // Prevent any default behavior that might cause scrolling
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
 
-        if (!message && !uploadedFile) {
-            alert("Please provide a message or upload a file.");
+    if (!message && !uploadedFile) {
+        alert("Please provide a message or upload a file.");
+        return;
+    }
+
+    // Validate QA fields if QA mode is selected
+    if (gameMode === 'qa_challenge' && uploadedFile?.type === 'image') {
+        if (!qaQuestion.trim() || !qaAnswer.trim()) {
+            alert("Please provide both a question and answer for the Q&A challenge.");
             return;
         }
+    }
 
-        // Validate QA fields if QA mode is selected
-        if (gameMode === 'qa_challenge' && uploadedFile?.type === 'image') {
-            if (!qaQuestion.trim() || !qaAnswer.trim()) {
-                alert("Please provide both a question and answer for the Q&A challenge.");
-                return;
-            }
-        }
-
-        if (isLandingPage) {
-            // Save form data and show signup prompt
-            saveFormData();
-            setShowSignupPrompt(true);
+    // --- FIX 1: VALIDATE MICRO QUEST FIELDS ---
+    if (gameMode === 'reveal_rush' && uploadedFile?.type === 'image') {
+        if (microQuestType === 'group_qa' && (!mqGroupQuestion.trim() || !mqGroupAnswer.trim())) {
+            alert("Please provide a question and answer for the Group Q&A quest.");
             return;
         }
-
-        setIsLoading(true);
-        try {
-            // Prepare the mutation parameters
-            const mutationParams: any = {
-                message: message || undefined,
-                recipientName,
-                publicNote,
-                fileUrl: uploadedFile?.url,
-                fileType: uploadedFile?.type,
-                withWatermark: addWatermark,
-                duration: uploadedFile?.type === 'video' ? undefined : parseInt(duration),
-            };
-
-            // Only add game mode and QA fields for images
-            if (uploadedFile?.type === 'image') {
-                mutationParams.gameMode = gameMode;
-                
-                // Add QA fields only if QA mode is selected
-                if (gameMode === 'qa_challenge') {
-                    mutationParams.qaQuestion = qaQuestion;
-                    mutationParams.qaAnswer = qaAnswer;
-                    mutationParams.qaMaxAttempts = qaMaxAttempts;
-                    mutationParams.qaCaseSensitive = qaCaseSensitive;
-                    mutationParams.qaShowHints = qaShowHints;
-                }
-            } else {
-                // For videos or no file, always use "none"
-                mutationParams.gameMode = "none";
-            }
-
-            const publicId = await createSecret(mutationParams);
-
-            if (publicId) {
-                const link = `${window.location.origin}/redirect/${publicId}`;
-                setGeneratedLink(link);
-            }
-
-            // Clear the form for next secret
-            setMessage("");
-            setUploadedFile(null);
-            setGameMode("none");
-            setQaQuestion("");
-            setQaAnswer("");
-            setQaMaxAttempts(3);
-            setQaCaseSensitive(false);
-            setQaShowHints(true);
-        } catch (error) {
-            console.error(error);
-            alert("Failed to create secret message.");
-        } finally {
-            setIsLoading(false);
+        if (microQuestType === 'rate_my' && (!mqRateCategory.trim() || !mqExpectedRating)) {
+            alert("Please provide a category and select your rating for the Rate My... quest.");
+            return;
         }
-    };
+        if (microQuestType === 'game_suggestion' && !mqSuggestionPrompt.trim()) {
+            alert("Please provide a prompt for the Game Suggestion quest.");
+            return;
+        }
+    }
+
+    if (isLandingPage) {
+        // Save form data and show signup prompt
+        saveFormData();
+        setShowSignupPrompt(true);
+        return;
+    }
+
+    setIsLoading(true);
+    try {
+        // Prepare the mutation parameters
+        const mutationParams: any = {
+            message: message || undefined,
+            recipientName,
+            publicNote,
+            fileUrl: uploadedFile?.url,
+            fileType: uploadedFile?.type,
+            withWatermark: addWatermark,
+            duration: uploadedFile?.type === 'video' ? undefined : parseInt(duration),
+        };
+
+        // Only add game mode and related fields for images
+        if (uploadedFile?.type === 'image') {
+            mutationParams.gameMode = gameMode;
+            
+            // Add QA fields only if QA mode is selected
+            if (gameMode === 'qa_challenge') {
+                mutationParams.qaQuestion = qaQuestion;
+                mutationParams.qaAnswer = qaAnswer;
+                mutationParams.qaMaxAttempts = qaMaxAttempts;
+                mutationParams.qaCaseSensitive = qaCaseSensitive;
+                mutationParams.qaShowHints = qaShowHints;
+            }
+            
+            // --- FIX 2: ADD MICRO QUEST FIELDS ONLY IF MICRO QUEST MODE IS SELECTED ---
+            if (gameMode === 'reveal_rush') {
+                mutationParams.microQuestType = microQuestType;
+                mutationParams.mqGroupQuestion = mqGroupQuestion;
+                mutationParams.mqGroupAnswer = mqGroupAnswer;
+                mutationParams.mqRateCategory = mqRateCategory;
+                mutationParams.mqExpectedRating = mqExpectedRating;
+                mutationParams.mqSuggestionPrompt = mqSuggestionPrompt;
+            }
+        } else {
+            // For videos or no file, always use "none"
+            mutationParams.gameMode = "none";
+        }
+
+        const publicId = await createSecret(mutationParams);
+
+        if (publicId) {
+            const link = `${window.location.origin}/redirect/${publicId}`;
+            setGeneratedLink(link);
+        }
+
+        // Clear the form for next secret
+        setMessage("");
+        setUploadedFile(null);
+        setGameMode("none");
+        setMicroQuestType("group_qa");
+        setMqGroupQuestion("");
+        setMqGroupAnswer("");
+        setMqRateCategory("");
+        setMqExpectedRating(0);
+        setMqSuggestionPrompt("");
+        setQaQuestion("");
+        setQaAnswer("");
+        setQaMaxAttempts(3);
+        setQaCaseSensitive(false);
+        setQaShowHints(true);
+    } catch (error) {
+        console.error(error);
+        alert("Failed to create secret message.");
+    } finally {
+        setIsLoading(false);
+    }
+};
 
     // Enhanced form field handlers that clear generated link
     const handleMessageChange = (value: string) => {
@@ -314,6 +355,9 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
         setQaShowHints(value);
     };
 
+
+    
+
     // Upload handlers
     const handleImageUploadComplete = (res: any) => {
         if (res) {
@@ -331,6 +375,17 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
         alert(`ERROR! ${error.message}`);
         setIsUploading(false);
     };
+
+ const handleMicroQuestTypeChange = (type: MicroQuestType) => {
+        setMicroQuestType(type);
+    };
+    const handleMqGroupQuestionChange = (value: string) => setMqGroupQuestion(value);
+    const handleMqGroupAnswerChange = (value: string) => setMqGroupAnswer(value);
+    const handleMqRateCategoryChange = (value: string) => setMqRateCategory(value);
+    const handleMqExpectedRatingChange = (value: number) => setMqExpectedRating(value);
+    const handleMqSuggestionPromptChange = (value: string) => setMqSuggestionPrompt(value);
+
+    
 
     const isTimerDisabled = uploadedFile?.type === 'video';
     const isGameModeDisabled = uploadedFile?.type === 'video';
@@ -428,7 +483,29 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                     />
                                 </div>
                             )}
+
+                             {gameMode === 'reveal_rush' && uploadedFile?.type === 'image' && (
+        <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
+            <MicroQuestFormFields
+                microQuestType={microQuestType}
+                onTypeChange={handleMicroQuestTypeChange}
+                mqGroupQuestion={mqGroupQuestion}
+                onGroupQuestionChange={handleMqGroupQuestionChange}
+                mqGroupAnswer={mqGroupAnswer}
+                onGroupAnswerChange={handleMqGroupAnswerChange}
+                mqRateCategory={mqRateCategory}
+                onRateCategoryChange={handleMqRateCategoryChange}
+                mqExpectedRating={mqExpectedRating}
+                onExpectedRatingChange={handleMqExpectedRatingChange}
+                mqSuggestionPrompt={mqSuggestionPrompt}
+                onSuggestionPromptChange={handleMqSuggestionPromptChange}
+            />
+        </div>
+    )}
                         </div>
+
+
+                        
 
                         {/* Mobile: Form Fields Second, Desktop: Right Column */}
                         <div className="space-y-4 sm:space-y-6 lg:space-y-8 order-2 lg:order-2">

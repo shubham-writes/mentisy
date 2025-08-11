@@ -15,6 +15,7 @@ import { QAGame } from "@/components/qa-game";
 
 // --- IMPORT THE NEW GAME COMPONENT ---
 import { ScratchGame } from "@/components/scratch-game";
+import { MicroQuestGame } from "@/components/reveal-rush-game";
 
 
 export default function SecretPage({ params }: { params: { id: string } }) {
@@ -398,6 +399,14 @@ const truncateMessage = (message: string, maxLength: number = 100) => {
         </div>
     </>
 )}
+
+ {secret.fileType === "image" && secret.fileUrl && secret.gameMode === 'reveal_rush' && (
+                    <MicroQuestGame
+                        secret={secret}
+                        onImageReady={handleMediaLoad}
+                        receiverIp={receiverIp}
+                    />
+                )}
 
                     {/* --- ORIGINAL IMAGE LOGIC (FALLBACK) --- */}
                     {secret.fileType === "image" && secret.fileUrl && (!secret.gameMode || secret.gameMode === 'none') && (

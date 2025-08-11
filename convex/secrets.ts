@@ -5,66 +5,238 @@ import { api, internal } from "./_generated/api";
 import { paginationOptsValidator } from "convex/server";
 
 function generatePublicId(length = 8) {
-    return Math.random().toString(36).substring(2, 2 + length);
+  return Math.random().toString(36).substring(2, 2 + length);
 }
 
 export const create = mutation({
-    args: { 
-        message: v.optional(v.string()), 
-        recipientName: v.optional(v.string()), 
-        publicNote: v.optional(v.string()), 
-        fileUrl: v.optional(v.string()), 
-        fileType: v.optional(v.union(v.literal("image"), v.literal("video"))), 
-        withWatermark: v.optional(v.boolean()),
-        duration: v.optional(v.number()),
-        // --- UPDATED GAME MODE TO INCLUDE qa_challenge ---
-        gameMode: v.optional(v.union(
-            v.literal("none"),
-            v.literal("scratch_and_see"),
-            v.literal("qa_challenge"),
-            v.literal("mystery_reveal"),
-            v.literal("emoji_curtain")
-        )),
-        // --- ADD Q&A FIELDS ---
-        qaQuestion: v.optional(v.string()),
-        qaAnswer: v.optional(v.string()),
-        qaMaxAttempts: v.optional(v.number()),
-        qaCaseSensitive: v.optional(v.boolean()),
-        qaShowHints: v.optional(v.boolean()),
-     },
-    handler: async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity(); 
-        if (!identity) throw new Error("Unauthorized");
-        
-        const user = await ctx.db.query("users").withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier)).unique(); 
-        if (!user) throw new Error("User not found.");
-        
-        const secretId = await ctx.db.insert("secrets", { 
-            authorId: user._id, 
-            publicId: generatePublicId(), 
-            message: args.message, 
-            recipientName: args.recipientName, 
-            publicNote: args.publicNote, 
-            fileUrl: args.fileUrl, 
-            fileType: args.fileType, 
-            withWatermark: args.withWatermark, 
-            isRead: false, 
-            hiddenForSender: false,
-            duration: args.duration,
-            // --- SAVE THE GAME MODE ---
-            gameMode: args.gameMode,
-            // --- SAVE Q&A FIELDS ---
-            qaQuestion: args.qaQuestion,
-            qaAnswer: args.qaAnswer,
-            qaMaxAttempts: args.qaMaxAttempts,
-            qaCaseSensitive: args.qaCaseSensitive,
-            qaShowHints: args.qaShowHints,
-         });
-        
-        const newSecret = await ctx.db.get(secretId);
-        return newSecret?.publicId;
-    },
+  args: {
+    message: v.optional(v.string()),
+    recipientName: v.optional(v.string()),
+    publicNote: v.optional(v.string()),
+    fileUrl: v.optional(v.string()),
+    fileType: v.optional(v.union(v.literal("image"), v.literal("video"))),
+    withWatermark: v.optional(v.boolean()),
+    duration: v.optional(v.number()),
+
+    gameMode: v.optional(v.union(
+      v.literal("none"),
+      v.literal("scratch_and_see"),
+      v.literal("qa_challenge"),
+      v.literal("mystery_reveal"),
+      v.literal("emoji_curtain"),
+      v.literal("reveal_rush")
+    )),
+
+    // Q&A fields
+    qaQuestion: v.optional(v.string()),
+    qaAnswer: v.optional(v.string()),
+    qaMaxAttempts: v.optional(v.number()),
+    qaCaseSensitive: v.optional(v.boolean()),
+    qaShowHints: v.optional(v.boolean()),
+
+    // reveal-rush fields
+    microQuestType: v.optional(v.union(
+      v.literal("group_qa"),
+      v.literal("rate_my"),
+      v.literal("game_suggestion")
+    )),
+    mqGroupQuestion: v.optional(v.string()),
+    mqGroupAnswer: v.optional(v.string()),
+    mqRateCategory: v.optional(v.string()),
+    mqExpectedRating: v.optional(v.number()),
+    mqSuggestionPrompt: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+
+    const user = await ctx.db.query("users")
+      .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
+      .unique();
+    if (!user) throw new Error("User not found.");
+
+    const secretId = await ctx.db.insert("secrets", {
+      authorId: user._id,
+      publicId: generatePublicId(),
+      message: args.message,
+      recipientName: args.recipientName,
+      publicNote: args.publicNote,
+      fileUrl: args.fileUrl,
+      fileType: args.fileType,
+      withWatermark: args.withWatermark,
+      isRead: false,
+      hiddenForSender: false,
+      duration: args.duration,
+      gameMode: args.gameMode,
+
+      // Q&A
+      qaQuestion: args.qaQuestion,
+      qaAnswer: args.qaAnswer,
+      qaMaxAttempts: args.qaMaxAttempts,
+      qaCaseSensitive: args.qaCaseSensitive,
+      qaShowHints: args.qaShowHints,
+
+      // reveal-rush
+      microQuestType: args.microQuestType,
+      mqGroupQuestion: args.mqGroupQuestion,
+      mqGroupAnswer: args.mqGroupAnswer,
+      mqRateCategory: args.mqRateCategory,
+      mqExpectedRating: args.mqExpectedRating,
+      mqSuggestionPrompt: args.mqSuggestionPrompt,
+
+      mqIsCompleted: false,
+      mqParticipants: [],
+      mqWinnerId: undefined,
+      mqWinnerName: undefined,
+      mqWinnerAt: undefined,
+    });
+
+    const newSecret = await ctx.db.get(secretId);
+    return newSecret?.publicId;
+  },
 });
+
+// Handle reveal-rush attempts
+// convex/secrets.ts
+
+// ... (previous code is unchanged)
+
+// Handle reveal-rush attempts
+export const submitMicroQuestAttempt = mutation({
+  args: {
+    secretId: v.id("secrets"),
+    attempt: v.union(v.string(), v.number()),
+  },
+  handler: async (ctx, args) => {
+    const secret = await ctx.db.get(args.secretId);
+    if (!secret) throw new Error("Secret not found.");
+
+    if (secret.mqIsCompleted) {
+      return { success: false, isWinner: false, reason: `Game Over — Someone has already won!` };
+    }
+
+    const identity = await ctx.auth.getUserIdentity();
+    const user = identity
+      ? await ctx.db.query("users")
+        .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
+        .unique()
+      : null;
+
+    // Only check for previous attempts if the user is logged in
+    if (user) {
+      const alreadyTried = secret.mqParticipants?.find(p => p.userId === user._id);
+      if (alreadyTried) {
+        return { success: false, isWinner: false, reason: "You have already participated." };
+      }
+    }
+
+    let isCorrect = false;
+    let feedback = "";
+
+    switch (secret.microQuestType) {
+      case 'group_qa':
+        if (typeof args.attempt === 'string' && secret.mqGroupAnswer) {
+          isCorrect = args.attempt.trim().toLowerCase() === secret.mqGroupAnswer.trim().toLowerCase();
+          feedback = isCorrect ? "Correct answer!" : "Incorrect answer.";
+        }
+        break;
+
+      case 'rate_my':
+        if (typeof args.attempt === 'number' && secret.mqExpectedRating !== undefined) {
+          isCorrect = args.attempt === secret.mqExpectedRating;
+          feedback = isCorrect ? "Perfect guess!" : `The answer was ${secret.mqExpectedRating}`;
+        }
+        break;
+
+      case 'game_suggestion':
+        if (typeof args.attempt === 'string' && args.attempt.length >= 3) {
+          isCorrect = true; // For suggestions, any valid input is "correct"
+          feedback = "Nice idea!";
+        }
+        break;
+    }
+
+    // Only add participant to the list if they are logged in
+    const updatedParticipants = user ? [...(secret.mqParticipants || []), {
+      userId: user._id,
+      attempt: args.attempt,
+      isCorrect,
+      timestamp: Date.now(),
+    }] : secret.mqParticipants; // Keep participants the same if user is anonymous
+
+    if (isCorrect) {
+      await ctx.db.patch(secret._id, {
+        mqIsCompleted: true,
+        mqWinnerId: user?._id, // Store ID only if user is logged in
+        mqWinnerName: "Someone", // Generic winner name
+        mqWinnerAt: Date.now(),
+        mqParticipants: updatedParticipants,
+        expired: true,
+      });
+
+      const delay = (secret.duration || 10) * 1000 + 60000;
+      ctx.scheduler.runAfter(delay, internal.secrets.destroy, { secretId: secret._id });
+
+      return { success: true, isWinner: true, message: `🎉 You won! ${feedback}` };
+    } else {
+      // Only update participants if a logged-in user made an incorrect attempt
+      if (user) {
+        await ctx.db.patch(secret._id, { mqParticipants: updatedParticipants });
+      }
+      return { success: true, isWinner: false, message: feedback };
+    }
+  },
+});
+
+// Read & Reveal
+export const readAndReveal = mutation({
+  args: { secretId: v.id("secrets") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    const secret = await ctx.db.get(args.secretId);
+    if (!secret) return null;
+
+    if (secret.gameMode === "reveal_rush") {
+      const user = identity
+        ? await ctx.db.query("users").withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier)).unique()
+        : null;
+
+      if (secret.mqIsCompleted) {
+        // Allow the winner to view, even if anonymous
+        if (user && user._id === secret.mqWinnerId) {
+            const elapsed = Date.now() - (secret.mqWinnerAt || 0);
+            const allowedDuration = (secret.duration || 10) * 1000;
+
+            if (elapsed > allowedDuration) {
+                return { ...secret, expired: true, message: "Your viewing time has expired." };
+            }
+            return secret;
+        } else {
+          // Generic message for everyone else
+          return { ...secret, expired: true, message: "Game Over — Someone has won!" };
+        }
+      }
+      return secret;
+    }
+
+    // --- Original Logic for other game modes ---
+    if (secret.isRead) {
+      return null;
+    }
+
+    await ctx.db.patch(secret._id, { isRead: true, viewedAt: Date.now() });
+    const delay = secret.duration ? secret.duration * 1000 : 300000;
+    ctx.scheduler.runAfter(delay, internal.secrets.destroy, { secretId: secret._id });
+
+    return secret;
+  },
+});
+
+// ... (the rest of the file remains the same)
+
+// Rest of your functions (unchanged) ...
+
+
 
 // ... (the rest of the file remains the same)
 
@@ -175,40 +347,7 @@ export const getSecretIdFromPublicId = query({
     }, 
 });
 
-export const readAndReveal = mutation({ 
-    args: { 
-        secretId: v.id("secrets"),
-        // REMOVED: viewerUserAgent parameter - no device tracking
-    }, 
-    handler: async (ctx, args) => { 
-        const secret = await ctx.db.get(args.secretId); 
-        if (!secret) return null;
-        
-        // If the secret is already read and has no content (expired), return it
-        // so the frontend can show it as expired
-        if (secret.isRead && !secret.message && !secret.fileUrl) {
-            return secret;
-        }
-        
-        // If the secret is already read but still has content, return null
-        // (this shouldn't happen in normal flow)
-        if (secret.isRead) return null;
-        
-        // Mark as read and store only timestamp
-        await ctx.db.patch(secret._id, { 
-            isRead: true,
-            viewedAt: Date.now(),
-            // REMOVED: viewerUserAgent storage
-        }); 
-        
-        // Use the stored duration for images/text, or a longer default for videos
-        const deletionDelay = secret.duration ? secret.duration * 1000 : 300000; // Default to 5 minutes for videos
-        
-        ctx.scheduler.runAfter(deletionDelay, internal.secrets.destroy, { secretId: secret._id }); 
-        
-        return secret; 
-    }, 
-});
+
 
 export const destroy = internalAction({ 
     args: { secretId: v.id("secrets") }, 
@@ -271,4 +410,11 @@ export const deleteSecretRecord = internalMutation({
     handler: async (ctx, args) => { 
         await ctx.db.delete(args.secretId); 
     }, 
+});
+
+export const getLiveSecret = query({
+  args: { id: v.id("secrets") },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
 });

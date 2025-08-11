@@ -18,16 +18,13 @@ export const store = mutation({
             )
             .unique();
 
-        // Generate a username from the email if a nickname isn't available
         const username = identity.nickname || identity.email?.split('@')[0];
 
-        // Throw an error if a username can't be generated
         if (!username) {
             throw new Error("Cannot create user without a nickname or email.");
         }
 
         if (user !== null) {
-            // If we've seen this identity before but the data has changed, patch the user.
             if (
                 user.imageUrl !== identity.pictureUrl ||
                 user.email !== identity.email ||
@@ -37,20 +34,19 @@ export const store = mutation({
                 await ctx.db.patch(user._id, {
                     imageUrl: identity.pictureUrl,
                     email: identity.email,
-                    username: username, // Use the generated username
+                    username: username,
                     wallet: args.wallet,
                 });
             }
             return user._id;
         }
 
-        // If it's a new identity, create a new `User`.
         return await ctx.db.insert("users", {
             tokenIdentifier: identity.tokenIdentifier,
             clerkUserId: identity.subject,
             imageUrl: identity.pictureUrl!,
             email: identity.email!,
-            username: username, // Use the generated username
+            username: username,
             wallet: args.wallet || "",
         });
     },
@@ -71,3 +67,24 @@ export async function getUser(ctx: QueryCtx, username: string) {
         .withIndex("username", (q) => q.eq("username", username))
         .unique();
 }
+
+// --- THIS IS THE NEW FUNCTION YOU NEED TO ADD ---
+// Get the current user's identity from their auth token
+export const getMyIdentity = query({
+    args: {},
+    handler: async (ctx) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) {
+            // Return null if the user is not authenticated
+            return null;
+        }
+
+        // Find the user document corresponding to the authenticated user
+        const user = await ctx.db
+            .query("users")
+            .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
+            .unique();
+        
+        return user;
+    },
+});
