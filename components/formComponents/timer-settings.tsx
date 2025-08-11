@@ -46,7 +46,7 @@ export function TimerSettings({ duration, onDurationChange, isTimerDisabled }: T
                     >
                         <span className="text-lg sm:text-2xl lg:text-3xl mb-1 sm:mb-2">⚡</span>
                         <span className="font-semibold text-sm sm:text-base lg:text-lg">3 Sec</span>
-                        <span className="text-xs text-gray-500 mt-0.5 sm:mt-1 text-center leading-tight">Quick </span>
+                        <span className="text-xs text-gray-500 mt-0.5 sm:mt-1 text-center leading-tight">Quick glance</span>
                     </Label>
                 </div>
                 
@@ -67,23 +67,24 @@ export function TimerSettings({ duration, onDurationChange, isTimerDisabled }: T
                     </Label>
                 </div>
                 
-                {/* 10 Second Option - Touch Optimized */}
+                {/* MODIFIED 30 Second Option - Touch Optimized */}
                 <div className={`relative ${isTimerDisabled ? 'opacity-50' : ''}`}>
-                    <RadioGroupItem value="10" id="r3" className="sr-only" />
+                    <RadioGroupItem value="30" id="r3" className="sr-only" />
                     <Label 
                         htmlFor="r3" 
                         className={`flex flex-col items-center justify-center p-3 sm:p-4 lg:p-5 border-2 rounded-lg sm:rounded-xl cursor-pointer transition-all active:scale-95 sm:hover:scale-105 min-h-[80px] sm:min-h-[100px] lg:min-h-[120px] ${
-                            duration === '10' 
+                            duration === '30' 
                                 ? 'border-[#FF75A0] bg-gradient-to-br from-[#FF75A0]/10 to-[#FFAA70]/10 text-[#FF75A0] dark:bg-[#FF75A0]/20 dark:text-[#FF75A0]' 
                                 : 'border-gray-200 dark:border-gray-600 hover:border-[#FF75A0]/50'
                         }`}
                     >
-                        <span className="text-lg sm:text-2xl lg:text-3xl mb-1 sm:mb-2">🧠</span>
-                        <span className="font-semibold text-sm sm:text-base lg:text-lg">10 Sec</span>
-                        <span className="text-xs text-gray-500 mt-0.5 sm:mt-1 text-center leading-tight">Process it</span>
+                        <span className="text-lg sm:text-2xl lg:text-3xl mb-1 sm:mb-2">🤔</span>
+                        <span className="font-semibold text-sm sm:text-base lg:text-lg">30 Sec</span>
+                        <span className="text-xs text-gray-500 mt-0.5 sm:mt-1 text-center leading-tight">Think it over</span>
                     </Label>
                 </div>
             </RadioGroup>
+            
         </div>
     );
 }
