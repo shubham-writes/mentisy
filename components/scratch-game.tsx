@@ -284,7 +284,12 @@ export function ScratchGame({
     return (
         <div 
             ref={containerRef} 
-            className="relative w-full h-[80vh] sm:max-h-96 rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-700"
+            className="relative w-full h-[80vh] sm:max-h-96 rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-700" style={{ 
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
+            MozUserSelect: 'none',
+            msUserSelect: 'none'
+        }}
         >
             {/* Base Image */}
             <Image
@@ -294,6 +299,7 @@ export function ScratchGame({
                 style={{ objectFit: 'contain' }}
                 onLoad={handleImageLoad}
                 priority
+                draggable={false}
                 className="rounded-xl"
             />
             
@@ -313,16 +319,18 @@ export function ScratchGame({
                 className={`absolute top-0 left-0 w-full h-full touch-none z-20 ${
                     isGameComplete ? 'hidden' : isAutoCompleting ? 'cursor-wait' : 'cursor-crosshair'
                 }`}
-                style={{ 
-                    touchAction: 'none',
-                    userSelect: 'none',
-                    WebkitUserSelect: 'none'
-                }}
+                 style={{ 
+                touchAction: 'none',
+                userSelect: 'none',
+                WebkitUserSelect: 'none',
+                MozUserSelect: 'none',
+                msUserSelect: 'none'
+            }}
             />
             
             {/* Progress Indicator - Shows during scratching */}
             {hasStartedScratching && !isGameComplete && (
-                <div className="absolute top-2 right-2 bg-black/70 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-medium z-30">
+                <div className="absolute top-2 left-2 bg-black/70 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-medium z-30">
                     {scratchProgress}%
                     {scratchProgress >= autoCompleteThreshold && isAutoCompleting && (
                         <span className="ml-1 animate-pulse">✨</span>

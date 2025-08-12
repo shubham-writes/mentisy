@@ -328,51 +328,49 @@ const truncateMessage = (message: string, maxLength: number = 100) => {
 
                     {/* --- UPDATED GAME LOGIC --- */}
                      {secret.fileType === "image" && secret.fileUrl && secret.gameMode === 'scratch_and_see' && (
-                        <>
-                            <div className="relative w-full max-w-full sm:max-w-lg mx-auto mb-4 rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 p-2 sm:p-4">
-                                <ScratchGame
-                                    imageUrl={secureFileUrl}
-                                    onImageReady={handleMediaLoad}
-                                    onScratchComplete={() => console.log("Game completed!")}
-                                    recipientName={secret.recipientName}
-                                    receiverIp={receiverIp}
-                                    withWatermark={secret.withWatermark}
-                                    // Remove message from scratch game - we'll show it separately
-                                    // message={secret.message}
-                                    // expandedMessages={expandedMessages}
-                                    // onToggleMessage={(messageId: string) => {
-                                    //     setExpandedMessages(prev => ({
-                                    //         ...prev,
-                                    //         [messageId]: !prev[messageId]
-                                    //     }));
-                                    // }}
-                                />
-                            </div>
-                            
-                            {/* Message below the scratch game - much better UX! */}
-                            {secret.message && (
-                                <div className="max-w-full sm:max-w-lg mx-auto mb-6 sm:mb-8 p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl border border-blue-200/50 dark:border-blue-700/50 shadow-lg">
-                                    <div className="text-center mb-3">
-                                        <span className="text-xl sm:text-2xl">💌</span>
-                                    </div>
-                                    <blockquote className="text-sm sm:text-base font-medium text-gray-800 dark:text-gray-200 text-center leading-relaxed">
-                                        &ldquo;{expandedMessages['scratch'] || secret.message.length <= 100
-                                            ? secret.message
-                                            : truncateMessage(secret.message)
-                                        }&rdquo;
-                                    </blockquote>
-                                    {secret.message.length > 100 && (
-                                        <button
-                                            onClick={() => toggleMessageExpansion('scratch')}
-                                            className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 text-xs sm:text-sm font-medium mt-3 block mx-auto transition-colors"
-                                        >
-                                            {expandedMessages['scratch'] ? 'Read less' : 'Read more'}
-                                        </button>
-                                    )}
-                                </div>
-                            )}
-                        </>
-                    )}
+    <>
+        <div className="relative w-full max-w-full sm:max-w-lg mx-auto mb-4 rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 p-2 sm:p-4">
+            {/* Innermost container with timer */}
+            <div className="relative">
+                <ScratchGame
+                    imageUrl={secureFileUrl}
+                    onImageReady={handleMediaLoad}
+                    onScratchComplete={() => console.log("Game completed!")}
+                    recipientName={secret.recipientName}
+                    receiverIp={receiverIp}
+                    withWatermark={secret.withWatermark}
+                />
+                {/* Timer in the innermost game area */}
+                {!isMediaLoading && (
+                    <CountdownTimer initialSeconds={secret.duration || 10} onComplete={handleTimerComplete} />
+                )}
+            </div>
+        </div>
+        
+        {/* Message below - unchanged */}
+        {secret.message && (
+            <div className="max-w-full sm:max-w-lg mx-auto mb-6 sm:mb-8 p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl border border-blue-200/50 dark:border-blue-700/50 shadow-lg">
+                <div className="text-center mb-3">
+                    <span className="text-xl sm:text-2xl">💌</span>
+                </div>
+                <blockquote className="text-sm sm:text-base font-medium text-gray-800 dark:text-gray-200 text-center leading-relaxed">
+                    &ldquo;{expandedMessages['scratch'] || secret.message.length <= 100
+                        ? secret.message
+                        : truncateMessage(secret.message)
+                    }&rdquo;
+                </blockquote>
+                {secret.message.length > 100 && (
+                    <button
+                        onClick={() => toggleMessageExpansion('scratch')}
+                        className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 text-xs sm:text-sm font-medium mt-3 block mx-auto transition-colors"
+                    >
+                        {expandedMessages['scratch'] ? 'Read less' : 'Read more'}
+                    </button>
+                )}
+            </div>
+        )}
+    </>
+)}
 
                     {secret.fileType === "image" && secret.fileUrl && secret.gameMode === 'qa_challenge' && (
     <>
@@ -384,7 +382,6 @@ const truncateMessage = (message: string, maxLength: number = 100) => {
                 onImageReady={handleMediaLoad}
                 onAnswerCorrect={() => {
                     console.log("Q&A Challenge completed!");
-                    // You can add analytics here later
                 }}
                 recipientName={secret.recipientName}
                 receiverIp={receiverIp}
@@ -395,222 +392,243 @@ const truncateMessage = (message: string, maxLength: number = 100) => {
                 maxAttempts={secret.qaMaxAttempts || 3}
                 caseSensitive={secret.qaCaseSensitive || false}
                 showHints={secret.qaShowHints ?? true}
+                // Pass the timer as a component
+                timerComponent={!isMediaLoading ? (
+                    <CountdownTimer 
+                        initialSeconds={secret.duration || 10} 
+                        onComplete={handleTimerComplete} 
+                    />
+                
+                ) : null}
             />
         </div>
     </>
 )}
 
- {secret.fileType === "image" && secret.fileUrl && secret.gameMode === 'reveal_rush' && (
-                    <MicroQuestGame
-                        secret={secret}
-                        onImageReady={handleMediaLoad}
-                        receiverIp={receiverIp}
-                    />
-                )}
+{secret.fileType === "image" && secret.fileUrl && secret.gameMode === 'reveal_rush' && (
+    <MicroQuestGame
+        secret={secret}
+        onImageReady={handleMediaLoad}
+        receiverIp={receiverIp}
+        timerComponent={!isMediaLoading ? (
+            <CountdownTimer 
+                initialSeconds={secret.duration || 10} 
+                onComplete={handleTimerComplete} 
+            />
+        ) : null}
+    />
+)}
 
                     {/* --- ORIGINAL IMAGE LOGIC (FALLBACK) --- */}
                     {secret.fileType === "image" && secret.fileUrl && (!secret.gameMode || secret.gameMode === 'none') && (
-                        <div className="relative w-full max-w-full sm:max-w-lg mx-auto mb-6 sm:mb-8 rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 p-2 sm:p-4">
-                            <div className="relative w-full h-[80vh] sm:max-h-96 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700">
-                                <Image
-                                    src={secureFileUrl}
-                                    alt="Secret Image"
-                                    fill
-                                    style={{ objectFit: "contain" }}
-                                    onLoad={handleMediaLoad}
-                                    onError={() => {
-                                        console.error("Failed to load image");
-                                        setIsMediaLoading(false);
-                                    }}
-                                    priority
-                                    className="rounded-xl"
-                                />
-                                {secret.withWatermark && (
-                                    <Watermark name={secret.recipientName} ip={receiverIp ?? undefined} />
-                                )}
+    <div className="relative w-full max-w-full sm:max-w-lg mx-auto mb-6 sm:mb-8 rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 p-2 sm:p-4">
+        {/* THIS IS THE INNERMOST IMAGE CONTAINER */}
+        <div className="relative w-full h-[80vh] sm:max-h-96 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700">
+            <Image
+                src={secureFileUrl}
+                alt="Secret Image"
+                fill
+                style={{ objectFit: "contain" }}
+                onLoad={handleMediaLoad}
+                onError={() => {
+                    console.error("Failed to load image");
+                    setIsMediaLoading(false);
+                }}
+                priority
+                className="rounded-xl"
+            />
+            
+            {secret.withWatermark && (
+                <Watermark name={secret.recipientName} ip={receiverIp ?? undefined} />
+            )}
 
-                               {/* Message overlay for images */}
-                                {secret.message && (
-                                    <div className="absolute bottom-0 left-0 right-0 bg-black/40 backdrop-blur-xm text-white p-3 sm:p-4">
-                                        <p className="text-sm sm:text-base font-medium text-center leading-relaxed">
-                                            {expandedMessages['image'] || secret.message.length <= 100
-                                                ? secret.message
-                                                : truncateMessage(secret.message)
-                                            }
-                                        </p>
-                                        {secret.message.length > 100 && (
-                                            <button
-                                                onClick={() => toggleMessageExpansion('image')}
-                                                className="text-blue-300 hover:text-blue-200 text-xs sm:text-sm font-medium mt-1 block mx-auto transition-colors"
-                                            >
-                                                {expandedMessages['image'] ? 'Read less' : 'Read more'}
-                                            </button>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
+            {/* Timer INSIDE the actual image display area */}
+            {!isMediaLoading && (
+                <CountdownTimer initialSeconds={secret.duration || 10} onComplete={handleTimerComplete} />
+            )}
+
+            {/* Message overlay at bottom */}
+            {secret.message && (
+                <div className="absolute bottom-0 left-0 right-0 bg-black/40 backdrop-blur-xm text-white p-3 sm:p-4">
+                    <p className="text-sm sm:text-base font-medium text-center leading-relaxed">
+                        {expandedMessages['image'] || secret.message.length <= 100
+                            ? secret.message
+                            : truncateMessage(secret.message)
+                        }
+                    </p>
+                    {secret.message.length > 100 && (
+                        <button
+                            onClick={() => toggleMessageExpansion('image')}
+                            className="text-blue-300 hover:text-blue-200 text-xs sm:text-sm font-medium mt-1 block mx-auto transition-colors"
+                        >
+                            {expandedMessages['image'] ? 'Read less' : 'Read more'}
+                        </button>
                     )}
+                </div>
+            )}
+        </div>
+    </div>
+)}
 
                     {secret.fileType === "video" && secret.fileUrl && (
-                        <div className="w-full max-w-full sm:max-w-2xl mx-auto mb-6 sm:mb-8">
-                            {/* Mobile-optimized warning banner */}
-                            <div className="mb-3 sm:mb-4 p-3 sm:p-4 bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 border border-red-200/50 dark:border-red-700/50 rounded-xl">
-                                <div className="flex items-start sm:items-center space-x-3">
-                                    <span className="text-xl sm:text-2xl flex-shrink-0 mt-0.5 sm:mt-0">⚠️</span>
-                                    <div className="min-w-0 flex-1">
-                                        <p className="font-semibold text-red-800 dark:text-red-300 mb-1 text-sm sm:text-base">
-                                            One-Time View Only
-                                        </p>
-                                        <p className="text-xs sm:text-sm text-red-700 dark:text-red-400 leading-relaxed">
-                                            You cannot pause, replay, or download. Stay focused and watch carefully!
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
+    <div className="w-full max-w-full sm:max-w-2xl mx-auto mb-6 sm:mb-8">
+        {/* Warning banner - unchanged */}
+        <div className="mb-3 sm:mb-4 p-3 sm:p-4 bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 border border-red-200/50 dark:border-red-700/50 rounded-xl">
+            <div className="flex items-start sm:items-center space-x-3">
+                <span className="text-xl sm:text-2xl flex-shrink-0 mt-0.5 sm:mt-0">⚠️</span>
+                <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-red-800 dark:text-red-300 mb-1 text-sm sm:text-base">
+                        One-Time View Only
+                    </p>
+                    <p className="text-xs sm:text-sm text-red-700 dark:text-red-400 leading-relaxed">
+                        You cannot pause, replay, or download. Stay focused and watch carefully!
+                    </p>
+                </div>
+            </div>
+        </div>
 
-                            {/* Mobile-optimized video container */}
-                            <div className="relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-2 sm:p-4 shadow-xl">
-                                {/* Video wrapper - mobile optimized */}
-                                <div className="relative w-full  rounded-lg sm:rounded-xl overflow-hidden">
-                                    {showVideo && (
-                                        <video
-                                            ref={videoRef}
-                                            src={secureFileUrl}
-                                            playsInline
-                                            preload="auto"
-                                            className="w-full h-[80vh] sm:max-h-96 rounded-lg sm:rounded-xl pointer-events-none shadow-lg bg-black block"
-                                            style={{ objectFit: "contain" }}
-                                            onContextMenu={(e) => e.preventDefault()}
-                                            onLoadedMetadata={(e) => {
-                                                const video = e.currentTarget;
-                                                const handleFullyBuffered = () => {
-                                                    handleMediaLoad();
-                                                    setDuration(Math.ceil(video.duration));
-                                                    video.removeEventListener("canplaythrough", handleFullyBuffered);
-                                                };
-                                                video.addEventListener("canplaythrough", handleFullyBuffered);
-                                            }}
-                                            onProgress={(e) => {
-                                                const video = e.currentTarget;
-                                                if (video.buffered.length > 0) {
-                                                    const bufferedEnd = video.buffered.end(video.buffered.length - 1);
-                                                    const duration = video.duration;
-                                                    if (duration > 0) {
-                                                        const percent = Math.min((bufferedEnd / duration) * 100, 100);
-                                                        setBufferedPercent(percent);
-                                                    }
-                                                }
-                                            }}
-                                            onEnded={handleTimerComplete}
-                                        />
-                                    )}
+        {/* Video container */}
+        <div className="relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-2 sm:p-4 shadow-xl">
+            {/* INNERMOST VIDEO WRAPPER */}
+            <div className="relative w-full rounded-lg sm:rounded-xl overflow-hidden">
+                {showVideo && (
+                    <video
+                        ref={videoRef}
+                        src={secureFileUrl}
+                        playsInline
+                        preload="auto"
+                        className="w-full h-[80vh] sm:max-h-96 rounded-lg sm:rounded-xl pointer-events-none shadow-lg bg-black block"
+                        style={{ objectFit: "contain" }}
+                        onContextMenu={(e) => e.preventDefault()}
+                        onLoadedMetadata={(e) => {
+                            const video = e.currentTarget;
+                            const handleFullyBuffered = () => {
+                                handleMediaLoad();
+                                setDuration(Math.ceil(video.duration));
+                                video.removeEventListener("canplaythrough", handleFullyBuffered);
+                            };
+                            video.addEventListener("canplaythrough", handleFullyBuffered);
+                        }}
+                        onProgress={(e) => {
+                            const video = e.currentTarget;
+                            if (video.buffered.length > 0) {
+                                const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+                                const duration = video.duration;
+                                if (duration > 0) {
+                                    const percent = Math.min((bufferedEnd / duration) * 100, 100);
+                                    setBufferedPercent(percent);
+                                }
+                            }
+                        }}
+                        onEnded={handleTimerComplete}
+                    />
+                )}
 
-                                    {/* Mobile-optimized watermark overlay */}
-                                    {secret.withWatermark && (
-                                        <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-lg sm:rounded-xl">
-                                            <Watermark
-                                                name={secret.recipientName}
-                                                ip={receiverIp ?? undefined}
-                                                animated={true}
-                                                mode="video"
-                                            />
-                                        </div>
-                                    )}
+                {/* Watermark overlay */}
+                {secret.withWatermark && (
+                    <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-lg sm:rounded-xl">
+                        <Watermark
+                            name={secret.recipientName}
+                            ip={receiverIp ?? undefined}
+                            animated={true}
+                            mode="video"
+                        />
+                    </div>
+                )}
 
-                                    {/* Message overlay for videos */}
-                                    {secret.message && (
-                                        <div className="absolute bottom-0 left-0 right-0 bg-black/70 backdrop-blur-sm text-white p-3 sm:p-4 z-10">
-                                            <p className="text-sm sm:text-base font-medium text-center leading-relaxed">
-                                                {expandedMessages['video'] || secret.message.length <= 100
-                                                    ? secret.message
-                                                    : truncateMessage(secret.message)
-                                                }
-                                            </p>
-                                            {secret.message.length > 100 && (
-                                                <button
-                                                    onClick={() => toggleMessageExpansion('video')}
-                                                    className="text-blue-300 hover:text-blue-200 text-xs sm:text-sm font-medium mt-1 block mx-auto transition-colors"
-                                                >
-                                                    {expandedMessages['video'] ? 'Read less' : 'Read more'}
-                                                </button>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
+                {/* Timer INSIDE the video display area */}
+                {secret.fileType === "video" && hasStarted && !isMediaLoading && (
+                    <CountdownTimer
+                        initialSeconds={duration || 10}
+                        onComplete={handleTimerComplete}
+                    />
+                )}
 
-                                {/* Mobile-optimized controls panel */}
-                                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 mt-3 sm:mt-4 p-3 sm:p-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg sm:rounded-xl border border-gray-200/50 dark:border-gray-700/50 shadow-sm">
-                                    {!hasStarted && (
-                                        <Button
-                                            onClick={handleUserPlay}
-                                            size="lg"
-                                            className="w-full sm:w-auto h-11 sm:h-12 px-6 sm:px-8 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 border-0 shadow-lg transform hover:scale-105 transition-all rounded-xl text-white font-medium text-sm sm:text-base"
-                                        >
-                                            ▶️ Start Watching
-                                        </Button>
-                                    )}
-                                    {/* Mobile-optimized volume control */}
-                                    <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-center sm:justify-start">
-                                        <label htmlFor="volume" className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 flex-shrink-0">
-                                            🔊 Volume
-                                        </label>
-                                        <input
-                                            id="volume"
-                                            type="range"
-                                            min="0"
-                                            max="1"
-                                            step="0.05"
-                                            defaultValue="1"
-                                            onChange={(e) => {
-                                                if (videoRef.current) {
-                                                    videoRef.current.volume = parseFloat(e.target.value);
-                                                }
-                                            }}
-                                            className="w-24 sm:w-32 h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
+                {/* Message overlay at bottom */}
+                {secret.message && (
+                    <div className="absolute bottom-0 left-0 right-0 bg-black/40 backdrop-blur-xm text-white p-3 sm:p-4 z-10 pointer-events-none">
+                        <p className="text-sm sm:text-base font-medium text-center leading-relaxed pointer-events-none">
+                            {expandedMessages['video'] || secret.message.length <= 100
+                                ? secret.message
+                                : truncateMessage(secret.message)
+                            }
+                        </p>
+                        {secret.message.length > 100 && (
+                            <button
+                                onClick={() => toggleMessageExpansion('video')}
+                                className="text-blue-300 hover:text-blue-200 text-xs sm:text-sm font-medium mt-1 block mx-auto transition-colors"
+                            >
+                                {expandedMessages['video'] ? 'Read less' : 'Read more'}
+                            </button>
+                        )}
+                    </div>
+                )}
+            </div>
+
+            {/* Controls panel - unchanged */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 mt-3 sm:mt-4 p-3 sm:p-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg sm:rounded-xl border border-gray-200/50 dark:border-gray-700/50 shadow-sm">
+                {!hasStarted && (
+                    <Button
+                        onClick={handleUserPlay}
+                        size="lg"
+                        className="w-full sm:w-auto h-11 sm:h-12 px-6 sm:px-8 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 border-0 shadow-lg transform hover:scale-105 transition-all rounded-xl text-white font-medium text-sm sm:text-base"
+                    >
+                        ▶️ Start Watching
+                    </Button>
+                )}
+                <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-center sm:justify-start">
+                    <label htmlFor="volume" className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 flex-shrink-0">
+                        🔊 Volume
+                    </label>
+                    <input
+                        id="volume"
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.05"
+                        defaultValue="1"
+                        onChange={(e) => {
+                            if (videoRef.current) {
+                                videoRef.current.volume = parseFloat(e.target.value);
+                            }
+                        }}
+                        className="w-24 sm:w-32 h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
+                    />
+                </div>
+            </div>
+        </div>
+    </div>
+)}
 
                     {/* Standalone message (only when no file) */}
                     {secret.message && !secret.fileUrl && (
-                        <div className="max-w-sm sm:max-w-xl mx-auto mb-6 sm:mb-8 p-6 sm:p-8 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl">
-                            <div className="text-center mb-4">
-                                <span className="text-2xl sm:text-3xl">💌</span>
-                            </div>
-                            <blockquote className="text-base sm:text-lg md:text-xl font-medium text-gray-800 dark:text-gray-200 text-center leading-relaxed px-2">
-                                &ldquo;{expandedMessages['standalone'] || secret.message.length <= 100
-                                    ? secret.message
-                                    : truncateMessage(secret.message)
-                                }&rdquo;
-                            </blockquote>
-                            {secret.message.length > 100 && (
-                                <button
-                                    onClick={() => toggleMessageExpansion('standalone')}
-                                    className="text-[#FF75A0] hover:text-[#FF75A0]/80 text-sm font-medium mt-3 block mx-auto transition-colors"
-                                >
-                                    {expandedMessages['standalone'] ? 'Read less' : 'Read more'}
-                                </button>
-                            )}
-                        </div>
-                    )}
+    <div className="relative max-w-sm sm:max-w-xl mx-auto mb-6 sm:mb-8 p-6 sm:p-8 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl">
+        {/* ADD THE TIMER HERE */}
+        {!isMediaLoading && (
+            <CountdownTimer initialSeconds={secret.duration || 10} onComplete={handleTimerComplete} />
+        )}
+        
+        <div className="text-center mb-4">
+            <span className="text-2xl sm:text-3xl">💌</span>
+        </div>
+        <blockquote className="text-base sm:text-lg md:text-xl font-medium text-gray-800 dark:text-gray-200 text-center leading-relaxed px-2">
+            &ldquo;{expandedMessages['standalone'] || secret.message.length <= 100
+                ? secret.message
+                : truncateMessage(secret.message)
+            }&rdquo;
+        </blockquote>
+        {secret.message.length > 100 && (
+            <button
+                onClick={() => toggleMessageExpansion('standalone')}
+                className="text-[#FF75A0] hover:text-[#FF75A0]/80 text-sm font-medium mt-3 block mx-auto transition-colors"
+            >
+                {expandedMessages['standalone'] ? 'Read less' : 'Read more'}
+            </button>
+        )}
+    </div>
+)}
 
-                    {!isMediaLoading && (
-                        <div >
-                            {(!secret.fileType || secret.fileType === "image") && (
-                                <CountdownTimer initialSeconds={secret.duration || 10} onComplete={handleTimerComplete} />
-                            )}
-                            {secret.fileType === "video" && hasStarted && (
-                                <CountdownTimer
-                                    initialSeconds={duration || 10}
-                                    onComplete={handleTimerComplete}
-                                />
-                            )}
-                        </div>
-                    )}
+                  
                 </div>
             </>
         );
@@ -645,11 +663,11 @@ const truncateMessage = (message: string, maxLength: number = 100) => {
                 </div>
 
                 {/* Mobile-optimized Content Container */}
-                <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl border border-white/20 dark:border-gray-800/20 overflow-hidden">
-                    <div className="p-4 sm:p-6 md:p-8">
+                
+                    
                         {renderContent()}
-                    </div>
-                </div>
+                    
+                
 
                 {/* Mobile-optimized Actions */}
                 {secret && !isSecretExpiredOrAlreadyViewed(secret) && !hasExpiredDuringViewing && (

@@ -24,7 +24,7 @@ import { QAFormFields } from "./qa-form-fields";
 import { MicroQuestFormFields } from "./reveal-rush-form-fields";
 
 // Updated GameMode type to match backend expectations
-type GameMode = "none" | "scratch_and_see" | "qa_challenge" | "mystery_reveal" | "emoji_curtain" | "reveal_rush";
+type GameMode = "none" | "scratch_and_see" | "qa_challenge" | "reveal_rush";
 type MicroQuestType = "group_qa" | "rate_my" | "game_suggestion";
 
 interface SecretFormProps {
@@ -529,6 +529,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                     duration={duration}
                                     onDurationChange={setDuration}
                                     isTimerDisabled={isTimerDisabled}
+                                    gameMode={gameMode}
                                 />
                             </div>
                             

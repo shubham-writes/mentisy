@@ -1,4 +1,4 @@
-// reveal-rush-game.tsx
+// reveal-rush-game.tsx - Updated with timer support
 
 "use client";
 
@@ -16,9 +16,16 @@ interface MicroQuestGameProps {
     secret: Doc<"secrets">;
     onImageReady: () => void;
     receiverIp?: string | null;
+    // Add timer component prop
+    timerComponent?: React.ReactNode;
 }
 
-export function MicroQuestGame({ secret: initialSecret, onImageReady, receiverIp }: MicroQuestGameProps) {
+export function MicroQuestGame({ 
+    secret: initialSecret, 
+    onImageReady, 
+    receiverIp,
+    timerComponent // Add this parameter
+}: MicroQuestGameProps) {
     const liveSecret = useQuery(api.secrets.getLiveSecret, { id: initialSecret._id });
     const secret = liveSecret || initialSecret;
 
@@ -42,7 +49,6 @@ export function MicroQuestGame({ secret: initialSecret, onImageReady, receiverIp
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [localError, setLocalError] = useState<string | null>(null);
     const [hasSubmittedLocally, setHasSubmittedLocally] = useState(false);
-    // ✅ FIX 1: Add local state to immediately identify the winner in the current session.
     const [isLocalWinner, setIsLocalWinner] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -56,8 +62,6 @@ export function MicroQuestGame({ secret: initialSecret, onImageReady, receiverIp
     };
     
     const hasUserSubmitted = !!identity && currentQuestState.participants.some(p => p.userId === identity?._id);
-    
-    // ✅ FIX 2: A user is the winner if the DB says so OR if they just won in this session.
     const isLoggedInWinner = !!identity && currentQuestState.winnerId === identity?._id;
     const isWinner = isLoggedInWinner || isLocalWinner;
     
@@ -86,7 +90,6 @@ export function MicroQuestGame({ secret: initialSecret, onImageReady, receiverIp
             
             if (result.success) {
                 setHasSubmittedLocally(true);
-                // ✅ FIX 3: If the mutation result says we won, set local state immediately.
                 if (result.isWinner) {
                     setIsLocalWinner(true);
                 }
@@ -121,7 +124,6 @@ export function MicroQuestGame({ secret: initialSecret, onImageReady, receiverIp
     const { title, prompt } = getQuestInfo();
 
     const isGameOver = currentQuestState.isCompleted;
-    // The image is revealed if the user is the winner.
     const isRevealed = isWinner;
 
     useEffect(() => {
@@ -132,7 +134,7 @@ export function MicroQuestGame({ secret: initialSecret, onImageReady, receiverIp
 
     return (
         <div className="w-full max-w-full sm:max-w-lg mx-auto">
-            {/* This status bar will now show the correct message */}
+            {/* Status bar */}
             <div className="mb-4 p-3 bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 rounded-xl border border-orange-200/50 dark:border-orange-700/50">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
@@ -171,7 +173,7 @@ export function MicroQuestGame({ secret: initialSecret, onImageReady, receiverIp
                 </div>
             </div>
 
-            {/* This image will now unblur correctly for the winner */}
+            {/* Image container with timer positioned correctly */}
             <div className="relative w-full h-[80vh] sm:max-h-96 rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-700 shadow-xl mb-4">
                 <Image 
                     src={fileUrl!} 
@@ -184,7 +186,16 @@ export function MicroQuestGame({ secret: initialSecret, onImageReady, receiverIp
                         isRevealed ? 'blur-0' : 'blur-lg brightness-75'
                     }`} 
                 />
+                
                 {withWatermark && isRevealed && <Watermark name={recipientName} ip={receiverIp || undefined} />}
+                
+                {/* Timer positioned directly over the image area */}
+                {timerComponent && (
+                    <div className="absolute top-2 right-2 z-50 pointer-events-none">
+                        {timerComponent}
+                    </div>
+                )}
+                
                 {!isRevealed && (
                     <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-10">
                         <div className="text-center text-white p-4">
@@ -196,7 +207,7 @@ export function MicroQuestGame({ secret: initialSecret, onImageReady, receiverIp
                 )}
             </div>
             
-            {/* Hide the input form if the game is over OR if this user has won */}
+            {/* Input form - unchanged */}
             {!isGameOver && !isWinner && (
                 <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-xl p-4 sm:p-6 border border-purple-200/50 dark:border-purple-700/50">
                     <p className="font-semibold text-gray-800 dark:text-gray-200 mb-3">{prompt}</p>
@@ -271,6 +282,7 @@ export function MicroQuestGame({ secret: initialSecret, onImageReady, receiverIp
                 </div>
             )}
 
+            {/* Message section - unchanged */}
             {message && isRevealed && (
                 <div className="mt-4 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-4 sm:p-6 border border-blue-200/50 dark:border-blue-700/50">
                     <div className="text-center mb-3">

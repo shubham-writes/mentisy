@@ -2,7 +2,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 // --- CHANGE 1: ADD "reveal_rush" TO THE GAMEMODE TYPE ---
-type GameMode = "none" | "scratch_and_see" | "qa_challenge" | "mystery_reveal" | "emoji_curtain" | "reveal_rush";
+type GameMode = "none" | "scratch_and_see" | "qa_challenge" | "reveal_rush";
 
 interface GameModeSelectorProps {
     selectedMode: GameMode;
@@ -14,9 +14,8 @@ interface GameModeSelectorProps {
 const gameOptions = [
     { id: "none", icon: "✨", title: "Classic", description: "The original one-time view" },
     { id: "scratch_and_see", icon: "🐾", title: "Scratch & See", description: "Make them work for it" },
-    { id: "qa_challenge", icon: "🤔", title: "Q & A", description: "Quiz them to unlock" },
-    { id: "reveal_rush", icon: "🏆", title: "reveal-rush", description: "Group challenge mode" },
-    { id: "mystery_reveal", icon: "❓", title: "Mystery Reveal", description: "A slow, blurry reveal" },
+    { id: "qa_challenge", icon: "⁉️", title: "Q & A", description: "Quiz them to unlock" },
+    { id: "reveal_rush", icon: "🏆", title: "Reveal Rush", description: "Group challenge mode" },
 ] as const;
 
 export function GameModeSelector({ selectedMode, onModeChange, isGameModeDisabled }: GameModeSelectorProps) {
@@ -41,7 +40,7 @@ export function GameModeSelector({ selectedMode, onModeChange, isGameModeDisable
                 value={selectedMode}
                 onValueChange={(value) => onModeChange(value as GameMode)}
                 disabled={isGameModeDisabled}
-                className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3"
+                className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3"
             >
                 {gameOptions.map((option) => (
                     <div key={option.id} className={`relative ${isGameModeDisabled ? 'opacity-50' : ''}`}>

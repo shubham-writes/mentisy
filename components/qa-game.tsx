@@ -24,6 +24,7 @@ interface QAGameProps {
     maxAttempts?: number; // Default 3
     caseSensitive?: boolean; // Default false
     showHints?: boolean; // Default true
+    timerComponent?: React.ReactNode;
 }
 
 // Helper function to truncate message
@@ -55,7 +56,8 @@ export function QAGame({
     onToggleMessage,
     maxAttempts = 3,
     caseSensitive = false,
-    showHints = true
+    showHints = true,
+    timerComponent
 }: QAGameProps) {
     const [userAnswer, setUserAnswer] = useState('');
     const [attempts, setAttempts] = useState(0);
@@ -193,6 +195,12 @@ export function QAGame({
                         />
                     </div>
                 )}
+
+                {timerComponent && (
+        <div className="absolute top-2 right-2 z-[9999]">
+            {timerComponent}
+        </div>
+    )}
 
                 {/* Overlay for locked state */}
                 {!isCorrect && !gameOver && (
