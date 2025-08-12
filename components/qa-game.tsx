@@ -67,7 +67,7 @@ export function QAGame({
     const [showHint, setShowHint] = useState(false);
     const [isImageLoaded, setIsImageLoaded] = useState(false);
     const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
-    const [showSuccessOverlay, setShowSuccessOverlay] = useState(false); // NEW STATE FOR OVERLAY
+    const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
     // Handle image load
@@ -95,10 +95,10 @@ export function QAGame({
         if (normalizedUserAnswer === normalizedCorrectAnswer) {
             setIsCorrect(true);
             setFeedback('correct');
-            setShowSuccessOverlay(true); // SHOW SUCCESS OVERLAY
+            setShowSuccessOverlay(true);
             onAnswerCorrect();
             
-            // HIDE SUCCESS OVERLAY AFTER 1 SECOND
+            // Hide success overlay after 1 second
             setTimeout(() => setShowSuccessOverlay(false), 1000);
             setTimeout(() => setFeedback(null), 2000);
         } else {
@@ -142,7 +142,7 @@ export function QAGame({
                     </div>
                     <div className="flex items-center space-x-2 text-xs text-gray-500 dark:text-gray-400">
                         <span>Attempts: {attempts}/{maxAttempts}</span>
-                        {!isCorrect && !gameOver && (
+                        {!isCorrect && (
                             <span className="flex space-x-1">
                                 {Array.from({ length: maxAttempts - attempts }).map((_, i) => (
                                     <div key={i} className="w-2 h-2 bg-green-400 rounded-full"></div>
@@ -180,44 +180,66 @@ export function QAGame({
                     onLoad={handleImageLoad}
                     priority
                     className={`rounded-xl transition-all duration-1000 ${
-                        isCorrect || gameOver 
+                        isCorrect
                             ? 'blur-0 brightness-100' 
                             : 'blur-md brightness-75 grayscale'
                     }`}
                 />
                 
+               
                 {/* Watermark */}
-                {withWatermark && recipientName && (
-                    <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-xl z-10">
-                        <Watermark
-                            name={recipientName}
-                            ip={receiverIp || undefined}
-                        />
+{withWatermark && recipientName && (
+    <div className={`absolute inset-0 pointer-events-none overflow-hidden rounded-xl z-10 transition-all duration-1000 ${
+        isCorrect 
+            ? 'blur-0' 
+            : 'blur-md'
+    }`}>
+        <Watermark
+            name={recipientName}
+            ip={receiverIp || undefined}
+        />
+    </div>
+)}
+
+                {/* Timer Component - HIGHEST Z-INDEX to ensure it and its overlays are always visible */}
+                {timerComponent && (
+                    <div className="absolute top-2 right-2 z-[100]">
+                        {timerComponent}
                     </div>
                 )}
 
+                {/* Critical Time Warning Overlay - covers entire image when timer is critical */}
                 {timerComponent && (
-        <div className="absolute top-2 right-2 z-[9999]">
-            {timerComponent}
-        </div>
-    )}
+                    <div className="absolute inset-0 pointer-events-none z-[90] rounded-xl overflow-hidden">
+                        <div id="critical-time-overlay" className="absolute inset-0 bg-red-500/10 opacity-0 transition-opacity duration-300" />
+                    </div>
+                )}
 
                 {/* Overlay for locked state */}
                 {!isCorrect && !gameOver && (
                     <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-20 rounded-xl">
                         <div className="text-center text-white p-4">
-                            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <EyeOff className="w-8 h-8" />
-                            </div>
-                            <h3 className="font-bold text-lg mb-2">Answer to Reveal!</h3>
-                            <p className="text-sm opacity-90">Get the answer right to see the secret image</p>
-                        </div>
+    <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+        <EyeOff className="w-8 h-8" />
+    </div>
+    {gameOver ? (
+        <>
+            <h3 className="font-bold text-lg mb-2">Better Luck Next Time! 😔</h3>
+            <p className="text-sm opacity-90">You&apos;ve used all your attempts. The image remains hidden.</p>
+        </>
+    ) : (
+        <>
+            <h3 className="font-bold text-lg mb-2">Answer to Reveal!</h3>
+            <p className="text-sm opacity-90">Get the answer right to see the secret image</p>
+        </>
+    )}
+</div>
                     </div>
                 )}
 
-                {/* Success overlay - FIXED TO USE showSuccessOverlay STATE */}
+                {/* Success overlay - LOWER Z-INDEX so timer overlays are still visible */}
                 {showSuccessOverlay && (
-                    <div className="absolute inset-0 bg-green-500/20 backdrop-blur-sm flex items-center justify-center z-20 rounded-xl animate-pulse">
+                    <div className="absolute inset-0 bg-green-500/20 backdrop-blur-sm flex items-center justify-center z-25 rounded-xl animate-pulse">
                         <div className="text-center text-white p-4">
                             <div className="w-16 h-16 bg-green-500/30 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <Eye className="w-8 h-8" />
@@ -319,11 +341,9 @@ export function QAGame({
             </div>
 
             {/* Message Section */}
-            {message && (isCorrect || gameOver) && (
+            {message && isCorrect  && (
                 <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-4 sm:p-6 border border-blue-200/50 dark:border-blue-700/50 shadow-lg">
-                    <div className="text-center mb-3">
-                        <span className="text-xl sm:text-2xl">💌</span>
-                    </div>
+                    
                     <blockquote className="text-sm sm:text-base font-medium text-gray-800 dark:text-gray-200 text-center leading-relaxed">
                         &ldquo;{expandedMessages['qa'] || message.length <= 100
                             ? message

@@ -25,6 +25,20 @@ export function CountdownTimer({ initialSeconds, onComplete }: CountdownTimerPro
   // Calculate urgency for color changes
   const urgencyLevel = seconds <= 3 ? 'critical' : seconds <= 15 ? 'warning' : 'normal';
   
+  // Update the critical overlay in the parent container when critical
+  useEffect(() => {
+    const criticalOverlay = document.getElementById('critical-time-overlay');
+    if (criticalOverlay) {
+      if (urgencyLevel === 'critical') {
+        criticalOverlay.style.opacity = '1';
+        criticalOverlay.classList.add('animate-pulse');
+      } else {
+        criticalOverlay.style.opacity = '0';
+        criticalOverlay.classList.remove('animate-pulse');
+      }
+    }
+  }, [urgencyLevel]);
+  
   // Format time display
   const formatTime = (seconds: number) => {
     if (seconds >= 3600) {
@@ -86,11 +100,10 @@ export function CountdownTimer({ initialSeconds, onComplete }: CountdownTimerPro
         </div>
       </div>
 
-      {/* Critical Time Warning Overlay - only for very urgent situations */}
-      {urgencyLevel === 'critical' && seconds <= 3 && (
+      {/* Critical Time Warning Overlay - only for standalone use (when not in Q&A game) */}
+      {urgencyLevel === 'critical' && seconds <= 3 && !document.getElementById('critical-time-overlay') && (
         <div className="absolute inset-0 pointer-events-none z-30 rounded-xl overflow-hidden">
           <div className="absolute inset-0 bg-red-500/10 animate-pulse" />
-          
         </div>
       )}
     </>

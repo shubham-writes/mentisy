@@ -350,9 +350,7 @@ const truncateMessage = (message: string, maxLength: number = 100) => {
         {/* Message below - unchanged */}
         {secret.message && (
             <div className="max-w-full sm:max-w-lg mx-auto mb-6 sm:mb-8 p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl border border-blue-200/50 dark:border-blue-700/50 shadow-lg">
-                <div className="text-center mb-3">
-                    <span className="text-xl sm:text-2xl">💌</span>
-                </div>
+                
                 <blockquote className="text-sm sm:text-base font-medium text-gray-800 dark:text-gray-200 text-center leading-relaxed">
                     &ldquo;{expandedMessages['scratch'] || secret.message.length <= 100
                         ? secret.message
@@ -609,7 +607,7 @@ const truncateMessage = (message: string, maxLength: number = 100) => {
         )}
         
         <div className="text-center mb-4">
-            <span className="text-2xl sm:text-3xl">💌</span>
+            <span className="text-2xl sm:text-3xl">📧</span>
         </div>
         <blockquote className="text-base sm:text-lg md:text-xl font-medium text-gray-800 dark:text-gray-200 text-center leading-relaxed px-2">
             &ldquo;{expandedMessages['standalone'] || secret.message.length <= 100

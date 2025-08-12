@@ -1,4 +1,4 @@
-// reveal-rush-game.tsx - Updated with timer support
+// reveal-rush-game.tsx - Updated with timer support and critical overlay fix
 
 "use client";
 
@@ -191,8 +191,15 @@ export function MicroQuestGame({
                 
                 {/* Timer positioned directly over the image area */}
                 {timerComponent && (
-                    <div className="absolute top-2 right-2 z-50 pointer-events-none">
+                    <div className="absolute top-2 right-2 z-[100] pointer-events-none">
                         {timerComponent}
+                    </div>
+                )}
+
+                {/* Critical Time Warning Overlay - covers entire image when timer is critical */}
+                {timerComponent && (
+                    <div className="absolute inset-0 pointer-events-none z-[90] rounded-xl overflow-hidden">
+                        <div id="critical-time-overlay" className="absolute inset-0 bg-red-500/10 opacity-0 transition-opacity duration-300" />
                     </div>
                 )}
                 
@@ -285,9 +292,7 @@ export function MicroQuestGame({
             {/* Message section - unchanged */}
             {message && isRevealed && (
                 <div className="mt-4 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-4 sm:p-6 border border-blue-200/50 dark:border-blue-700/50">
-                    <div className="text-center mb-3">
-                        <span className="text-xl sm:text-2xl">💌</span>
-                    </div>
+                    
                     <blockquote className="text-center font-medium text-gray-800 dark:text-gray-200">
                         &ldquo;{message}&rdquo;
                     </blockquote>
