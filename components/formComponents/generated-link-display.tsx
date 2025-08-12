@@ -45,8 +45,9 @@ export function GeneratedLinkDisplay({ generatedLink, publicNote }: GeneratedLin
                         <div className="flex-1 p-3 pr-12 overflow-hidden">
                             <div className="text-sm">
                                 <span className="font-medium text-gray-800 dark:text-gray-200">
-                                    {publicNote}{": "}
-                                </span>
+  {publicNote && `${publicNote} : `}
+</span>
+
                                 <span className="text-[#FF75A0] dark:text-[#FF75A0] font-mono break-all sm:break-normal whitespace-nowrap sm:whitespace-normal overflow-hidden text-ellipsis">
                                     {generatedLink}
                                 </span>
