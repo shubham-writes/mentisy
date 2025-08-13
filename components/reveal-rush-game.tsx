@@ -1,4 +1,4 @@
-// reveal-rush-game.tsx - Updated with timer support and critical overlay fix
+// reveal-rush-game.tsx - Updated with compact design and question section above image
 
 "use client";
 
@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Watermark } from '@/components/watermark';
-import { Trophy, Users, Eye, EyeOff, AlertCircle, Clock, XCircle } from 'lucide-react';
+import { Trophy, Users, Eye, EyeOff, AlertCircle, Clock, XCircle, Zap } from 'lucide-react';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { Doc } from '@/convex/_generated/dataModel';
@@ -16,7 +16,6 @@ interface MicroQuestGameProps {
     secret: Doc<"secrets">;
     onImageReady: () => void;
     receiverIp?: string | null;
-    // Add timer component prop
     timerComponent?: React.ReactNode;
 }
 
@@ -24,7 +23,7 @@ export function MicroQuestGame({
     secret: initialSecret, 
     onImageReady, 
     receiverIp,
-    timerComponent // Add this parameter
+    timerComponent
 }: MicroQuestGameProps) {
     const liveSecret = useQuery(api.secrets.getLiveSecret, { id: initialSecret._id });
     const secret = liveSecret || initialSecret;
@@ -115,13 +114,29 @@ export function MicroQuestGame({
     
     const getQuestInfo = () => {
         switch (microQuestType) {
-            case 'group_qa': return { title: 'Group Q&A', prompt: mqGroupQuestion };
-            case 'rate_my': return { title: 'Rate My...', prompt: `Rate my ${mqRateCategory || 'vibe'}` };
-            case 'game_suggestion': return { title: 'Suggest a Game', prompt: mqSuggestionPrompt };
-            default: return { title: 'Challenge', prompt: 'Complete the challenge!' };
+            case 'group_qa': return { 
+                title: 'Group Q&A', 
+                prompt: mqGroupQuestion,
+                icon: '🤔'
+            };
+            case 'rate_my': return { 
+                title: 'Rate My...', 
+                prompt: `Rate my ${mqRateCategory || 'vibe'}`,
+                icon: '⭐'
+            };
+            case 'game_suggestion': return { 
+                title: 'Suggest a Game', 
+                prompt: mqSuggestionPrompt,
+                icon: '💡'
+            };
+            default: return { 
+                title: 'Challenge', 
+                prompt: 'Complete the challenge!',
+                icon: '🎯'
+            };
         }
     };
-    const { title, prompt } = getQuestInfo();
+    const { title, prompt, icon } = getQuestInfo();
 
     const isGameOver = currentQuestState.isCompleted;
     const isRevealed = isWinner;
@@ -133,47 +148,191 @@ export function MicroQuestGame({
     }, [currentQuestState.isCompleted]);
 
     return (
-        <div className="w-full max-w-full sm:max-w-lg mx-auto">
-            {/* Status bar */}
-            <div className="mb-4 p-3 bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 rounded-xl border border-orange-200/50 dark:border-orange-700/50">
+        <div className="relative w-full max-w-full sm:max-w-lg mx-auto">
+            {/* Game Status Bar - Compact */}
+            <div className="mb-3 px-3 py-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg border border-gray-200/50 dark:border-gray-700/50 shadow-sm">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                        <Trophy className="w-4 h-4 text-orange-500" />
-                        <span className="text-sm font-medium text-orange-700 dark:text-orange-300">{title}</span>
+                        <Zap className="w-3.5 h-3.5 text-orange-500" />
+                        <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Reveal Rush</span>
                     </div>
-                    <div className="flex items-center space-x-2 text-xs text-orange-600 dark:text-orange-400">
-                        <Users className="w-3 h-3" />
-                        <span>{currentQuestState.participants.length} logged-in participant{currentQuestState.participants.length !== 1 ? 's' : ''}</span>
+                    <div className="flex items-center space-x-3">
+                        {/* Status Message */}
+                        {isWinner && (
+                            <div className="flex items-center space-x-1.5 text-green-600 dark:text-green-400">
+                                <Trophy className="w-3.5 h-3.5" />
+                                <span className="text-xs font-medium">Winner!</span>
+                            </div>
+                        )}
+                        {isGameOver && !isWinner && (
+                            <div className="flex items-center space-x-1.5 text-red-600 dark:text-red-400">
+                                <XCircle className="w-3.5 h-3.5" />
+                                <span className="text-xs font-medium">Game Over</span>
+                            </div>
+                        )}
+                        {(hasSubmittedLocally || hasUserSubmitted) && !isGameOver && (
+                            <div className="flex items-center space-x-1.5 text-blue-600 dark:text-blue-400">
+                                <Clock className="w-3.5 h-3.5" />
+                                <span className="text-xs font-medium">Submitted</span>
+                            </div>
+                        )}
+                        
+                        {/* Participants Counter */}
+                        <div className="flex items-center space-x-1.5 text-xs text-gray-500 dark:text-gray-400">
+                            <Users className="w-3 h-3" />
+                            <span>{currentQuestState.participants.length}</span>
+                        </div>
                     </div>
-                </div>
-                <div className={`mt-2 flex items-center space-x-2 text-sm font-medium ${
-                    isWinner ? 'text-green-600' : isGameOver ? 'text-red-600' : 'text-blue-600'
-                }`}>
-                    {isWinner ? (
-                        <>
-                            <Trophy className="w-4 h-4" />
-                            <span>🎉 You won! Image revealed!</span>
-                        </>
-                    ) : isGameOver ? (
-                        <>
-                            <XCircle className="w-4 h-4" />
-                            <span>Someone has won! Better luck next time.</span>
-                        </>
-                    ) : hasSubmittedLocally || hasUserSubmitted ? (
-                        <>
-                            <Clock className="w-4 h-4" />
-                            <span>✅ Your attempt is in! Waiting for results...</span>
-                        </>
-                    ) : (
-                        <>
-                            <Eye className="w-4 h-4" />
-                            <span>🏃‍♀️ First to win sees the secret!</span>
-                        </>
-                    )}
                 </div>
             </div>
 
-            {/* Image container with timer positioned correctly */}
+            {/* Question and Input Section - Compact and Above Image */}
+            <div className="bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 rounded-lg px-4 py-3 border border-orange-200/50 dark:border-orange-700/50 shadow-lg mb-3">
+                {/* Question - Compact */}
+                <div className="mb-3">
+                    <div className="flex items-center mb-1.5">
+                        <span className="text-base mr-1.5">{icon}</span>
+                        <h3 className="font-semibold text-sm text-gray-800 dark:text-gray-200">{title}:</h3>
+                    </div>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 bg-white/50 dark:bg-gray-800/50 px-3 py-2 rounded-md border border-gray-200/50 dark:border-gray-600/50">
+                        {prompt}
+                    </p>
+                </div>
+
+                {/* Input Section - Only show if game is active and user hasn't won */}
+                {!isGameOver && !isWinner && (
+                    <div className="space-y-2">
+                        {/* Text Input for Q&A */}
+                        {microQuestType === 'group_qa' && (
+                            <div className="flex space-x-2">
+                                <Input
+                                    ref={inputRef}
+                                    type="text"
+                                    placeholder="Your answer..."
+                                    value={userInput}
+                                    onChange={(e) => setUserInput(e.target.value)}
+                                    onKeyPress={handleKeyPress}
+                                    className="flex-1 h-9 text-sm"
+                                    disabled={isSubmitting || hasUserSubmitted}
+                                />
+                                <Button 
+                                    onClick={handleSubmit}
+                                    disabled={isSubmitting || hasUserSubmitted || !userInput.trim()}
+                                    size="sm"
+                                    className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 h-9 px-4 text-sm"
+                                >
+                                    {isSubmitting ? (
+                                        <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                    ) : (
+                                        'Submit'
+                                    )}
+                                </Button>
+                            </div>
+                        )}
+
+                        {/* Text Input for Game Suggestion */}
+                        {microQuestType === 'game_suggestion' && (
+                            <div className="flex space-x-2">
+                                <Input
+                                    ref={inputRef}
+                                    type="text"
+                                    placeholder="Your suggestion..."
+                                    value={userInput}
+                                    onChange={(e) => setUserInput(e.target.value)}
+                                    onKeyPress={handleKeyPress}
+                                    className="flex-1 h-9 text-sm"
+                                    disabled={isSubmitting || hasUserSubmitted}
+                                />
+                                <Button 
+                                    onClick={handleSubmit}
+                                    disabled={isSubmitting || hasUserSubmitted || !userInput.trim()}
+                                    size="sm"
+                                    className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 h-9 px-4 text-sm"
+                                >
+                                    {isSubmitting ? (
+                                        <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                    ) : (
+                                        'Submit'
+                                    )}
+                                </Button>
+                            </div>
+                        )}
+
+                        {/* Rating Input */}
+                        {microQuestType === 'rate_my' && (
+                            <>
+                                <div className="flex items-center justify-center gap-1 mb-2">
+                                    <div className="flex gap-1">
+                                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(r => (
+                                            <button 
+                                                key={r}
+                                                onClick={() => setSelectedRating(r)}
+                                                onMouseEnter={() => !isSubmitting && !hasUserSubmitted && setSelectedRating(r)}
+                                                className={`w-6 h-6 text-lg transition-all duration-200 hover:scale-110 ${
+                                                    selectedRating && r <= selectedRating
+                                                        ? 'text-yellow-400' 
+                                                        : 'text-gray-300 dark:text-gray-600 hover:text-yellow-300'
+                                                }`}
+                                                disabled={isSubmitting || hasUserSubmitted}
+                                                title={`Rate ${r}/10`}
+                                            >
+                                                ⭐
+                                            </button>
+                                        ))}
+                                    </div>
+                                    {selectedRating && (
+                                        <div className="ml-3 flex items-center">
+                                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 bg-white/50 dark:bg-gray-800/50 px-2 py-1 rounded-md border">
+                                                {selectedRating}/10
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+                                <Button 
+                                    onClick={handleSubmit}
+                                    disabled={isSubmitting || hasUserSubmitted || selectedRating === null}
+                                    className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 h-9 text-sm"
+                                >
+                                    {isSubmitting ? (
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                            Submitting...
+                                        </div>
+                                    ) : (
+                                        '🚀 Submit Rating'
+                                    )}
+                                </Button>
+                            </>
+                        )}
+
+                        {/* Error Message */}
+                        {localError && (
+                            <div className="flex items-center space-x-1.5 text-red-600 dark:text-red-400 text-xs">
+                                <AlertCircle className="w-3.5 h-3.5" />
+                                <span>{localError}</span>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Status Messages for completed states */}
+                {(isGameOver || isWinner || hasSubmittedLocally || hasUserSubmitted) && (
+                    <div className="mt-2 px-3 py-2 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-md border border-green-200/50 dark:border-green-700/50">
+                        <div className="flex items-center space-x-2">
+                            <span className="text-xs font-medium text-green-800 dark:text-green-300">
+                                {isWinner ? '🏆' : isGameOver ? '❌' : '⏳'}
+                            </span>
+                            <span className="font-semibold text-sm text-green-900 dark:text-green-200">
+                                {isWinner ? 'You won! 🎉' : 
+                                 isGameOver ? 'Someone else won this round' : 
+                                 'Your attempt is submitted! Waiting for results...'}
+                            </span>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* Image Container */}
             <div className="relative w-full h-[80vh] sm:max-h-96 rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-700 shadow-xl mb-4">
                 <Image 
                     src={fileUrl!} 
@@ -182,118 +341,61 @@ export function MicroQuestGame({
                     style={{ objectFit: 'contain' }} 
                     onLoad={handleImageLoad} 
                     priority 
-                    className={`rounded-xl transition-all duration-700 ${
-                        isRevealed ? 'blur-0' : 'blur-lg brightness-75'
+                    className={`rounded-xl transition-all duration-1000 ${
+                        isRevealed ? 'blur-0 brightness-100' : 'blur-md brightness-75 grayscale'
                     }`} 
                 />
                 
-                {withWatermark && isRevealed && <Watermark name={recipientName} ip={receiverIp || undefined} />}
+                {/* Watermark */}
+                {withWatermark && isRevealed && (
+                    <div className={`absolute inset-0 pointer-events-none overflow-hidden rounded-xl z-10 transition-all duration-1000 ${
+                        isRevealed ? 'blur-0' : 'blur-md'
+                    }`}>
+                        <Watermark name={recipientName} ip={receiverIp || undefined} />
+                    </div>
+                )}
                 
-                {/* Timer positioned directly over the image area */}
+                {/* Timer Component - HIGHEST Z-INDEX */}
                 {timerComponent && (
-                    <div className="absolute top-2 right-2 z-[100] pointer-events-none">
+                    <div className="absolute top-2 right-2 z-[100]">
                         {timerComponent}
                     </div>
                 )}
 
-                {/* Critical Time Warning Overlay - covers entire image when timer is critical */}
+                {/* Critical Time Warning Overlay */}
                 {timerComponent && (
                     <div className="absolute inset-0 pointer-events-none z-[90] rounded-xl overflow-hidden">
                         <div id="critical-time-overlay" className="absolute inset-0 bg-red-500/10 opacity-0 transition-opacity duration-300" />
                     </div>
                 )}
                 
+                {/* Overlay for locked state */}
                 {!isRevealed && (
-                    <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-10">
+                    <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-20 rounded-xl">
                         <div className="text-center text-white p-4">
-                            <EyeOff className="w-8 h-8 mx-auto mb-2" />
-                            <h3 className="font-bold text-lg">Complete the Quest</h3>
-                            <p className="text-sm opacity-90">First correct answer wins!</p>
+                            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <EyeOff className="w-8 h-8" />
+                            </div>
+                            {isGameOver ? (
+                                <>
+                                    <h3 className="font-bold text-lg mb-2">Better Luck Next Time! 😔</h3>
+                                    <p className="text-sm opacity-90">Someone else won this round. The image remains hidden.</p>
+                                </>
+                            ) : (
+                                <>
+                                    <h3 className="font-bold text-lg mb-2">Complete the Quest!</h3>
+                                    <p className="text-sm opacity-90">First correct answer wins and reveals the image</p>
+                                </>
+                            )}
                         </div>
                     </div>
                 )}
             </div>
-            
-            {/* Input form - unchanged */}
-            {!isGameOver && !isWinner && (
-                <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-xl p-4 sm:p-6 border border-purple-200/50 dark:border-purple-700/50">
-                    <p className="font-semibold text-gray-800 dark:text-gray-200 mb-3">{prompt}</p>
-                    
-                    <div className="space-y-3">
-                        {microQuestType === 'group_qa' && (
-                            <Input 
-                                ref={inputRef}
-                                type="text" 
-                                placeholder="Your answer..." 
-                                value={userInput} 
-                                onChange={(e) => setUserInput(e.target.value)} 
-                                onKeyPress={handleKeyPress} 
-                                disabled={isSubmitting}
-                                className="h-12 rounded-lg border-2 focus:border-purple-500"
-                            />
-                        )}
-                        
-                        {microQuestType === 'game_suggestion' && (
-                            <textarea 
-                                placeholder="Your brilliant idea..." 
-                                value={userInput} 
-                                onChange={(e) => setUserInput(e.target.value)} 
-                                disabled={isSubmitting} 
-                                className="w-full p-3 h-24 rounded-lg border-2 focus:border-purple-500 bg-white/50 dark:bg-gray-800/50 resize-none"
-                            />
-                        )}
-                        
-                        {microQuestType === 'rate_my' && (
-                            <div className="flex justify-center gap-2 flex-wrap">
-                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(r => (
-                                    <button 
-                                        key={r}
-                                        onClick={() => setSelectedRating(r)}
-                                        className={`w-10 h-10 rounded-lg border-2 font-medium transition-all duration-200 ${
-                                            selectedRating === r 
-                                                ? 'border-purple-500 bg-purple-500 text-white shadow-lg' 
-                                                : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:border-purple-400'
-                                        }`}
-                                        disabled={isSubmitting}
-                                    >
-                                        {r}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                        
-                        <Button 
-                            onClick={handleSubmit} 
-                            disabled={isSubmitting || hasUserSubmitted} 
-                            className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 h-12 rounded-lg font-medium"
-                        >
-                            {isSubmitting ? (
-                                <div className="flex items-center gap-2">
-                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                    Submitting...
-                                </div>
-                            ) : (
-                                '🚀 Submit Attempt'
-                            )}
-                        </Button>
-                        
-                        {localError && (
-                            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
-                                <p className="text-red-600 dark:text-red-400 text-sm flex items-center gap-2">
-                                    <AlertCircle className="w-4 h-4 flex-shrink-0"/>
-                                    {localError}
-                                </p>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
 
-            {/* Message section - unchanged */}
+            {/* Message Section - Only show when revealed */}
             {message && isRevealed && (
-                <div className="mt-4 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-4 sm:p-6 border border-blue-200/50 dark:border-blue-700/50">
-                    
-                    <blockquote className="text-center font-medium text-gray-800 dark:text-gray-200">
+                <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-4 sm:p-6 border border-blue-200/50 dark:border-blue-700/50 shadow-lg">
+                    <blockquote className="text-sm sm:text-base font-medium text-gray-800 dark:text-gray-200 text-center leading-relaxed">
                         &ldquo;{message}&rdquo;
                     </blockquote>
                 </div>

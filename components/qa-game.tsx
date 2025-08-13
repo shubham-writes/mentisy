@@ -133,39 +133,138 @@ export function QAGame({
 
     return (
         <div className="relative w-full max-w-full sm:max-w-lg mx-auto">
-            {/* Game Status Bar */}
-            <div className="mb-4 p-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-xl border border-gray-200/50 dark:border-gray-700/50 shadow-sm">
-                <div className="flex items-center justify-between mb-2">
+            {/* Game Status Bar - Slimmer */}
+            <div className="mb-3 px-3 py-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg border border-gray-200/50 dark:border-gray-700/50 shadow-sm">
+                <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                        <HelpCircle className="w-4 h-4 text-blue-500" />
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Q&A Challenge</span>
+                        <HelpCircle className="w-3.5 h-3.5 text-blue-500" />
+                        <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Q&A Challenge</span>
                     </div>
-                    <div className="flex items-center space-x-2 text-xs text-gray-500 dark:text-gray-400">
-                        <span>Attempts: {attempts}/{maxAttempts}</span>
-                        {!isCorrect && (
-                            <span className="flex space-x-1">
-                                {Array.from({ length: maxAttempts - attempts }).map((_, i) => (
-                                    <div key={i} className="w-2 h-2 bg-green-400 rounded-full"></div>
-                                ))}
-                                {Array.from({ length: attempts }).map((_, i) => (
-                                    <div key={i} className="w-2 h-2 bg-red-400 rounded-full"></div>
-                                ))}
-                            </span>
+                    <div className="flex items-center space-x-3">
+                        {/* Status Message */}
+                        {isCorrect && (
+                            <div className="flex items-center space-x-1.5 text-green-600 dark:text-green-400">
+                                <CheckCircle className="w-3.5 h-3.5" />
+                                <span className="text-xs font-medium">Correct!</span>
+                            </div>
                         )}
+                        {gameOver && !isCorrect && (
+                            <div className="flex items-center space-x-1.5 text-red-600 dark:text-red-400">
+                                <XCircle className="w-3.5 h-3.5" />
+                                <span className="text-xs font-medium">Game Over</span>
+                            </div>
+                        )}
+                        
+                        {/* Attempts Counter */}
+                        <div className="flex items-center space-x-1.5 text-xs text-gray-500 dark:text-gray-400">
+                            <span>{attempts}/{maxAttempts}</span>
+                            {!isCorrect && (
+                                <div className="flex space-x-0.5">
+                                    {Array.from({ length: maxAttempts - attempts }).map((_, i) => (
+                                        <div key={i} className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
+                                    ))}
+                                    {Array.from({ length: attempts }).map((_, i) => (
+                                        <div key={i} className="w-1.5 h-1.5 bg-red-400 rounded-full"></div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
-                
-                {/* Status indicators */}
-                {isCorrect && (
-                    <div className="flex items-center space-x-2 text-green-600 dark:text-green-400">
-                        <CheckCircle className="w-4 h-4" />
-                        <span className="text-sm font-medium">Correct! Image revealed!</span>
+            </div>
+
+            {/* Question and Answer Section - Slimmer */}
+            <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg px-4 py-3 border border-purple-200/50 dark:border-purple-700/50 shadow-lg mb-3">
+                {/* Question - More compact */}
+                <div className="mb-3">
+                    <div className="flex items-center mb-1.5">
+                        <span className="text-base mr-1.5">🤔</span>
+                        <h3 className="font-semibold text-sm text-gray-800 dark:text-gray-200">Question:</h3>
+                    </div>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 bg-white/50 dark:bg-gray-800/50 px-3 py-2 rounded-md border border-gray-200/50 dark:border-gray-600/50">
+                        {question}
+                    </p>
+                </div>
+
+                {/* Answer Input Section - Compact */}
+                {!isCorrect && !gameOver && (
+                    <div className="space-y-2">
+                        <div className="flex space-x-2">
+                            <Input
+                                ref={inputRef}
+                                type="text"
+                                placeholder="Type your answer..."
+                                value={userAnswer}
+                                onChange={(e) => setUserAnswer(e.target.value)}
+                                onKeyPress={handleKeyPress}
+                                className={`flex-1 h-9 text-sm ${
+                                    feedback === 'incorrect' 
+                                        ? 'border-red-500 ring-red-200' 
+                                        : feedback === 'correct'
+                                        ? 'border-green-500 ring-green-200'
+                                        : ''
+                                }`}
+                                disabled={isCorrect || gameOver}
+                            />
+                            <Button 
+                                onClick={handleSubmitAnswer}
+                                disabled={!userAnswer.trim() || isCorrect || gameOver}
+                                size="sm"
+                                className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 h-9 px-4 text-sm"
+                            >
+                                Submit
+                            </Button>
+                        </div>
+
+                        {/* Hint and Feedback in one row */}
+                        <div className="flex items-center justify-between">
+                            {/* Hint Section */}
+                            {showHints && attempts > 0 && (
+                                <div className="flex items-center space-x-2">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => setShowHint(!showHint)}
+                                        className="text-purple-600 hover:text-purple-700 dark:text-purple-400 h-6 px-2 text-xs"
+                                    >
+                                        💡 {showHint ? 'Hide' : 'Hint'}
+                                    </Button>
+                                    {showHint && (
+                                        <span className="text-xs text-gray-600 dark:text-gray-400 font-mono bg-yellow-100 dark:bg-yellow-900/30 px-1.5 py-0.5 rounded">
+                                            {generateHint(correctAnswer)}
+                                        </span>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Feedback Messages */}
+                            {feedback === 'incorrect' && (
+                                <div className="flex items-center space-x-1.5 text-red-600 dark:text-red-400 text-xs">
+                                    <XCircle className="w-3.5 h-3.5" />
+                                    <span>
+                                        {maxAttempts - attempts} left
+                                    </span>
+                                </div>
+                            )}
+                            {feedback === 'correct' && (
+                                <div className="flex items-center space-x-1.5 text-green-600 dark:text-green-400 text-xs">
+                                    <CheckCircle className="w-3.5 h-3.5" />
+                                    <span>Perfect! 🎉</span>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 )}
-                {gameOver && !isCorrect && (
-                    <div className="flex items-center space-x-2 text-red-600 dark:text-red-400">
-                        <XCircle className="w-4 h-4" />
-                        <span className="text-sm font-medium">Game Over! Answer revealed.</span>
+
+                {/* Show Answer - Compact */}
+                {(gameOver || isCorrect) && (
+                    <div className="mt-2 px-3 py-2 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-md border border-green-200/50 dark:border-green-700/50">
+                        <div className="flex items-center space-x-2">
+                            <span className="text-xs font-medium text-green-800 dark:text-green-300">
+                                {isCorrect ? '✅' : '💡'}
+                            </span>
+                            <span className="font-semibold text-sm text-green-900 dark:text-green-200">{correctAnswer}</span>
+                        </div>
                     </div>
                 )}
             </div>
@@ -186,20 +285,19 @@ export function QAGame({
                     }`}
                 />
                 
-               
                 {/* Watermark */}
-{withWatermark && recipientName && (
-    <div className={`absolute inset-0 pointer-events-none overflow-hidden rounded-xl z-10 transition-all duration-1000 ${
-        isCorrect 
-            ? 'blur-0' 
-            : 'blur-md'
-    }`}>
-        <Watermark
-            name={recipientName}
-            ip={receiverIp || undefined}
-        />
-    </div>
-)}
+                {withWatermark && recipientName && (
+                    <div className={`absolute inset-0 pointer-events-none overflow-hidden rounded-xl z-10 transition-all duration-1000 ${
+                        isCorrect 
+                            ? 'blur-0' 
+                            : 'blur-md'
+                    }`}>
+                        <Watermark
+                            name={recipientName}
+                            ip={receiverIp || undefined}
+                        />
+                    </div>
+                )}
 
                 {/* Timer Component - HIGHEST Z-INDEX to ensure it and its overlays are always visible */}
                 {timerComponent && (
@@ -219,21 +317,21 @@ export function QAGame({
                 {!isCorrect && !gameOver && (
                     <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-20 rounded-xl">
                         <div className="text-center text-white p-4">
-    <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-        <EyeOff className="w-8 h-8" />
-    </div>
-    {gameOver ? (
-        <>
-            <h3 className="font-bold text-lg mb-2">Better Luck Next Time! 😔</h3>
-            <p className="text-sm opacity-90">You&apos;ve used all your attempts. The image remains hidden.</p>
-        </>
-    ) : (
-        <>
-            <h3 className="font-bold text-lg mb-2">Answer to Reveal!</h3>
-            <p className="text-sm opacity-90">Get the answer right to see the secret image</p>
-        </>
-    )}
-</div>
+                            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <EyeOff className="w-8 h-8" />
+                            </div>
+                            {gameOver ? (
+                                <>
+                                    <h3 className="font-bold text-lg mb-2">Better Luck Next Time! 😔</h3>
+                                    <p className="text-sm opacity-90">You&apos;ve used all your attempts. The image remains hidden.</p>
+                                </>
+                            ) : (
+                                <>
+                                    <h3 className="font-bold text-lg mb-2">Answer to Reveal!</h3>
+                                    <p className="text-sm opacity-90">Get the answer right to see the secret image</p>
+                                </>
+                            )}
+                        </div>
                     </div>
                 )}
 
@@ -250,100 +348,9 @@ export function QAGame({
                 )}
             </div>
 
-            {/* Question and Answer Section */}
-            <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-xl p-4 sm:p-6 border border-purple-200/50 dark:border-purple-700/50 shadow-lg mb-4">
-                {/* Question */}
-                <div className="mb-4">
-                    <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-2 flex items-center">
-                        <span className="text-lg mr-2">🤔</span>
-                        Question:
-                    </h3>
-                    <p className="text-gray-700 dark:text-gray-300 bg-white/50 dark:bg-gray-800/50 p-3 rounded-lg border border-gray-200/50 dark:border-gray-600/50">
-                        {question}
-                    </p>
-                </div>
-
-                {/* Answer Input Section */}
-                {!isCorrect && !gameOver && (
-                    <div className="space-y-3">
-                        <div className="flex space-x-2">
-                            <Input
-                                ref={inputRef}
-                                type="text"
-                                placeholder="Type your answer..."
-                                value={userAnswer}
-                                onChange={(e) => setUserAnswer(e.target.value)}
-                                onKeyPress={handleKeyPress}
-                                className={`flex-1 ${
-                                    feedback === 'incorrect' 
-                                        ? 'border-red-500 ring-red-200' 
-                                        : feedback === 'correct'
-                                        ? 'border-green-500 ring-green-200'
-                                        : ''
-                                }`}
-                                disabled={isCorrect || gameOver}
-                            />
-                            <Button 
-                                onClick={handleSubmitAnswer}
-                                disabled={!userAnswer.trim() || isCorrect || gameOver}
-                                className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
-                            >
-                                Submit
-                            </Button>
-                        </div>
-
-                        {/* Hint Section */}
-                        {showHints && attempts > 0 && (
-                            <div className="flex items-center justify-between">
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => setShowHint(!showHint)}
-                                    className="text-purple-600 hover:text-purple-700 dark:text-purple-400"
-                                >
-                                    💡 {showHint ? 'Hide Hint' : 'Show Hint'}
-                                </Button>
-                                {showHint && (
-                                    <span className="text-sm text-gray-600 dark:text-gray-400 font-mono bg-yellow-100 dark:bg-yellow-900/30 px-2 py-1 rounded">
-                                        {generateHint(correctAnswer)}
-                                    </span>
-                                )}
-                            </div>
-                        )}
-
-                        {/* Feedback Messages */}
-                        {feedback === 'incorrect' && (
-                            <div className="flex items-center space-x-2 text-red-600 dark:text-red-400 text-sm">
-                                <XCircle className="w-4 h-4" />
-                                <span>
-                                    Incorrect! {maxAttempts - attempts} attempt{maxAttempts - attempts !== 1 ? 's' : ''} remaining
-                                </span>
-                            </div>
-                        )}
-                        {feedback === 'correct' && (
-                            <div className="flex items-center space-x-2 text-green-600 dark:text-green-400 text-sm">
-                                <CheckCircle className="w-4 h-4" />
-                                <span>Perfect! Image revealed! 🎉</span>
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                {/* Show Answer (when game over or correct) */}
-                {(gameOver || isCorrect) && (
-                    <div className="mt-4 p-3 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-lg border border-green-200/50 dark:border-green-700/50">
-                        <p className="text-sm font-medium text-green-800 dark:text-green-300 mb-1">
-                            {isCorrect ? '✅ Correct Answer:' : '💡 The Answer Was:'}
-                        </p>
-                        <p className="font-semibold text-green-900 dark:text-green-200">{correctAnswer}</p>
-                    </div>
-                )}
-            </div>
-
             {/* Message Section */}
-            {message && isCorrect  && (
+            {message && isCorrect && (
                 <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-4 sm:p-6 border border-blue-200/50 dark:border-blue-700/50 shadow-lg">
-                    
                     <blockquote className="text-sm sm:text-base font-medium text-gray-800 dark:text-gray-200 text-center leading-relaxed">
                         &ldquo;{expandedMessages['qa'] || message.length <= 100
                             ? message
