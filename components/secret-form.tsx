@@ -409,7 +409,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     console.log("Current form state:", { recipientName, publicNote, message, useCase, templateApplied, gameMode });
 
     return (
-        <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+        <div className="w-full max-w-7xl mx-auto px-2 sm:px-2 md:px-6 lg:px-8">
             <PersonalizedHeader useCase={useCase} isLandingPage={isLandingPage} />
 
             {/* Use Case Tips - Mobile Optimized */}
@@ -421,7 +421,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
 
             {/* Main Form Container - Mobile First Responsive */}
             <div className="bg-white/80 dark:bg-gray-900/50 dark:border mb-20 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-xl sm:shadow-2xl border border-white/20 dark:border-gray-800 overflow-hidden">
-                <div className="p-4 sm:p-6 md:p-8 lg:p-10">
+                <div className="p-2 sm:p-2 md:p-8 lg:p-10">
                     
                     {/* Landing Page Notice */}
                     {isLandingPage && <LandingPageNotice />}
@@ -434,7 +434,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                             
                             {/* File Upload Area or Preview */}
                             {uploadedFile ? (
-                                <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-[#FF75A0]/20 dark:border-[#FF75A0]/30 shadow-lg">
+                                <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-1 sm:p-6 border border-[#FF75A0]/20 dark:border-[#FF75A0]/30 shadow-lg">
                                     <FilePreview 
                                         file={uploadedFile} 
                                         onRemove={handleFileRemove}

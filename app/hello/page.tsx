@@ -81,7 +81,7 @@ function HelloPageContent() {
                     </section>
                     
                     {/* My Secrets List Section */}
-                    <section id="my-secrets-list" data-secrets-list className="w-full mt-12 scroll-mt-20 py-4 mr-6">
+                    <section id="my-secrets-list" data-secrets-list className="w-full mt-12 scroll-mt-20 py-4 ">
                         <MySecretsList />
                     </section>
                 </div>

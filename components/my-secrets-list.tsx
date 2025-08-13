@@ -101,9 +101,9 @@ export function MySecretsList() {
     };
 
     return (
-        <div className="w-full max-w-4xl mx-auto p-3">
+        <div className="w-full flex flex-col items-center justify-center p-1 sm:p-3">
             {/* Header Section */}
-            <div className="mb-6 sm:mb-8 text-center px-2">
+            <div className="mb-6 sm:mb-8 w-full text-center px-2">
                 <h3 className="text-2xl sm:text-4xl font-bold mb-3 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] bg-clip-text text-transparent">
                     Your Secret Links
                 </h3>
@@ -112,10 +112,10 @@ export function MySecretsList() {
                 </p>
             </div>
 
-            <div className="bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-xl p-4 sm:p-8 shadow-sm">
+            <div className="w-full sm:w-auto bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-xl  sm:p-6 lg:p-8 p-2 sm:mx-0 shadow-sm">
                 {/* Header with delete all button */}
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 sm:mb-8">
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center p-2 space-x-3">
                         <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#FF75A0] to-[#FFAA70] rounded-lg flex items-center justify-center">
                             <span className="text-lg sm:text-xl">🔗</span>
                         </div>
@@ -144,7 +144,7 @@ export function MySecretsList() {
                 )}
                 
                 {/* Scrollable Secrets List */}
-                <div ref={scrollContainerRef} className="space-y-4 max-h-96 overflow-y-auto pr-2">
+                <div ref={scrollContainerRef} className="space-y-4 max-h-96 overflow-y-auto">
                     {/* Empty State */}
                     {visibleSecrets.length === 0 && status !== "LoadingFirstPage" && (
                         <div className="text-center py-12 sm:py-16 px-4">

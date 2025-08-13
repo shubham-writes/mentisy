@@ -14,7 +14,7 @@ interface GameModeSelectorProps {
 const gameOptions = [
     { id: "none", icon: "✨", title: "Classic", description: "The original one-time view" },
     { id: "scratch_and_see", icon: "🐾", title: "Scratch & See", description: "Make them work for it" },
-    { id: "qa_challenge", icon: "⁉️", title: "Q & A", description: "Quiz them to unlock" },
+    { id: "qa_challenge", icon: "🤔", title: "Q & A", description: "Quiz them to unlock" },
     { id: "reveal_rush", icon: "🏆", title: "Reveal Rush", description: "Group challenge mode" },
 ] as const;
 

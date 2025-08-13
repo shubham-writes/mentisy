@@ -8,7 +8,7 @@ export default function AuthenticatedDashboard() {
   return (
     <div className="min-h-screen">
       {/* Clean authenticated header */}
-      <div className="px-6 py-6">
+      <div className=" py-6">
         <div className="max-w-7xl mx-auto"> {/* Changed from max-w-4xl to max-w-7xl */}
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -24,7 +24,7 @@ export default function AuthenticatedDashboard() {
           </div>
           
           {/* Secrets list */}
-          <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 m-2 sm:m-2 md:m-6 lg:m-8  shadow-sm">
             <div className="mb-4">
               <h2 className="text-lg font-medium mb-1 text-gray-900 dark:text-white"></h2>
               <p className="text-sm text-gray-500 dark:text-gray-400"></p>
