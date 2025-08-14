@@ -78,7 +78,7 @@ export default defineSchema({
         // Stores the ID of the winning user
         mqWinnerId: v.optional(v.id("users")),
         mqWinnerName: v.optional(v.string()),   // ✅ New
-    mqWinnerAt: v.optional(v.number()),  
+        mqWinnerAt: v.optional(v.number()),  
 
         // A flag to lock the quest once someone has won
         mqIsCompleted: v.optional(v.boolean()),
@@ -86,6 +86,37 @@ export default defineSchema({
     })
         .index("by_author", ["authorId"])
         .index("by_publicId", ["publicId"]),
+
+    // NEW: Feedback table
+    feedback: defineTable({
+        userId: v.optional(v.id("users")), // Optional for anonymous feedback
+        userEmail: v.optional(v.string()), // For anonymous users who want to be contacted
+        type: v.union(
+            v.literal("game_suggestion"), 
+            v.literal("bug_report"), 
+            v.literal("general_feedback"),
+            v.literal("feature_request")
+        ),
+        title: v.string(),
+        description: v.string(),
+        rating: v.optional(v.number()), // 1-5 stars for overall app rating
+        gameIdea: v.optional(v.string()), // Specific field for game suggestions
+        priority: v.optional(v.union(v.literal("low"), v.literal("medium"), v.literal("high"))),
+        status: v.union(
+            v.literal("pending"), 
+            v.literal("reviewing"), 
+            v.literal("in_progress"),
+            v.literal("completed"),
+            v.literal("rejected")
+        ),
+        adminNotes: v.optional(v.string()), // For admin use
+        createdAt: v.number(),
+        updatedAt: v.optional(v.number()),
+    })
+        .index("by_type", ["type"])
+        .index("by_status", ["status"])
+        .index("by_user", ["userId"])
+        .index("by_created", ["createdAt"]),
 
     test_table: defineTable({
         message: v.string(),

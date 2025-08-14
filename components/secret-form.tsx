@@ -25,7 +25,7 @@ import { MicroQuestFormFields } from "./reveal-rush-form-fields";
 
 // Updated GameMode type to match backend expectations
 type GameMode = "none" | "scratch_and_see" | "qa_challenge" | "reveal_rush";
-type MicroQuestType = "group_qa" | "rate_my" | "game_suggestion";
+type MicroQuestType = "group_qa" | "rate_my";
 
 interface SecretFormProps {
     isLandingPage?: boolean;
@@ -191,10 +191,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
             alert("Please provide a category and select your rating for the Rate My... quest.");
             return;
         }
-        if (microQuestType === 'game_suggestion' && !mqSuggestionPrompt.trim()) {
-            alert("Please provide a prompt for the Game Suggestion quest.");
-            return;
-        }
+        
     }
 
     if (isLandingPage) {
@@ -497,8 +494,8 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                 onRateCategoryChange={handleMqRateCategoryChange}
                 mqExpectedRating={mqExpectedRating}
                 onExpectedRatingChange={handleMqExpectedRatingChange}
-                mqSuggestionPrompt={mqSuggestionPrompt}
-                onSuggestionPromptChange={handleMqSuggestionPromptChange}
+
+
             />
         </div>
     )}

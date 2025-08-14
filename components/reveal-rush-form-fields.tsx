@@ -3,8 +3,10 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { FeedbackModal } from '@/components/feedback/FeedbackModal';
+import { useState } from "react";
 
-type MicroQuestType = "group_qa" | "rate_my" | "game_suggestion";
+type MicroQuestType = "group_qa" | "rate_my";
 
 interface MicroQuestFormFieldsProps {
     microQuestType: MicroQuestType;
@@ -21,10 +23,6 @@ interface MicroQuestFormFieldsProps {
     mqExpectedRating: number;
     onRateCategoryChange: (value: string) => void;
     onExpectedRatingChange: (value: number) => void;
-
-    // Game suggestion fields
-    mqSuggestionPrompt: string;
-    onSuggestionPromptChange: (value: string) => void;
 }
 
 export function MicroQuestFormFields({
@@ -38,9 +36,8 @@ export function MicroQuestFormFields({
     mqExpectedRating,
     onRateCategoryChange,
     onExpectedRatingChange,
-    mqSuggestionPrompt,
-    onSuggestionPromptChange,
 }: MicroQuestFormFieldsProps) {
+    const [showFeedback, setShowFeedback] = useState(false);
 
     const questTypes = [
         {
@@ -54,12 +51,6 @@ export function MicroQuestFormFields({
             icon: "⭐",
             title: "Rate My...",
             description: "Guess my self-rating"
-        },
-        {
-            id: "game_suggestion",
-            icon: "💡",
-            title: "Suggest a Game",
-            description: "Crowdsource ideas"
         },
     ];
 
@@ -80,29 +71,56 @@ export function MicroQuestFormFields({
                     Choose Your Challenge Type
                 </Label>
 
-                <RadioGroup
-                    value={microQuestType}
-                    onValueChange={(value) => onTypeChange(value as MicroQuestType)}
-                    className="grid grid-cols-1 sm:grid-cols-3 gap-3"
-                >
-                    {questTypes.map((option) => (
-                        <div key={option.id} className="relative">
-                            <RadioGroupItem value={option.id} id={option.id} className="sr-only" />
-                            <Label
-                                htmlFor={option.id}
-                                className={`flex flex-col items-center justify-center p-4 border-2 rounded-xl cursor-pointer transition-all hover:scale-105 min-h-[120px] ${
-                                    microQuestType === option.id
-                                        ? 'border-orange-500 bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/30 dark:to-red-900/30 text-orange-700 dark:text-orange-300'
-                                        : 'border-gray-200 dark:border-gray-600 hover:border-orange-300'
-                                }`}
-                            >
-                                <span className="text-2xl mb-2">{option.icon}</span>
-                                <span className="font-semibold text-sm text-center mb-1">{option.title}</span>
-                                <span className="text-xs text-gray-500 dark:text-gray-400 text-center">{option.description}</span>
-                            </Label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <RadioGroup
+                        value={microQuestType}
+                        onValueChange={(value) => onTypeChange(value as MicroQuestType)}
+                        className="contents"
+                    >
+                        {questTypes.map((option) => (
+                            <div key={option.id} className="relative">
+                                <RadioGroupItem value={option.id} id={option.id} className="sr-only" />
+                                <Label
+                                    htmlFor={option.id}
+                                    className={`flex flex-col items-center justify-center p-4 border-2 rounded-xl cursor-pointer transition-all hover:scale-105 min-h-[120px] ${
+                                        microQuestType === option.id
+                                            ? 'border-orange-500 bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/30 dark:to-red-900/30 text-orange-700 dark:text-orange-300'
+                                            : 'border-gray-200 dark:border-gray-600 hover:border-orange-300'
+                                    }`}
+                                >
+                                    <span className="text-2xl mb-2">{option.icon}</span>
+                                    <span className="font-semibold text-sm text-center mb-1">{option.title}</span>
+                                    <span className="text-xs text-gray-500 dark:text-gray-400 text-center">{option.description}</span>
+                                </Label>
+                            </div>
+                        ))}
+                    </RadioGroup>
+
+                    {/* Locked Game Suggestion Option */}
+                    <div 
+                        className="relative cursor-pointer"
+                        onClick={() => setShowFeedback(true)}
+                        title="Click to request this feature"
+                    >
+                        <div className="flex flex-col items-center justify-center p-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl min-h-[120px] bg-gray-200 dark:bg-gray-700 transition-all hover:bg-gray-300 dark:hover:bg-gray-600">
+                            <div className="relative">
+                                <span className="text-2xl mb-2 block opacity-30">💡</span>
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <span className="text-lg opacity-60">🔒</span>
+                                </div>
+                            </div>
+                            <span className="font-semibold text-sm text-center mb-1 text-gray-400 dark:text-gray-500">Suggest a Game</span>
+                            <span className="text-xs text-gray-400 dark:text-gray-500 text-center">Coming Soon</span>
                         </div>
-                    ))}
-                </RadioGroup>
+                        
+                        {/* Subtle overlay pattern for disabled look */}
+                        <div className="absolute inset-0 bg-gray-400/10 dark:bg-gray-600/10 rounded-xl pointer-events-none" 
+                             style={{
+                                 backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,255,255,.1) 2px, rgba(255,255,255,.1) 4px)'
+                             }}>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {/* Conditional Form Fields Based on Selected Type */}
@@ -180,27 +198,13 @@ export function MicroQuestFormFields({
                     </div>
                 </div>
             )}
-
-            {microQuestType === "game_suggestion" && (
-                <div className="space-y-4 p-4 sm:p-6 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200/50 dark:border-green-700/50">
-                    <h4 className="font-semibold text-green-800 dark:text-green-200 flex items-center">
-                        <span className="mr-2">💡</span>
-                        Setup: Game Suggestion
-                    </h4>
-                    <div>
-                        <Label htmlFor="mq-suggestion-prompt" className="text-sm font-medium mb-2 block text-gray-700 dark:text-gray-300">
-                            Ask them to suggest... <span className="text-red-500">*</span>
-                        </Label>
-                        <Input
-                            id="mq-suggestion-prompt"
-                            placeholder="e.g., a fun game idea, a new feature"
-                            value={mqSuggestionPrompt}
-                            onChange={(e) => onSuggestionPromptChange(e.target.value)}
-                            className="h-12 rounded-lg border-2 focus:border-green-500"
-                        />
-                    </div>
-                </div>
-            )}
+            
+            {/* Feedback Modal */}
+            <FeedbackModal
+                isOpen={showFeedback}
+                onClose={() => setShowFeedback(false)}
+                defaultTab="game"
+            />
         </div>
     );
 }

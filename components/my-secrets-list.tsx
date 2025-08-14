@@ -112,7 +112,7 @@ export function MySecretsList() {
                 </p>
             </div>
 
-            <div className="w-full sm:w-auto bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-xl  sm:p-6 lg:p-8 p-2 sm:mx-0 shadow-sm">
+            <div className="w-full sm:w-lg bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-xl  sm:p-6 lg:p-8 p-2 sm:mx-0 shadow-sm">
                 {/* Header with delete all button */}
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 sm:mb-8">
                     <div className="flex items-center p-2 space-x-3">

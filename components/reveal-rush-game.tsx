@@ -34,7 +34,6 @@ export function MicroQuestGame({
         microQuestType,
         mqGroupQuestion,
         mqRateCategory,
-        mqSuggestionPrompt,
         mqIsCompleted,
         mqWinnerId,
         mqParticipants,
@@ -76,9 +75,6 @@ export function MicroQuestGame({
         } else if (microQuestType === 'rate_my') {
             if (selectedRating === null) { setLocalError("Please select a rating."); return; }
             attempt = selectedRating;
-        } else if (microQuestType === 'game_suggestion') {
-            if (userInput.trim().length < 5) { setLocalError("Suggestion must be at least 5 characters."); return; }
-            attempt = userInput.trim();
         }
 
         setIsSubmitting(true);
@@ -123,11 +119,6 @@ export function MicroQuestGame({
                 title: 'Rate My...', 
                 prompt: `Rate my ${mqRateCategory || 'vibe'}`,
                 icon: '⭐'
-            };
-            case 'game_suggestion': return { 
-                title: 'Suggest a Game', 
-                prompt: mqSuggestionPrompt,
-                icon: '💡'
             };
             default: return { 
                 title: 'Challenge', 
@@ -230,34 +221,6 @@ export function MicroQuestGame({
                             </div>
                         )}
 
-                        {/* Text Input for Game Suggestion */}
-                        {microQuestType === 'game_suggestion' && (
-                            <div className="flex space-x-2">
-                                <Input
-                                    ref={inputRef}
-                                    type="text"
-                                    placeholder="Your suggestion..."
-                                    value={userInput}
-                                    onChange={(e) => setUserInput(e.target.value)}
-                                    onKeyPress={handleKeyPress}
-                                    className="flex-1 h-9 text-sm"
-                                    disabled={isSubmitting || hasUserSubmitted}
-                                />
-                                <Button 
-                                    onClick={handleSubmit}
-                                    disabled={isSubmitting || hasUserSubmitted || !userInput.trim()}
-                                    size="sm"
-                                    className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 h-9 px-4 text-sm"
-                                >
-                                    {isSubmitting ? (
-                                        <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                    ) : (
-                                        'Submit'
-                                    )}
-                                </Button>
-                            </div>
-                        )}
-
                         {/* Rating Input */}
                         {microQuestType === 'rate_my' && (
                             <>
@@ -320,7 +283,7 @@ export function MicroQuestGame({
                     <div className="mt-2 px-3 py-2 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-md border border-green-200/50 dark:border-green-700/50">
                         <div className="flex items-center space-x-2">
                             <span className="text-xs font-medium text-green-800 dark:text-green-300">
-                                {isWinner ? '🏆' : isGameOver ? '❌' : '⏳'}
+                                {isWinner ? '🏆' : isGameOver ? '⌛' : '⳰'}
                             </span>
                             <span className="font-semibold text-sm text-green-900 dark:text-green-200">
                                 {isWinner ? 'You won! 🎉' : 
