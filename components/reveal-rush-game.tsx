@@ -280,19 +280,28 @@ export function MicroQuestGame({
 
                 {/* Status Messages for completed states */}
                 {(isGameOver || isWinner || hasSubmittedLocally || hasUserSubmitted) && (
-                    <div className="mt-2 px-3 py-2 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-md border border-green-200/50 dark:border-green-700/50">
-                        <div className="flex items-center space-x-2">
-                            <span className="text-xs font-medium text-green-800 dark:text-green-300">
-                                {isWinner ? '🏆' : isGameOver ? '⌛' : '⳰'}
-                            </span>
-                            <span className="font-semibold text-sm text-green-900 dark:text-green-200">
-                                {isWinner ? 'You won! 🎉' : 
-                                 isGameOver ? 'Someone else won this round' : 
-                                 'Your attempt is submitted! Waiting for results...'}
-                            </span>
-                        </div>
-                    </div>
-                )}
+    <div className="mt-2 px-3 py-2 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-md border border-green-200/50 dark:border-green-700/50">
+        <div className="flex items-center space-x-2">
+            <span className="text-xs font-medium text-green-800 dark:text-green-300">
+                {isWinner ? '🏆' : isGameOver ? '❌' : hasSubmittedLocally || hasUserSubmitted ? '⚠️' : '⏰'}
+            </span>
+            <span className="font-semibold text-sm text-green-900 dark:text-green-200">
+                {isWinner ? 'You won! 🎉 Image revealed!' : 
+                 isGameOver ? 'Game over - Someone else won this round' : 
+                 hasSubmittedLocally || hasUserSubmitted ? 'Incorrect attempt - You cannot participate further' :
+                 'Your attempt is submitted! Waiting for results...'}
+            </span>
+        </div>
+        
+        {/* Additional context for incorrect attempts */}
+        {!isWinner && !isGameOver && (hasSubmittedLocally || hasUserSubmitted) && (
+            <div className="mt-1.5 text-xs text-orange-700 dark:text-orange-300 bg-orange-50 dark:bg-orange-900/20 px-2 py-1 rounded border border-orange-200 dark:border-orange-700">
+                💡 Only the first correct answer wins and reveals the image
+            </div>
+        )}
+    </div>
+)}
+
             </div>
 
             {/* Image Container */}

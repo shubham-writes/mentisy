@@ -1,3 +1,5 @@
+// Replace the entire game-mode-selector.tsx file with this:
+
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
@@ -8,10 +10,12 @@ import {FeedbackModal} from '@/components/feedback/FeedbackModal';
 // --- CHANGE 1: ADD "reveal_rush" TO THE GAMEMODE TYPE ---
 type GameMode = "none" | "scratch_and_see" | "qa_challenge" | "reveal_rush";
 
+// UPDATED INTERFACE - ADD uploadedFile prop
 interface GameModeSelectorProps {
     selectedMode: GameMode;
     onModeChange: (value: GameMode) => void;
     isGameModeDisabled: boolean;
+    uploadedFile?: { url: string; type: "image" | "video" } | null;
 }
 
 // --- CHANGE 2: ADD THE NEW reveal-rush OBJECT TO THE ARRAY ---
@@ -22,7 +26,8 @@ const gameOptions = [
     { id: "reveal_rush", icon: "🏆", title: "Reveal Rush", description: "Group challenge mode" },
 ] as const;
 
-export function GameModeSelector({ selectedMode, onModeChange, isGameModeDisabled }: GameModeSelectorProps) {
+// UPDATED FUNCTION SIGNATURE - ADD uploadedFile parameter
+export function GameModeSelector({ selectedMode, onModeChange, isGameModeDisabled, uploadedFile }: GameModeSelectorProps) {
     const [showFeedback, setShowFeedback] = useState(false);
 
     return (
@@ -46,12 +51,15 @@ export function GameModeSelector({ selectedMode, onModeChange, isGameModeDisable
                     </Button>
                 </div>
 
+                {/* UPDATED DISABLED MESSAGE */}
                 {isGameModeDisabled && (
                     <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg sm:rounded-xl border border-blue-300 dark:border-blue-700">
                         <div className="flex items-start sm:items-center space-x-2 sm:space-x-3 text-blue-800 dark:text-blue-200">
                             <span className="text-lg sm:text-xl flex-shrink-0 mt-0.5 sm:mt-0">🎮</span>
                             <span className="font-medium text-xs sm:text-sm leading-relaxed">
-                                Games are only available for photos right now.
+                                {!uploadedFile 
+                                    ? "Upload an image first to unlock reveal games!" 
+                                    : "Games are only available for photos right now."}
                             </span>
                         </div>
                     </div>

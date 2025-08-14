@@ -385,7 +385,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     
 
     const isTimerDisabled = uploadedFile?.type === 'video';
-    const isGameModeDisabled = uploadedFile?.type === 'video';
+    const isGameModeDisabled = !uploadedFile || uploadedFile?.type === 'video';
 
     const formData = {
         recipientName,
@@ -457,10 +457,11 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                             {/* Game Mode Selector */}
                             <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
                                 <GameModeSelector
-                                    selectedMode={gameMode}
-                                    onModeChange={handleGameModeChange}
-                                    isGameModeDisabled={isGameModeDisabled}
-                                />
+    selectedMode={gameMode}
+    onModeChange={handleGameModeChange}
+    isGameModeDisabled={isGameModeDisabled}
+    uploadedFile={uploadedFile}
+/>
                             </div>
 
                             {/* QA Form Fields (Conditional) */}
@@ -494,8 +495,6 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                 onRateCategoryChange={handleMqRateCategoryChange}
                 mqExpectedRating={mqExpectedRating}
                 onExpectedRatingChange={handleMqExpectedRatingChange}
-
-
             />
         </div>
     )}
