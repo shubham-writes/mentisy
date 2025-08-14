@@ -77,6 +77,11 @@ export function GameModeSelector({ selectedMode, onModeChange, isGameModeDisable
                                 <span className="text-2xl sm:text-3xl lg:text-4xl mb-1 sm:mb-2">{option.icon}</span>
                                 <span className="font-semibold text-xs sm:text-sm text-center leading-tight">{option.title}</span>
                             </Label>
+                            {option.id === "reveal_rush" && (
+                                <div className="absolute flex items-center justify-center -top-1 -right-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-2 py-1 rounded-full shadow-lg border-2 border-white dark:border-gray-800">
+                                    <span className="text-[9px] sm:text-[10px] font-bold tracking-wide">Group</span>
+                                </div>
+                            )}
                         </div>
                     ))}
                 </RadioGroup>

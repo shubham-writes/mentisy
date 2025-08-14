@@ -104,13 +104,13 @@ export function MicroQuestFormFields({
                     >
                         <div className="flex flex-col items-center justify-center p-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl min-h-[120px] bg-gray-200 dark:bg-gray-700 transition-all hover:bg-gray-300 dark:hover:bg-gray-600">
                             <div className="relative">
-                                <span className="text-2xl mb-2 block opacity-30">💡</span>
+                                
                                 <div className="absolute inset-0 flex items-center justify-center">
-                                    <span className="text-lg opacity-60">🔒</span>
+                                    <span className="text-lg  opacity-60">🔒</span>
                                 </div>
                             </div>
-                            <span className="font-semibold text-sm text-center mb-1 text-gray-400 dark:text-gray-500">Suggest a Game</span>
-                            <span className="text-xs text-gray-400 dark:text-gray-500 text-center">Coming Soon</span>
+                            <span className="font-semibold text-sm text-center mb-1 text-gray-400 dark:text-gray-500">Coming Soon</span>
+                            <span className="text-xs text-gray-400 dark:text-gray-500 text-center">Suggest a Game</span>
                         </div>
                         
                         {/* Subtle overlay pattern for disabled look */}

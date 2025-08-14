@@ -286,7 +286,7 @@ export function QAGame({
                 />
                 
                 {/* Watermark */}
-                {withWatermark && recipientName && (
+                {withWatermark &&  (
                     <div className={`absolute inset-0 pointer-events-none overflow-hidden rounded-xl z-10 transition-all duration-1000 ${
                         isCorrect 
                             ? 'blur-0' 
@@ -295,6 +295,7 @@ export function QAGame({
                         <Watermark
                             name={recipientName}
                             ip={receiverIp || undefined}
+                            mode="image"
                         />
                     </div>
                 )}

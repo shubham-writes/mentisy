@@ -24,7 +24,7 @@ export function Watermark({
     : {};
 
   // Number of lines & vertical gap based on mode
-  const numLines = mode === "image" ? 3 : 3;
+  const numLines = mode === "image" ? 8 : 8;
   const lineGap = mode === "image" ? 32 : 35;
 
   const lines = Array.from({ length: numLines }, (_, i) => {
@@ -32,7 +32,7 @@ export function Watermark({
     const isEven = i % 2 === 0;
 
     // ✅ For images: wider lines + staggered positioning
-    const width = mode === "image" ? "120%" : "140%";
+    const width = mode === "image" ? "70%" : "50%";
     const translateX =
       mode === "image"
         ? isEven
@@ -51,12 +51,12 @@ export function Watermark({
         }}
       >
         <div
-          className="whitespace-nowrap opacity-25"
+          className="whitespace-nowrap opacity-35"
           style={{
             color: "white",
-            fontSize: "1rem",
+            fontSize: "0.5rem",
             fontWeight: "bold",
-            textShadow: "0 0 5px rgba(0,0,0,0.8)",
+            textShadow: "0 0 1px #000000, 0 0 1px #000",
             ...(isEven ? animationStyle : reverseAnimationStyle),
           }}
         >

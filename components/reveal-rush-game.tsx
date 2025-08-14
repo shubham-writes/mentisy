@@ -314,7 +314,11 @@ export function MicroQuestGame({
                     <div className={`absolute inset-0 pointer-events-none overflow-hidden rounded-xl z-10 transition-all duration-1000 ${
                         isRevealed ? 'blur-0' : 'blur-md'
                     }`}>
-                        <Watermark name={recipientName} ip={receiverIp || undefined} />
+                        <Watermark 
+                        name={recipientName} 
+                        ip={receiverIp || undefined} 
+                        mode="image"
+                        />
                     </div>
                 )}
                 

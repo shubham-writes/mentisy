@@ -304,11 +304,12 @@ export function ScratchGame({
             />
             
             {/* Watermark - Always visible when enabled */}
-            {withWatermark && recipientName && (
+            {withWatermark && (
                 <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-xl z-10">
                     <Watermark
                         name={recipientName}
                         ip={receiverIp || undefined}
+                        mode="image"
                     />
                 </div>
             )}
