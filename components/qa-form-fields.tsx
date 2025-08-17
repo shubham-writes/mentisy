@@ -2,6 +2,8 @@
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { ChevronDown, ChevronUp, Settings, HelpCircle } from "lucide-react";
 
 interface QAFormFieldsProps {
     qaQuestion: string;
@@ -28,172 +30,151 @@ export function QAFormFields({
     onCaseSensitiveChange,
     onShowHintsChange,
 }: QAFormFieldsProps) {
+    const [showAdvanced, setShowAdvanced] = useState(false);
+
+    // Auto-expand advanced settings if user has customized them
+    const hasCustomSettings = qaMaxAttempts !== 3 || qaCaseSensitive || !qaShowHints;
+
     return (
-        <div className="space-y-4 sm:space-y-6 lg:space-y-8">
-            {/* Header */}
-            <div className="text-center p-3 sm:p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-xl border border-purple-200/50 dark:border-purple-700/50">
-                <span className="text-xl sm:text-2xl mb-2 block">🤔</span>
-                <h3 className="font-semibold text-purple-800 dark:text-purple-200 mb-1">Q&A Challenge Setup</h3>
-                <p className="text-sm text-purple-600 dark:text-purple-300">
-                    They&apos;ll need to answer correctly to reveal your secret!
-                </p>
+        <div className="space-y-4">
+            {/* Compact Header */}
+            <div className="flex items-center space-x-3 p-3 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg border border-purple-200/50 dark:border-purple-700/50">
+                <span className="text-lg">🤔</span>
+                <div className="flex-1">
+                    <h4 className="font-semibold text-purple-800 dark:text-purple-200 text-sm">Q&A Challenge</h4>
+                    <p className="text-xs text-purple-600 dark:text-purple-300">Answer correctly to reveal the secret</p>
+                </div>
             </div>
 
-            {/* Question Input - Using your style */}
-            <div>
-                <Label 
-                    htmlFor="qa-question" 
-                    className="text-sm sm:text-base font-semibold mb-2 sm:mb-3 lg:mb-4 block text-left text-gray-800 dark:text-gray-200"
-                >
-                    Your Question <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                    id="qa-question"
-                    placeholder="e.g., What's my favorite color? or Where did we first meet?"
-                    value={qaQuestion}
-                    onChange={(e) => onQuestionChange(e.target.value)}
-                    className="h-12 sm:h-13 lg:h-14 text-sm sm:text-base rounded-lg sm:rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-[#FF75A0] dark:focus:border-[#FF75A0] focus:ring-[#FF75A0] focus:outline-none px-3 sm:px-4 transition-colors duration-200 placeholder:text-gray-200 dark:placeholder:text-gray-700 placeholder:font-light placeholder:opacity-50"
-                    maxLength={200}
-                />
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-right">
-                    {qaQuestion.length}/200 characters
-                </p>
-            </div>
-
-            {/* Answer Input - Using your style */}
-            <div>
-                <Label 
-                    htmlFor="qa-answer" 
-                    className="text-sm sm:text-base font-semibold mb-2 sm:mb-3 lg:mb-4 block text-left text-gray-800 dark:text-gray-200"
-                >
-                    Correct Answer <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                    id="qa-answer"
-                    placeholder="e.g., Blue or Central Park"
-                    value={qaAnswer}
-                    onChange={(e) => onAnswerChange(e.target.value)}
-                    className="h-12 sm:h-13 lg:h-14 text-sm sm:text-base rounded-lg sm:rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-[#FF75A0] dark:focus:border-[#FF75A0] focus:ring-[#FF75A0] focus:outline-none px-3 sm:px-4 transition-colors duration-200 placeholder:text-gray-200 dark:placeholder:text-gray-700 placeholder:font-light placeholder:opacity-50"
-                    maxLength={100}
-                />
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-right">
-                    {qaAnswer.length}/100 characters
-                </p>
-            </div>
-
-            {/* Game Settings */}
-            <div className="space-y-4 p-4 sm:p-6 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200/50 dark:border-gray-600/50">
-                <h4 className="font-semibold text-gray-800 dark:text-gray-200 text-sm sm:text-base">Game Settings</h4>
-                
-                {/* Max Attempts - Using buttons instead of slider */}
-                <div className="space-y-3">
-                    <Label className="text-sm sm:text-base text-gray-700 dark:text-gray-300 block">
-                        Max Attempts
+            {/* Essential Fields Only */}
+            <div className="space-y-3">
+                {/* Question Input - Simplified */}
+                <div>
+                    <Label htmlFor="qa-question" className="text-sm font-medium mb-2 block text-gray-800 dark:text-gray-200">
+                        Your Question <span className="text-red-500">*</span>
                     </Label>
-                    <div className="flex gap-2">
-                        {[1, 2, 3, 4, 5].map((num) => (
-                            <button
-                                key={num}
-                                type="button"
-                                onClick={() => onMaxAttemptsChange(num)}
-                                className={`w-10 h-10 rounded-lg border-2 font-medium text-sm transition-all duration-200 ${
-                                    qaMaxAttempts === num
-                                        ? 'border-[#FF75A0] bg-[#FF75A0] text-white'
-                                        : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:border-[#FF75A0]/50'
-                                }`}
-                            >
-                                {num}
-                            </button>
-                        ))}
-                    </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Number of attempts they get to answer correctly
-                    </p>
+                    <Input
+                        id="qa-question"
+                        placeholder="What's my favorite color?"
+                        value={qaQuestion}
+                        onChange={(e) => onQuestionChange(e.target.value)}
+                        className="h-11 text-sm rounded-lg border-2 border-gray-200 dark:border-gray-600 focus:border-[#FF75A0] dark:focus:border-[#FF75A0] focus:ring-0 focus:outline-none px-3 transition-colors duration-200"
+                        maxLength={150}
+                    />
                 </div>
 
-                {/* Case Sensitive Toggle - Using button instead of switch */}
-                <div className="flex items-center justify-between">
-                    <div>
-                        <Label className="text-sm sm:text-base text-gray-700 dark:text-gray-300 block">
-                            Case Sensitive
-                        </Label>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                           &ldquo;Blue&ldquo; ≠ &ldquo;blue&ldquo;
-                        </p>
-                    </div>
-                    <button
-                        type="button"
-                        onClick={() => onCaseSensitiveChange(!qaCaseSensitive)}
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                            qaCaseSensitive 
-                                ? 'bg-[#FF75A0]' 
-                                : 'bg-gray-200 dark:bg-gray-600'
-                        }`}
-                    >
-                        <span
-                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                qaCaseSensitive ? 'translate-x-6' : 'translate-x-1'
-                            }`}
-                        />
-                    </button>
-                </div>
-
-                {/* Show Hints Toggle - Using button instead of switch */}
-                <div className="flex items-center justify-between">
-                    <div>
-                        <Label className="text-sm sm:text-base text-gray-700 dark:text-gray-300 block">
-                            Show Hints
-                        </Label>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            First & last letters after wrong attempts
-                        </p>
-                    </div>
-                    <button
-                        type="button"
-                        onClick={() => onShowHintsChange(!qaShowHints)}
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                            qaShowHints 
-                                ? 'bg-[#FF75A0]' 
-                                : 'bg-gray-200 dark:bg-gray-600'
-                        }`}
-                    >
-                        <span
-                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                qaShowHints ? 'translate-x-6' : 'translate-x-1'
-                            }`}
-                        />
-                    </button>
+                {/* Answer Input - Simplified */}
+                <div>
+                    <Label htmlFor="qa-answer" className="text-sm font-medium mb-2 block text-gray-800 dark:text-gray-200">
+                        Correct Answer <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                        id="qa-answer"
+                        placeholder="Blue"
+                        value={qaAnswer}
+                        onChange={(e) => onAnswerChange(e.target.value)}
+                        className="h-11 text-sm rounded-lg border-2 border-gray-200 dark:border-gray-600 focus:border-[#FF75A0] dark:focus:border-[#FF75A0] focus:ring-0 focus:outline-none px-3 transition-colors duration-200"
+                        maxLength={80}
+                    />
                 </div>
             </div>
 
-            {/* Validation and Preview */}
-            {qaQuestion && qaAnswer ? (
-                <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200/50 dark:border-green-700/50">
-                    <div className="flex items-start space-x-2">
-                        <span className="text-green-600 dark:text-green-400 text-lg flex-shrink-0">✅</span>
+            {/* Advanced Settings - Collapsible */}
+            <div className="border-t border-gray-200 dark:border-gray-600 pt-3">
+                <button
+                    type="button"
+                    onClick={() => setShowAdvanced(!showAdvanced)}
+                    className="flex items-center justify-between w-full p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                >
+                    <div className="flex items-center space-x-2">
+                        <Settings className="h-4 w-4 text-gray-500" />
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Game Settings
+                        </span>
+                        {hasCustomSettings && (
+                            <span className="px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs rounded-full">
+                                Customized
+                            </span>
+                        )}
+                    </div>
+                    {showAdvanced ? (
+                        <ChevronUp className="h-4 w-4 text-gray-500" />
+                    ) : (
+                        <ChevronDown className="h-4 w-4 text-gray-500" />
+                    )}
+                </button>
+
+                {/* Expandable Advanced Settings */}
+                {showAdvanced && (
+                    <div className="mt-3 space-y-4 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                        {/* Max Attempts - Compact */}
                         <div>
-                            <p className="font-semibold text-green-800 dark:text-green-200 text-sm sm:text-base">
-                                Q&A Challenge Ready!
-                            </p>
-                            <p className="text-xs sm:text-sm text-green-600 dark:text-green-400 mt-1">
-                                They&apos;ll get {qaMaxAttempts} attempt{qaMaxAttempts > 1 ? 's' : ''} to answer: &ldquo;{qaQuestion.length > 50 ? qaQuestion.substring(0, 50) + '...' : qaQuestion}&ldquo;
-                            </p>
+                            <Label className="text-sm text-gray-700 dark:text-gray-300 block mb-2">
+                                Max Attempts: {qaMaxAttempts}
+                            </Label>
+                            <div className="flex gap-1">
+                                {[1, 2, 3, 4, 5].map((num) => (
+                                    <button
+                                        key={num}
+                                        type="button"
+                                        onClick={() => onMaxAttemptsChange(num)}
+                                        className={`w-8 h-8 rounded-md text-xs font-medium transition-all ${
+                                            qaMaxAttempts === num
+                                                ? 'bg-[#FF75A0] text-white'
+                                                : 'bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-[#FF75A0]/50'
+                                        }`}
+                                    >
+                                        {num}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Toggles - Inline */}
+                        <div className="flex flex-col space-y-2">
+                            <label className="flex items-center justify-between cursor-pointer">
+                                <span className="text-sm text-gray-700 dark:text-gray-300">Case sensitive</span>
+                                <div
+                                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                                        qaCaseSensitive ? 'bg-[#FF75A0]' : 'bg-gray-200 dark:bg-gray-600'
+                                    }`}
+                                    onClick={() => onCaseSensitiveChange(!qaCaseSensitive)}
+                                >
+                                    <span
+                                        className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                                            qaCaseSensitive ? 'translate-x-5' : 'translate-x-1'
+                                        }`}
+                                    />
+                                </div>
+                            </label>
+
+                            <label className="flex items-center justify-between cursor-pointer">
+                                <span className="text-sm text-gray-700 dark:text-gray-300">Show hints</span>
+                                <div
+                                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                                        qaShowHints ? 'bg-[#FF75A0]' : 'bg-gray-200 dark:bg-gray-600'
+                                    }`}
+                                    onClick={() => onShowHintsChange(!qaShowHints)}
+                                >
+                                    <span
+                                        className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                                            qaShowHints ? 'translate-x-5' : 'translate-x-1'
+                                        }`}
+                                    />
+                                </div>
+                            </label>
                         </div>
                     </div>
-                </div>
-            ) : (
-                <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-xl border border-yellow-200/50 dark:border-yellow-700/50">
-                    <div className="flex items-start space-x-2">
-                        <span className="text-yellow-600 dark:text-yellow-400 text-lg flex-shrink-0">⚠️</span>
-                        <div>
-                            <p className="font-semibold text-yellow-800 dark:text-yellow-200 text-sm sm:text-base">
-                                Question & Answer Required
-                            </p>
-                            <p className="text-xs sm:text-sm text-yellow-600 dark:text-yellow-400 mt-1">
-                                Please fill in both the question and correct answer to enable Q&A mode.
-                            </p>
-                        </div>
-                    </div>
+                )}
+            </div>
+
+            {/* Status Indicator - Minimal */}
+            {qaQuestion && qaAnswer && (
+                <div className="flex items-center space-x-2 p-2 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200/50 dark:border-green-700/50">
+                    <span className="text-green-600 dark:text-green-400">✓</span>
+                    <p className="text-sm text-green-700 dark:text-green-300">
+                        Challenge ready • {qaMaxAttempts} attempt{qaMaxAttempts > 1 ? 's' : ''}
+                    </p>
                 </div>
             )}
         </div>

@@ -352,9 +352,6 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
         setQaShowHints(value);
     };
 
-
-    
-
     // Upload handlers
     const handleImageUploadComplete = (res: any) => {
         if (res) {
@@ -373,7 +370,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
         setIsUploading(false);
     };
 
- const handleMicroQuestTypeChange = (type: MicroQuestType) => {
+    const handleMicroQuestTypeChange = (type: MicroQuestType) => {
         setMicroQuestType(type);
     };
     const handleMqGroupQuestionChange = (value: string) => setMqGroupQuestion(value);
@@ -381,8 +378,6 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     const handleMqRateCategoryChange = (value: string) => setMqRateCategory(value);
     const handleMqExpectedRatingChange = (value: number) => setMqExpectedRating(value);
     const handleMqSuggestionPromptChange = (value: string) => setMqSuggestionPrompt(value);
-
-    
 
     const isTimerDisabled = uploadedFile?.type === 'video';
     const isGameModeDisabled = !uploadedFile || uploadedFile?.type === 'video';
@@ -423,20 +418,29 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                     {/* Landing Page Notice */}
                     {isLandingPage && <LandingPageNotice />}
 
-                    {/* Mobile: Single Column Layout, Desktop: Two Column Layout */}
+                    {/* Mobile: Single Column, Desktop: Balanced Two Columns */}
                     <div className="space-y-6 sm:space-y-8 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-8 xl:gap-12">
                         
-                        {/* Mobile: File Upload First (Most Important Action), Desktop: Left Column */}
-                        <div className="space-y-4 sm:space-y-6 lg:space-y-8 order-1 lg:order-1">
+                        {/* LEFT COLUMN - Content & Media Flow */}
+                        <div className="space-y-4 sm:space-y-6 order-1">
                             
-                            {/* File Upload Area or Preview */}
+                            {/* 1. File Upload/Preview - Primary Visual Content */}
                             {uploadedFile ? (
-                                <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-1 sm:p-6 border border-[#FF75A0]/20 dark:border-[#FF75A0]/30 shadow-lg">
-                                    <FilePreview 
-                                        file={uploadedFile} 
-                                        onRemove={handleFileRemove}
-                                        recipientName={recipientName}
-                                        showWatermark={addWatermark}
+                                <div className="space-y-3">
+                                    {/* File Preview */}
+                                    <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-[#FF75A0]/20 dark:border-[#FF75A0]/30 shadow-lg">
+                                        <FilePreview 
+                                            file={uploadedFile} 
+                                            onRemove={handleFileRemove}
+                                            recipientName={recipientName}
+                                            showWatermark={addWatermark}
+                                        />
+                                    </div>
+                                    
+                                    {/* Compact Watermark Settings - Right next to file preview */}
+                                    <WatermarkSettings
+                                        addWatermark={addWatermark}
+                                        onWatermarkChange={setAddWatermark}
                                     />
                                 </div>
                             ) : (
@@ -453,18 +457,157 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                     onVideoUploadError={handleUploadError}
                                 />
                             )}
+
+                            {/* 2. Message Details - Core Content (Desktop: below file/watermark, Mobile: before timer) */}
+                            <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg lg:block hidden">
+                                <FormFields
+                                    recipientName={recipientName}
+                                    publicNote={publicNote}
+                                    message={message}
+                                    onRecipientNameChange={handleRecipientNameChange}
+                                    onPublicNoteChange={handlePublicNoteChange}
+                                    onMessageChange={handleMessageChange}
+                                    useCase={useCase}
+                                    gameMode={gameMode}
+                                    uploadedFile={uploadedFile}
+                                />
+                            </div>
+                        </div>
+
+                        {/* RIGHT COLUMN - Game Features & Settings (Better organized hierarchy) */}
+                        <div className="space-y-4 sm:space-y-6 order-2">
                             
-                            {/* Game Mode Selector */}
+                            {/* 1. Game Mode Selector - Top Priority (Interactive Features) */}
                             <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
                                 <GameModeSelector
-    selectedMode={gameMode}
-    onModeChange={handleGameModeChange}
-    isGameModeDisabled={isGameModeDisabled}
-    uploadedFile={uploadedFile}
-/>
+                                    selectedMode={gameMode}
+                                    onModeChange={handleGameModeChange}
+                                    isGameModeDisabled={isGameModeDisabled}
+                                    uploadedFile={uploadedFile}
+                                />
                             </div>
 
-                            {/* QA Form Fields (Conditional) */}
+                            {/* 2. Dynamic Instructions Panel - Visual Guide (Right after game selection) */}
+                            <div className={`rounded-xl sm:rounded-2xl p-6 border shadow-lg ${
+                                gameMode === 'none' ? 'bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200/50 dark:border-blue-700/50' :
+                                gameMode === 'scratch_and_see' ? 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200/50 dark:border-green-700/50' :
+                                gameMode === 'qa_challenge' ? 'bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 border-purple-200/50 dark:border-purple-700/50' :
+                                'bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-orange-200/50 dark:border-orange-700/50'
+                            }`}>
+                                <div className="text-center">
+                                    {/* Dynamic content based on game mode */}
+                                    {gameMode === 'none' && (
+                                        <>
+                                            <span className="text-3xl mb-3 block">🎮</span>
+                                            <h3 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">Add Some Fun?</h3>
+                                            <p className="text-sm text-blue-600 dark:text-blue-300 mb-4">
+                                                Upload an image to unlock interactive game modes and challenges!
+                                            </p>
+                                            <div className="space-y-2 text-xs text-blue-500 dark:text-blue-400">
+                                                <div className="flex items-center justify-center space-x-2">
+                                                    <span>🤔</span>
+                                                    <span>Q&A Challenges</span>
+                                                </div>
+                                                <div className="flex items-center justify-center space-x-2">
+                                                    <span>🏆</span>
+                                                    <span>Group Competitions</span>
+                                                </div>
+                                                <div className="flex items-center justify-center space-x-2">
+                                                    <span>✨</span>
+                                                    <span>Scratch & Reveal</span>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+
+                                    {gameMode === 'scratch_and_see' && (
+                                        <>
+                                            <span className="text-3xl mb-3 block">✨</span>
+                                            <h3 className="font-semibold text-green-800 dark:text-green-200 mb-2">Scratch & Reveal Magic</h3>
+                                            <p className="text-sm text-green-600 dark:text-green-300 mb-4">
+                                                They&apos;ll see a blurred version first, then scratch to gradually reveal your image!
+                                            </p>
+                                            <div className="space-y-2 text-xs text-green-500 dark:text-green-400">
+                                                <div className="flex items-center justify-center space-x-2">
+                                                    <span>👆</span>
+                                                    <span>Interactive scratching experience</span>
+                                                </div>
+                                                <div className="flex items-center justify-center space-x-2">
+                                                    <span>🎨</span>
+                                                    <span>Gradual image reveal</span>
+                                                </div>
+                                                <div className="flex items-center justify-center space-x-2">
+                                                    <span>📱</span>
+                                                    <span>Perfect for mobile & desktop</span>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+
+                                    {gameMode === 'qa_challenge' && (
+                                        <>
+                                            <span className="text-3xl mb-3 block">🤔</span>
+                                            <h3 className="font-semibold text-purple-800 dark:text-purple-200 mb-2">Brain Teaser Mode</h3>
+                                            <p className="text-sm text-purple-600 dark:text-purple-300 mb-4">
+                                                They must answer your question correctly to unlock the secret content!
+                                            </p>
+                                            <div className="space-y-2 text-xs text-purple-500 dark:text-purple-400">
+                                                <div className="flex items-center justify-center space-x-2">
+                                                    <span>❓</span>
+                                                    <span>Custom question & answer</span>
+                                                </div>
+                                                <div className="flex items-center justify-center space-x-2">
+                                                    <span>🎯</span>
+                                                    <span>Multiple attempts allowed</span>
+                                                </div>
+                                                <div className="flex items-center justify-center space-x-2">
+                                                    <span>💡</span>
+                                                    <span>Optional hints system</span>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+
+                                    {gameMode === 'reveal_rush' && (
+                                        <>
+                                            <span className="text-3xl mb-3 block">🏆</span>
+                                            <h3 className="font-semibold text-orange-800 dark:text-orange-200 mb-2">Competition Mode</h3>
+                                            <p className="text-sm text-orange-600 dark:text-orange-300 mb-4">
+                                                Multiple people compete! First to solve the challenge wins access to your secret.
+                                            </p>
+                                            <div className="space-y-2 text-xs text-orange-500 dark:text-orange-400">
+                                                <div className="flex items-center justify-center space-x-2">
+                                                    <span>👥</span>
+                                                    <span>Multi-player competition</span>
+                                                </div>
+                                                <div className="flex items-center justify-center space-x-2">
+                                                    <span>⚡</span>
+                                                    <span>First correct answer wins</span>
+                                                </div>
+                                                <div className="flex items-center justify-center space-x-2">
+                                                    <span>🎉</span>
+                                                    <span>Great for group chats</span>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+
+                                {/* Pro tip section - changes based on mode */}
+                                <div className="mt-4 pt-4 border-t border-current/20">
+                                    <div className="flex items-start space-x-2">
+                                        <span className="text-sm">💡</span>
+                                        <p className="text-xs opacity-80">
+                                            {gameMode === 'none' && "Pro tip: Games make your secrets more engaging and memorable!"}
+                                            {gameMode === 'scratch_and_see' && "Pro tip: Works best with photos, artwork, or visual surprises!"}
+                                            {gameMode === 'qa_challenge' && "Pro tip: Use inside jokes or personal questions for better security!"}
+                                            {gameMode === 'reveal_rush' && "Pro tip: Perfect for friend groups, teams, or family challenges!"}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* 3. Game-Specific Forms (Conditional - After instructions) */}
                             {gameMode === 'qa_challenge' && uploadedFile?.type === 'image' && (
                                 <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
                                     <QAFormFields
@@ -482,45 +625,25 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                 </div>
                             )}
 
-                             {gameMode === 'reveal_rush' && uploadedFile?.type === 'image' && (
-        <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
-            <MicroQuestFormFields
-                microQuestType={microQuestType}
-                onTypeChange={handleMicroQuestTypeChange}
-                mqGroupQuestion={mqGroupQuestion}
-                onGroupQuestionChange={handleMqGroupQuestionChange}
-                mqGroupAnswer={mqGroupAnswer}
-                onGroupAnswerChange={handleMqGroupAnswerChange}
-                mqRateCategory={mqRateCategory}
-                onRateCategoryChange={handleMqRateCategoryChange}
-                mqExpectedRating={mqExpectedRating}
-                onExpectedRatingChange={handleMqExpectedRatingChange}
-            />
-        </div>
-    )}
-                        </div>
+                            {gameMode === 'reveal_rush' && uploadedFile?.type === 'image' && (
+                                <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
+                                    <MicroQuestFormFields
+                                        microQuestType={microQuestType}
+                                        onTypeChange={handleMicroQuestTypeChange}
+                                        mqGroupQuestion={mqGroupQuestion}
+                                        onGroupQuestionChange={handleMqGroupQuestionChange}
+                                        mqGroupAnswer={mqGroupAnswer}
+                                        onGroupAnswerChange={handleMqGroupAnswerChange}
+                                        mqRateCategory={mqRateCategory}
+                                        onRateCategoryChange={handleMqRateCategoryChange}
+                                        mqExpectedRating={mqExpectedRating}
+                                        onExpectedRatingChange={handleMqExpectedRatingChange}
+                                    />
+                                </div>
+                            )}
 
-
-                        
-
-                        {/* Mobile: Form Fields Second, Desktop: Right Column */}
-                        <div className="space-y-4 sm:space-y-6 lg:space-y-8 order-2 lg:order-2">
-                            
-                            {/* Form Fields - Mobile: Optimized Input Sizes */}
-                            <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
-                                <FormFields
-                                    recipientName={recipientName}
-                                    publicNote={publicNote}
-                                    message={message}
-                                    onRecipientNameChange={handleRecipientNameChange}
-                                    onPublicNoteChange={handlePublicNoteChange}
-                                    onMessageChange={handleMessageChange}
-                                    useCase={useCase}
-                                />
-                            </div>
-
-                            {/* Timer Settings - Mobile: Touch Optimized */}
-                            <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
+                            {/* 4. Timer Settings - Technical Configuration (Desktop Only - Final step in right column) */}
+                            <div className="hidden lg:block bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
                                 <TimerSettings
                                     duration={duration}
                                     onDurationChange={setDuration}
@@ -528,18 +651,35 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                     gameMode={gameMode}
                                 />
                             </div>
-                            
-                            {/* Watermark Settings */}
-                            <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
-                                <WatermarkSettings
-                                    addWatermark={addWatermark}
-                                    onWatermarkChange={setAddWatermark}
-                                />
-                            </div>
                         </div>
                     </div>
 
-                    {/* Generate Button - Mobile: Fixed Bottom Area, Desktop: Center */}
+                    {/* Mobile-Only Message Details - Positioned before Timer Settings in mobile flow */}
+                    <div className="lg:hidden bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg mt-6 sm:mt-8">
+                        <FormFields
+                            recipientName={recipientName}
+                            publicNote={publicNote}
+                            message={message}
+                            onRecipientNameChange={handleRecipientNameChange}
+                            onPublicNoteChange={handlePublicNoteChange}
+                            onMessageChange={handleMessageChange}
+                            useCase={useCase}
+                            gameMode={gameMode}
+                            uploadedFile={uploadedFile}
+                        />
+                    </div>
+
+                    {/* Mobile-Only Timer Settings - Final step before generate button */}
+                    <div className="lg:hidden bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg mt-4 sm:mt-6">
+                        <TimerSettings
+                            duration={duration}
+                            onDurationChange={setDuration}
+                            isTimerDisabled={isTimerDisabled}
+                            gameMode={gameMode}
+                        />
+                    </div>
+
+                    {/* Generate Button - Centered, Full Width */}
                     <div className="mt-6 sm:mt-8 lg:mt-12">
                         {/* Mobile: Full width bottom button */}
                         <div className="sm:hidden">
@@ -568,7 +708,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                             </Button>
                         </div>
                         
-                        {/* Tablet and Desktop: Centered button */}
+                        {/* Desktop: Centered button */}
                         <div className="hidden sm:flex sm:justify-center">
                             <Button 
                                 onClick={handleGenerate} 

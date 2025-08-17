@@ -333,7 +333,7 @@ export function MicroQuestGame({
                 
                 {/* Timer Component - HIGHEST Z-INDEX */}
                 {timerComponent && (
-                    <div className="absolute top-2 right-2 z-[100]">
+                    <div className="absolute top-2 right-2 z-[49]">
                         {timerComponent}
                     </div>
                 )}

@@ -1,5 +1,6 @@
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Shield, ShieldAlert } from "lucide-react";
 
 interface WatermarkSettingsProps {
     addWatermark: boolean;
@@ -8,31 +9,42 @@ interface WatermarkSettingsProps {
 
 export function WatermarkSettings({ addWatermark, onWatermarkChange }: WatermarkSettingsProps) {
     return (
-        <div>
-            <div className="flex items-start space-x-3 sm:space-x-4 md:space-x-5">
+        <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-lg border border-gray-200/50 dark:border-gray-700/50 p-3 shadow-sm">
+            <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2 flex-1 min-w-0">
+                    {addWatermark ? (
+                        <Shield className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
+                    ) : (
+                        <ShieldAlert className="h-4 w-4 text-red-500 dark:text-red-400 flex-shrink-0" />
+                    )}
+                    <div className="min-w-0 flex-1">
+                        <Label 
+                            htmlFor="watermark-toggle" 
+                            className="text-sm font-medium cursor-pointer text-gray-700 dark:text-gray-300 block leading-tight"
+                        >
+                            Security watermark
+                        </Label>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 leading-tight">
+                            {addWatermark ? "Protected with overlay" : "Unprotected - can be recorded"}
+                        </p>
+                    </div>
+                </div>
                 <Switch 
                     id="watermark-toggle" 
                     checked={addWatermark}
                     onCheckedChange={onWatermarkChange}
-                    className="mt-0.5 sm:mt-1 flex-shrink-0"
+                    className="flex-shrink-0 ml-2"
                 />
-                <div className="flex-1 min-w-0">
-                    <Label htmlFor="watermark-toggle" className="text-sm sm:text-base font-semibold cursor-pointer text-gray-800 dark:text-gray-200 block mb-2 sm:mb-3 leading-tight">
-                        Add security watermark
-                    </Label>
-                    <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-2 sm:mb-3 pr-1">
-                        Adds their name and some security info as an overlay. It&apos;s like a &quot;this is for your eyes only&quot; reminder.
-                    </p>
-                    {!addWatermark && (
-                        <div className="p-3 sm:p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg sm:rounded-xl">
-                            <p className="text-xs sm:text-sm text-red-700 dark:text-red-300 flex items-start sm:items-center space-x-2">
-                                <span className="flex-shrink-0 mt-0.5 sm:mt-0">⚠️</span>
-                                <span className="leading-tight">Real talk: Without this, they could probably screen record it</span>
-                            </p>
-                        </div>
-                    )}
-                </div>
             </div>
+            
+            {!addWatermark && (
+                <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+                    <p className="text-xs text-red-700 dark:text-red-300 flex items-center space-x-1">
+                        <span>⚠️</span>
+                        <span>Without watermark, content can be screen recorded</span>
+                    </p>
+                </div>
+            )}
         </div>
     );
 }

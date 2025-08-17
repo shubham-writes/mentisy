@@ -14,7 +14,7 @@ interface TimerSettingsProps {
 
 // Durations for non-competitive modes
 const normalDurations = [
-    { value: "3", label: "3 Sec", description: "Quick glance", icon: "⚡️" },
+    { value: "3", label: "3 Sec", description: "Quick", icon: "⚡️" },
     { value: "5", label: "5 Sec", description: "Take it in", icon: "👀" },
     { value: "10", label: "10 Sec", description: "Process it", icon: "🧠" },
 ];
@@ -24,7 +24,7 @@ const normalDurationValues = normalDurations.map(d => d.value);
 const gameDurations = [
     { value: "30", label: "30 Sec", description: "Enough to play", icon: "🕹️" },
     { value: "60", label: "1 Min", description: "Take your time", icon: "⏳" },
-    { value: "300", label: "5 Mins", description: "No rush", icon: "🐢" },
+    { value: "120", label: "2 Mins", description: "No rush", icon: "🐢" },
 ];
 const gameDurationValues = gameDurations.map(d => d.value);
 
