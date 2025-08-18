@@ -53,7 +53,7 @@ export function TimerSettings({ duration, onDurationChange, isTimerDisabled, gam
     return (
         <div>
             <Label className="text-sm sm:text-base font-semibold mb-3 sm:mb-4 lg:mb-6 block text-gray-800 dark:text-gray-200">
-                How long before it disappears forever?
+                How long do they get to enjoy it?
             </Label>
             
             {isTimerDisabled && (

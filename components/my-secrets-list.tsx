@@ -105,10 +105,10 @@ export function MySecretsList() {
             {/* Header Section */}
             <div className="mb-6 sm:mb-8 w-full text-center px-2">
                 <h3 className="text-2xl sm:text-4xl font-bold mb-3 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] bg-clip-text text-transparent">
-                    Your Secret Links
+                    Your Shared Moments
                 </h3>
                 <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300">
-                    Track your moments in the void
+                    Track the joy you’ve created
                 </p>
             </div>
 
@@ -122,9 +122,9 @@ export function MySecretsList() {
                                 <span className="text-lg sm:text-xl">🔗</span>
                             </div>
                             <div>
-                                <h4 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Your Links</h4>
-                                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                                    {visibleSecrets.length} {visibleSecrets.length === 1 ? 'secret' : 'secrets'} in the wild
+                                
+                                <p className="text-md sm:text-lg text-gray-500 dark:text-gray-400">
+                                    {visibleSecrets.length} {visibleSecrets.length === 1 ? 'Fun Drop' : 'Fun Drops'}  in the Wild
                                 </p>
                             </div>
                         </div>

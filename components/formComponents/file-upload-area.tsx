@@ -73,8 +73,8 @@ export function FileUploadArea({
                     </h4>
                     <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-sm sm:text-base lg:text-lg px-2 sm:px-4">
                         {isLandingPage 
-                            ? "Upload that photo or video you've been too scared to share anywhere else" 
-                            : "Share your realest self — photos, videos, whatever needs to disappear after one view"
+                            ? "Upload anything — we’ll turn it into laughs with scratch, guess, or rate." 
+                            : "Make every share a game — scratch it, guess it, race it, or rate it with friends."
                         }
                     </p>
                 </div>

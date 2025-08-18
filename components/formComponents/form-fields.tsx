@@ -47,19 +47,19 @@ export function FormFields({
     const getPublicNotePlaceholder = () => {
         if (isGroupGame) return "Challenge your group to solve this...";
         if (isSinglePlayerGame) return "Think you can answer this? 🤔";
-        return template?.placeholder.publicNote || "'you're not ready for this...' or whatever fits the vibe";
+        return template?.placeholder.publicNote || "you're not ready for this... or whatever fits the vibe";
     };
     
     const getMessageLabel = () => {
         if (isGroupGame) return "Winner's reward message";
-        if (isSinglePlayerGame) return "Secret message";
-        return "Your secret message";
+        if (isSinglePlayerGame) return "Reveal Message / Caption";
+        return "Reveal Message / Caption";
     };
     
     const getMessagePlaceholder = () => {
         if (isGroupGame) return "Congrats! You solved it first 🏆";
         if (isSinglePlayerGame) return "You got it right! Here's what I wanted to tell you...";
-        return template?.placeholder.message || "That thing you've been wanting to say...";
+        return template?.placeholder.message || "A hidden note, roast, or caption that unlocks with the photo/video";
     };
 
     return (

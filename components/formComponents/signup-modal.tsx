@@ -12,6 +12,7 @@ interface SignupModalProps {
         uploadedFile: { url: string; type: "image" | "video" } | null;
         duration: string;
         addWatermark: boolean;
+        gameMode: "none" | "scratch_and_see" | "qa_challenge" | "reveal_rush";
     };
 }
 
@@ -35,47 +36,58 @@ export function SignupModal({ isVisible, onClose, formData }: SignupModalProps) 
                             You&apos;re almost done!
                         </CardTitle>
                         <CardDescription className="text-base text-gray-600 dark:text-gray-300 leading-relaxed">
-                            Create your account to get 5 free secret shares and join thousands sharing their truth
+                            Create your account to get 5 free game shares and join thousands turning snaps into fun challenges.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6 pb-6">
                         <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm p-6 rounded-xl border border-[#FF75A0]/20 dark:border-[#FF75A0]/30">
-                            <h4 className="font-semibold mb-3 text-[#FF75A0] dark:text-[#FF75A0] text-base">Your moment is ready:</h4>
-                            <div className="space-y-2 text-sm">
-                                {formData.recipientName && (
-                                    <div className="flex items-center space-x-2">
-                                        <span className="text-[#FF75A0] text-base">👤</span>
-                                        <span className="text-gray-700 dark:text-gray-300">For: {formData.recipientName}</span>
-                                    </div>
-                                )}
-                                {formData.publicNote && (
-                                    <div className="flex items-center space-x-2">
-                                        <span className="text-[#FF75A0] text-base">💭</span>
-                                        <span className="text-gray-700 dark:text-gray-300">Note: {formData.publicNote}</span>
-                                    </div>
-                                )}
-                                {formData.message && (
-                                    <div className="flex items-center space-x-2">
-                                        <span className="text-[#FF75A0] text-base">✍️</span>
-                                        <span className="text-gray-700 dark:text-gray-300">Secret message ready</span>
-                                    </div>
-                                )}
-                                {formData.uploadedFile && (
-                                    <div className="flex items-center space-x-2">
-                                        <span className="text-[#FF75A0] text-base">{formData.uploadedFile.type === 'video' ? '🎥' : '📸'}</span>
-                                        <span className="text-gray-700 dark:text-gray-300">{formData.uploadedFile.type} uploaded</span>
-                                    </div>
-                                )}
-                                <div className="flex items-center space-x-2">
-                                    <span className="text-[#FF75A0] text-base">⏱️</span>
-                                    <span className="text-gray-700 dark:text-gray-300">Timer: {formData.duration} seconds</span>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <span className="text-[#FF75A0] text-base">🔒</span>
-                                    <span className="text-gray-700 dark:text-gray-300">Watermark: {formData.addWatermark ? 'Protected' : 'Off'}</span>
-                                </div>
-                            </div>
-                        </div>
+  <h4 className="font-semibold mb-3 text-[#FF75A0] dark:text-[#FF75A0] text-base">
+    🎉 Your game is ready:
+  </h4>
+  <div className="space-y-2 text-sm">
+    {formData.recipientName && (
+      <div className="flex items-center space-x-2">
+        <span className="text-[#FF75A0] text-base">👤</span>
+        <span className="text-gray-700 dark:text-gray-300">For: {formData.recipientName}</span>
+      </div>
+    )}
+    {formData.publicNote && (
+      <div className="flex items-center space-x-2">
+        <span className="text-[#FF75A0] text-base">💭</span>
+        <span className="text-gray-700 dark:text-gray-300">Hint: {formData.publicNote}</span>
+      </div>
+    )}
+    {formData.message && (
+      <div className="flex items-center space-x-2">
+        <span className="text-[#FF75A0] text-base">✍️</span>
+        <span className="text-gray-700 dark:text-gray-300">Custom challenge added</span>
+      </div>
+    )}
+    {formData.uploadedFile && (
+      <div className="flex items-center space-x-2">
+        <span className="text-[#FF75A0] text-base">
+          {formData.uploadedFile.type === 'video' ? '🎥' : '📸'}
+        </span>
+        <span className="text-gray-700 dark:text-gray-300">
+          {formData.uploadedFile.type} uploaded — hidden until unlocked
+        </span>
+      </div>
+    )}
+    <div className="flex items-center space-x-2">
+      <span className="text-[#FF75A0] text-base">🎮</span>
+      <span className="text-gray-700 dark:text-gray-300">
+        Game Mode: {formData.gameMode || 'Scratch & See'}
+      </span>
+    </div>
+    <div className="flex items-center space-x-2">
+      <span className="text-[#FF75A0] text-base">⏱️</span>
+      <span className="text-gray-700 dark:text-gray-300">
+        Reveal Time: {formData.duration} seconds
+      </span>
+    </div>
+  </div>
+</div>
+
                         
                         <div className="space-y-3">
                             <SignUpButton mode="modal" fallbackRedirectUrl="/hello" forceRedirectUrl="/">
@@ -87,7 +99,7 @@ export function SignupModal({ isVisible, onClose, formData }: SignupModalProps) 
                                         e.stopPropagation();
                                     }}
                                 >
-                                    🚀 Get 5 Free Secret Shares
+                                    🚀 Claim My 5 Free Plays
                                 </Button>
                             </SignUpButton>
 

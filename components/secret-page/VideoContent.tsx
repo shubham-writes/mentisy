@@ -46,19 +46,12 @@ export function VideoContent({
   return (
     <div className="w-full max-w-full sm:max-w-2xl mx-auto mb-6 sm:mb-8">
       {/* Warning banner */}
-      <div className="mb-3 sm:mb-4 p-3 sm:p-4 bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 border border-red-200/50 dark:border-red-700/50 rounded-xl">
-        <div className="flex items-start sm:items-center space-x-3">
-          <span className="text-xl sm:text-2xl flex-shrink-0 mt-0.5 sm:mt-0">⚠️</span>
-          <div className="min-w-0 flex-1">
-            <p className="font-semibold text-red-800 dark:text-red-300 mb-1 text-sm sm:text-base">
-              One-Time View Only
-            </p>
-            <p className="text-xs sm:text-sm text-red-700 dark:text-red-400 leading-relaxed">
-              You cannot pause, replay, or download. Stay focused and watch carefully!
-            </p>
-          </div>
-        </div>
-      </div>
+      <div className="mb-3 sm:mb-4 p-3 sm:p-4 bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 border border-red-200/50 dark:border-red-700/50 rounded-xl flex items-center space-x-2">
+  <span className="text-xl sm:text-2xl flex-shrink-0">🎉</span>
+  <span className="font-semibold text-red-800 dark:text-red-300 text-sm sm:text-base">Live the Moment!</span>
+  <span className="text-red-700 dark:text-red-400 text-s sm:text-base">- See it once, feel it forever!</span>
+</div>
+
 
       {/* Video container */}
       <div className="relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-2 sm:p-4 shadow-xl">

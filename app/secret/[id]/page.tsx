@@ -108,23 +108,21 @@ export default function SecretPage({ params }: { params: { id: string } }) {
         secret === undefined ||
         hasExpiredDuringViewing ||
         isSecretExpiredOrAlreadyViewed(secret)) {
-      return "Secret Message";
+      return "";
     }
 
     if (secret && secret.recipientName) {
-      return `A Secret Message For ${secret.recipientName}`;
+      return `A Surprise For ${secret.recipientName}`;
     }
-    return "A Secret Message For You";
+    return "A Surprise Just For You";
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#FF75A0]/5 via-white to-[#FFAA70]/5 dark:from-[#FF75A0]/10 dark:via-gray-950 dark:to-[#FFAA70]/10 flex flex-col items-center justify-center sm:py-8 px-2 sm:px-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#FF75A0]/5 via-white to-[#FFAA70]/5 dark:from-[#FF75A0]/10 dark:via-gray-950 dark:to-[#FFAA70]/10 flex flex-col items-center justify-center  px-2 sm:px-4">
       <div className="w-full max-w-full mt-16 sm:max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-6 sm:mb-8">
-          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] rounded-full flex items-center justify-center text-xl sm:text-2xl mx-auto mb-4 sm:mb-6 shadow-lg">
-            🎁
-          </div>
+          
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] bg-clip-text text-transparent leading-tight px-2">
             {getHeading()}
           </h1>

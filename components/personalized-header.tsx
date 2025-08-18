@@ -39,10 +39,10 @@ export function PersonalizedHeader({ useCase, isLandingPage }: PersonalizedHeade
         return (
             <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold mb-4 text-gray-800 dark:text-white">
-                    Create Your Secret Link
+                    Make Your First Fun Link
                 </h2>
                 <p className="text-lg text-gray-600 dark:text-gray-400">
-                    Share it once, then it disappears forever
+                    Share it once — let your friends scratch, guess, or race to unlock.
                 </p>
             </div>
         );
@@ -122,7 +122,7 @@ export function PersonalizedHeader({ useCase, isLandingPage }: PersonalizedHeade
             <p className="text-lg text-gray-600 dark:text-gray-400">
                 {isNewUser 
                     ? "Let's create your first secret link"
-                    : "Create a new secret link or view your previous ones below"
+                    : "Create a new fun link or check out your previous ones below"
                 }
             </p>
             {isNewUser && user && (Date.now() - new Date(user.createdAt!).getTime()) < 30 * 60 * 1000 && (

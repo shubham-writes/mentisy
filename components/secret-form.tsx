@@ -703,7 +703,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                 ) : isLandingPage ? (
                                     "🚀 Create Account & Send"
                                 ) : (
-                                    "✨ Generate Secret Link"
+                                    "✨ Generate Fun Link"
                                 )}
                             </Button>
                         </div>
@@ -730,7 +730,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                 ) : isLandingPage ? (
                                     "🚀 Create Account & Send This Secret"
                                 ) : (
-                                    "✨ Generate Secret Link"
+                                    "✨ Generate Fun Link"
                                 )}
                             </Button>
                         </div>

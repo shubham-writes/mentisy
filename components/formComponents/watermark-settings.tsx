@@ -22,10 +22,10 @@ export function WatermarkSettings({ addWatermark, onWatermarkChange }: Watermark
                             htmlFor="watermark-toggle" 
                             className="text-sm font-medium cursor-pointer text-gray-700 dark:text-gray-300 block leading-tight"
                         >
-                            Security watermark
+                            Smart Overlay
                         </Label>
                         <p className="text-xs text-gray-500 dark:text-gray-400 leading-tight">
-                            {addWatermark ? "Protected with overlay" : "Unprotected - can be recorded"}
+                            {addWatermark ? "Overlay on — less chance of sneaky saves" : ""}
                         </p>
                     </div>
                 </div>
@@ -41,7 +41,7 @@ export function WatermarkSettings({ addWatermark, onWatermarkChange }: Watermark
                 <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
                     <p className="text-xs text-red-700 dark:text-red-300 flex items-center space-x-1">
                         <span>⚠️</span>
-                        <span>Without watermark, content can be screen recorded</span>
+                        <span>No overlay — friends can screenshot if they want 😜</span>
                     </p>
                 </div>
             )}

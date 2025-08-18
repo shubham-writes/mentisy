@@ -14,17 +14,17 @@ export function ErrorStates({ type }: ErrorStatesProps) {
           ❌
         </div>
         <p className="text-lg sm:text-xl text-red-600 dark:text-red-400 font-medium mb-2">
-          Secret Not Found
+          Oops! Link Not Found
         </p>
         <p className="text-gray-600 dark:text-gray-400 mb-6 sm:mb-8 px-2 text-sm sm:text-base">
-          This secret message could not be found or may have already been viewed.
+          This link has either vanished or was already enjoyed..
         </p>
         <Button
           asChild
           size="lg"
           className="bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-[#FF75A0]/90 hover:to-[#FFAA70]/90 text-white font-medium px-6 py-3 sm:px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 border-0 text-sm sm:text-base"
         >
-          <Link href="/">✨ Create Your Own Secret</Link>
+          <Link href="/">✨ Create Your Own Fun Link</Link>
         </Button>
       </div>
     );
@@ -39,17 +39,17 @@ export function ErrorStates({ type }: ErrorStatesProps) {
         Vanished Into Thin Air
       </h3>
       <p className="text-gray-500 dark:text-gray-400 text-base sm:text-lg mb-2 px-2">
-        This secret message has expired and is no longer available.
+        This link has already been enjoyed – it’s gone! 
       </p>
       <p className="text-sm text-gray-400 dark:text-gray-500 mb-6 sm:mb-8 px-2">
-        Some secrets are meant to disappear forever ✨
+        Some moments are meant to be fleeting ✨
       </p>
       <Button
         asChild
         size="lg"
         className="bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-[#FF75A0]/90 hover:to-[#FFAA70]/90 text-white font-medium px-6 py-3 sm:px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 border-0 text-sm sm:text-base"
       >
-        <Link href="/">✨ Create Your Own Secret</Link>
+        <Link href="/">✨ Create Your Own Fun Link</Link>
       </Button>
     </div>
   );

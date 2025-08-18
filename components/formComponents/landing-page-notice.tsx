@@ -8,7 +8,7 @@ export function LandingPageNotice() {
                         Preview Mode Active
                     </p>
                     <p className="text-sm text-amber-700 dark:text-amber-300 leading-relaxed">
-                        You&apos;re just testing the waters right now. Create an account to actually send your secrets into the void.
+                        You’re just testing the fun. Create an account to actually share games with friends.
                     </p>
                 </div>
             </div>
