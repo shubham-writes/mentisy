@@ -53,43 +53,43 @@ export function PersonalizedHeader({ useCase, isLandingPage }: PersonalizedHeade
         const emoji = useCaseEmojis[useCase as keyof typeof useCaseEmojis];
 
         const personalizedContent = {
-            "student-sharing": {
-                title: "Share Study Materials Securely",
-                subtitle: "Perfect for exam prep content that shouldn't stick around",
-                bgClass: "from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20",
-                textClass: "text-blue-700 dark:text-blue-300"
-            },
-            "personal-moments": {
-                title: "Share Your Special Moment",
-                subtitle: "For those intimate photos and videos meant just for them",
-                bgClass: "from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20",
-                textClass: "text-pink-700 dark:text-pink-300"
-            },
-            "fitness-progress": {
-                title: "Share Your Transformation",
-                subtitle: "Show your progress with control over who sees it",
-                bgClass: "from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20",
-                textClass: "text-green-700 dark:text-green-300"
-            },
-            "funny-moments": {
-                title: "Share the Laughs",
-                subtitle: "Those hilarious moments that are too good not to share",
-                bgClass: "from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20",
-                textClass: "text-yellow-700 dark:text-yellow-300"
-            },
-            "professional-use": {
-                title: "Share Professional Content",
-                subtitle: "Confidential presentations and demos with complete control",
-                bgClass: "from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20",
-                textClass: "text-purple-700 dark:text-purple-300"
-            },
-            "confessions": {
-                title: "Share Your Truth",
-                subtitle: "Personal messages that deserve privacy and trust",
-                bgClass: "from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20",
-                textClass: "text-red-700 dark:text-red-300"
-            }
-        };
+    "before-&-after-reveals": {
+        title: "Create Your Transformation Game",
+        subtitle: "Let friends guess your rating or scratch to reveal your glow-up moment",
+        bgClass: "from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20",
+        textClass: "text-green-700 dark:text-green-300"
+    },
+    "achievement-celebrations": {
+        title: "Make Your Achievement Interactive",
+        subtitle: "Turn your big moment into an exciting scratch reveal or guessing game",
+        bgClass: "from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20",
+        textClass: "text-yellow-700 dark:text-yellow-300"
+    },
+    "creative-projects": {
+        title: "Gamify Your Creative Reveal",
+        subtitle: "Challenge friends to rate your art or guess your project satisfaction",
+        bgClass: "from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20",
+        textClass: "text-purple-700 dark:text-purple-300"
+    },
+    "travel-adventures": {
+        title: "Create Your Travel Challenge",
+        subtitle: "Let friends race to guess your location or rate your adventure",
+        bgClass: "from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20",
+        textClass: "text-blue-700 dark:text-blue-300"
+    },
+    "daily-life-highlights": {
+        title: "Turn Daily Moments Into Games",
+        subtitle: "Challenge friends to match your ratings for coffee, outfits, or experiences",
+        bgClass: "from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20",
+        textClass: "text-pink-700 dark:text-pink-300"
+    },
+    "special-announcements": {
+        title: "Make Your Big News Interactive",
+        subtitle: "Create suspense with Q&A games or scratch reveals for life updates",
+        bgClass: "from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20",
+        textClass: "text-red-700 dark:text-red-300"
+    }
+};
 
         const content = personalizedContent[useCase as keyof typeof personalizedContent];
 

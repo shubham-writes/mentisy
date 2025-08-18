@@ -1,122 +1,122 @@
 export const useCaseTemplates = {
-  "student-sharing": {
-    recipientName: "Study group",
-    publicNote: "📚 Study materials inside - exam prep content!",
-    message: "Here are the study notes we discussed. Good luck with your exam! 📖",
-    duration: "10",
-    addWatermark: true,
-    tips: [
-      "Perfect for sharing study materials safely",
-      "Watermark prevents unauthorized sharing",
-      "Use longer timers for study content"
-    ],
-    placeholder: {
-      recipient: "Your study buddy, class group, etc.",
-      publicNote: "'Study notes for tomorrow's exam' or similar",
-      message: "Any additional context about the study materials..."
-    }
-  },
-  "personal-moments": {
-    recipientName: "",
-    publicNote: "💕 Something special just for you...",
-    message: "This moment is just between us. You mean everything to me ❤️",
-    duration: "10",
-    addWatermark: true,
-    tips: [
-      "Always use watermarks for intimate content",
-      "Longer timers let them savor the moment",
-      "Perfect for sharing personal photos/videos"
-    ],
-    placeholder: {
-      recipient: "Their name, pet name, or 'my love'",
-      publicNote: "'Something beautiful for you' or similar sweet message",
-      message: "Your heartfelt message to accompany the moment..."
-    }
-  },
-  "fitness-progress": {
-    recipientName: "Workout buddy",
-    publicNote: "💪 Check out this transformation!",
-    message: "The grind is paying off! What do you think of the progress? 🔥",
+  "before-&-after-reveals": {
+    recipientName: "My transformation buddy",
+    publicNote: "🌟 Guess my glow-up rating to see the reveal!",
+    message: "Rate this transformation from 1-10! Match my rating to unlock the photo 💫",
     duration: "10",
     addWatermark: false,
     tips: [
-      "10 second timer perfect for progress photos",
-      "Share with gym buddies or accountability partners",
-      "Watermark optional for fitness content"
+      "Perfect for fitness transformations and makeovers",
+      "Use 'Rate My...' game for interactive reveals",
+      "Friends love guessing transformation ratings"
     ],
     placeholder: {
-      recipient: "Gym buddy, trainer, or accountability partner",
-      publicNote: "'Progress update!' or motivational message",
-      message: "Share your fitness journey thoughts..."
+      recipient: "Workout buddy, best friend, etc.",
+      publicNote: "'Transformation reveal inside!' or similar teaser",
+      message: "Challenge them to guess your rating..."
     }
   },
-  "funny-moments": {
-    recipientName: "The crew",
-    publicNote: "😂 You're not ready for this...",
-    message: "I'm still laughing about this! Had to share it with you 🤣",
+  "achievement-celebrations": {
+    recipientName: "My support crew",
+    publicNote: "🏆 Big news inside - scratch to reveal!",
+    message: "Something amazing happened today! Scratch away to see my celebration moment 🎉",
+    duration: "15",
+    addWatermark: false,
+    tips: [
+      "Longer timers let them savor your achievement",
+      "Scratch & See perfect for big announcements",
+      "Great for graduations and job celebrations"
+    ],
+    placeholder: {
+      recipient: "Family, friends, or support network",
+      publicNote: "'Amazing news inside!' or achievement teaser",
+      message: "Share the excitement of your big moment..."
+    }
+  },
+  "creative-projects": {
+    recipientName: "Fellow creators",
+    publicNote: "🎨 Rate my latest creation!",
+    message: "Spent all day on this project! What rating would you give it? Match mine to see the full reveal 🎭",
+    duration: "10",
+    addWatermark: false,
+    tips: [
+      "Perfect for art, cooking, and DIY projects",
+      "Rating games create engaging discussions",
+      "Friends become invested in your creative journey"
+    ],
+    placeholder: {
+      recipient: "Creative friends, fellow artists, foodie group",
+      publicNote: "'New creation reveal!' or project teaser",
+      message: "Share your creative process and excitement..."
+    }
+  },
+  "travel-adventures": {
+    recipientName: "Travel squad",
+    publicNote: "✈️ First to guess the location wins the view!",
+    message: "Where do you think I am right now? First person to answer correctly gets to see this incredible view! 🌅",
+    duration: "8",
+    addWatermark: false,
+    tips: [
+      "Location guessing games are super engaging",
+      "Use Reveal Rush for group competitions",
+      "Perfect for stunning travel photography"
+    ],
+    placeholder: {
+      recipient: "Travel buddies, family, adventure crew",
+      publicNote: "'Guess my location!' or travel challenge",
+      message: "Create excitement about your adventure..."
+    }
+  },
+  "daily-life-highlights": {
+    recipientName: "My taste testers",
+    publicNote: "☕ Rate this coffee experience with me!",
+    message: "Just tried this new café! Rate the vibe from 1-10 and see if you match my score ☕",
     duration: "5",
     addWatermark: false,
     tips: [
-      "Shorter timers work great for funny content",
-      "Perfect for those 'you had to be there' moments",
-      "Keep it light and fun"
+      "Perfect for everyday moments and experiences",
+      "Rating games make simple moments fun",
+      "Great for coffee, food, and lifestyle content"
     ],
     placeholder: {
-      recipient: "Friend group name or 'my bestie'",
-      publicNote: "'This is hilarious' or funny teaser",
-      message: "Context about why this is so funny..."
+      recipient: "Friends, coffee buddies, lifestyle crew",
+      publicNote: "'Rate this with me!' or experience teaser",
+      message: "Share your experience and get them involved..."
     }
   },
-  "professional-use": {
-    recipientName: "Client",
-    publicNote: "📋 Professional content - confidential material inside",
-    message: "Please review this confidential material. Let me know your thoughts.",
-    duration: "10",
+  "special-announcements": {
+    recipientName: "My inner circle",
+    publicNote: "🎁 Big announcement - answer correctly to reveal!",
+    message: "I have huge news to share! Answer this question about me correctly to see the big reveal 💕",
+    duration: "15",
     addWatermark: true,
     tips: [
-      "Always watermark professional content",
-      "Longer timers allow proper review",
-      "Perfect for client presentations"
+      "Q&A games perfect for big announcements",
+      "Longer timers for important moments",
+      "Watermarks protect special memories"
     ],
     placeholder: {
-      recipient: "Client name, team, or department",
-      publicNote: "'Confidential presentation' or professional teaser",
-      message: "Professional context or instructions..."
-    }
-  },
-  "confessions": {
-    recipientName: "",
-    publicNote: "🤐 I need to tell you something...",
-    message: "This has been on my mind and I trust you with this truth.",
-    duration: "5",
-    addWatermark: true,
-    tips: [
-      "Shorter timers feel more intimate",
-      "Watermarks add security for vulnerable content",
-      "Perfect for sharing personal truths"
-    ],
-    placeholder: {
-      recipient: "The person you trust with this",
-      publicNote: "'Something I need to share' or similar",
-      message: "Your honest thoughts or confession..."
+      recipient: "Close family, best friends, partner",
+      publicNote: "'Life-changing news inside!' or announcement teaser",
+      message: "Build anticipation for your big news..."
     }
   }
 };
 
 export const useCaseLabels = {
-  "student-sharing": "Student Sharing",
-  "personal-moments": "Personal Moments", 
-  "fitness-progress": "Fitness Progress",
-  "funny-moments": "Funny Moments",
-  "professional-use": "Professional Use",
-  "confessions": "Confessions",
+  "before-&-after-reveals": "Before & After Reveals",
+  "achievement-celebrations": "Achievement Celebrations",
+  "creative-projects": "Creative Projects", 
+  "travel-adventures": "Travel Adventures",
+  "daily-life-highlights": "Daily Life Highlights",
+  "special-announcements": "Special Announcements",
 };
 
 export const useCaseEmojis = {
-  "student-sharing": "📚",
-  "personal-moments": "💕",
-  "fitness-progress": "💪",
-  "funny-moments": "😂", 
-  "professional-use": "📋",
-  "confessions": "🤐",
+  "before-&-after-reveals": "🌟",
+  "achievement-celebrations": "🏆",
+  "creative-projects": "🎨",
+  "travel-adventures": "✈️",
+  "daily-life-highlights": "☕",
+  "special-announcements": "🎁",
 };

@@ -17,16 +17,16 @@ export function TemplateSuggestion({ useCase, onApplyTemplate, hasContent }: Tem
     if (!template) return null;
 
     return (
-        <div className="mb-6 p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-800 rounded-xl">
+        <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border border-purple-200 dark:border-purple-800 rounded-xl">
             <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                     <span className="text-xl">{emoji}</span>
                     <div>
-                        <p className="font-semibold text-amber-800 dark:text-amber-200 text-sm">
-                            Want a head start?
+                        <p className="font-semibold text-purple-800 dark:text-purple-200 text-sm">
+                            Make it interactive!
                         </p>
-                        <p className="text-xs text-amber-700 dark:text-amber-300">
-                            Use our {label} template to get started quickly
+                        <p className="text-xs text-purple-700 dark:text-purple-300">
+                            Use our {label} template to create engaging games
                         </p>
                     </div>
                 </div>
@@ -34,9 +34,9 @@ export function TemplateSuggestion({ useCase, onApplyTemplate, hasContent }: Tem
                     size="sm"
                     variant="outline"
                     onClick={() => onApplyTemplate(template)}
-                    className="border-amber-300 text-amber-700 hover:bg-amber-100 dark:border-amber-600 dark:text-amber-300 dark:hover:bg-amber-900/30 text-xs"
+                    className="border-purple-300 text-purple-700 hover:bg-purple-100 dark:border-purple-600 dark:text-purple-300 dark:hover:bg-purple-900/30 text-xs"
                 >
-                    Apply Template
+                    Use Template
                 </Button>
             </div>
         </div>

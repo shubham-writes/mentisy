@@ -5,7 +5,7 @@ import { useState, useRef } from "react";
 import { SignUpButton } from "@clerk/nextjs";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { GraduationCap, Heart, Dumbbell, Smile, Briefcase, MessageCircle, Users, ChevronRight, ChevronDown, ChevronLeft } from "lucide-react";
+import { Trophy, Heart, Camera, MapPin, Star, Gift, Users, ChevronRight, ChevronDown, ChevronLeft, TrendingUp } from "lucide-react";
 
 const UseCasesSection = () => {
   const [activeUseCase, setActiveUseCase] = useState(0);
@@ -47,35 +47,11 @@ const UseCasesSection = () => {
 
   const useCases = [
     {
-      id: "student",
-      title: "Student Sharing",
-      icon: GraduationCap,
-      description: "I share my exam admit cards and answer videos with study partners, but don't want them floating around later.",
-      popularWith: "College students, exam prep groups",
-      color: "blue",
-      gradient: "from-blue-500 to-cyan-500",
-      bgColor: "bg-blue-50 dark:bg-blue-900/20",
-      iconColor: "text-blue-600 dark:text-blue-400",
-      borderColor: "border-blue-200 dark:border-blue-700"
-    },
-    {
-      id: "personal",
-      title: "Personal Moments",
-      icon: Heart,
-      description: "Sending special videos to my partner—just once, and then they disappear.",
-      popularWith: "Couples, close friends, family",
-      color: "pink",
-      gradient: "from-pink-500 to-rose-500",
-      bgColor: "bg-pink-50 dark:bg-pink-900/20",
-      iconColor: "text-pink-600 dark:text-pink-400",
-      borderColor: "border-pink-200 dark:border-pink-700"
-    },
-    {
-      id: "fitness",
-      title: "Fitness Progress",
-      icon: Dumbbell,
-      description: "Share my gym transformation videos for motivation, but control who sees my before/after photos.",
-      popularWith: "Fitness enthusiasts, trainers",
+      id: "transformations",
+      title: "Before & After Reveals",
+      icon: TrendingUp,
+      description: "Turn my transformation videos into exciting reveals! Friends guess my rating or answer questions before seeing my glow-up moments.",
+      popularWith: "Fitness enthusiasts, makeover lovers",
       color: "green",
       gradient: "from-green-500 to-emerald-500",
       bgColor: "bg-green-50 dark:bg-green-900/20",
@@ -83,11 +59,11 @@ const UseCasesSection = () => {
       borderColor: "border-green-200 dark:border-green-700"
     },
     {
-      id: "funny",
-      title: "Funny Moments",
-      icon: Smile,
-      description: "Those embarrassing but hilarious videos I want to share with one friend, not the whole world.",
-      popularWith: "Friends, social circles",
+      id: "achievements",
+      title: "Achievement Celebrations",
+      icon: Trophy,
+      description: "Make my big moments interactive! Scratch to reveal my graduation photo or guess the rating I gave my new job celebration.",
+      popularWith: "Students, professionals, achievers",
       color: "yellow",
       gradient: "from-yellow-500 to-orange-500",
       bgColor: "bg-yellow-50 dark:bg-yellow-900/20",
@@ -95,11 +71,11 @@ const UseCasesSection = () => {
       borderColor: "border-yellow-200 dark:border-yellow-700"
     },
     {
-      id: "professional",
-      title: "Professional Use",
-      icon: Briefcase,
-      description: "Sharing confidential presentation videos or demos with clients, ensuring they can't be redistributed.",
-      popularWith: "Freelancers, consultants",
+      id: "creative",
+      title: "Creative Projects",
+      icon: Camera,
+      description: "Share my art and cooking creations as fun challenges! Friends race to answer my trivia or match my project rating first.",
+      popularWith: "Artists, creators, food enthusiasts",
       color: "purple",
       gradient: "from-purple-500 to-indigo-500",
       bgColor: "bg-purple-50 dark:bg-purple-900/20",
@@ -107,11 +83,35 @@ const UseCasesSection = () => {
       borderColor: "border-purple-200 dark:border-purple-700"
     },
     {
-      id: "confessions",
-      title: "Confessions",
-      icon: MessageCircle,
-      description: "Opening up to someone special with a personal video message that I know will stay private.",
-      popularWith: "Young adults, relationships",
+      id: "travel",
+      title: "Travel Adventures",
+      icon: MapPin,
+      description: "Turn my vacation pics into location guessing games! First person to answer my travel trivia gets to see my amazing sunset photo.",
+      popularWith: "Travelers, adventure seekers",
+      color: "blue",
+      gradient: "from-blue-500 to-cyan-500",
+      bgColor: "bg-blue-50 dark:bg-blue-900/20",
+      iconColor: "text-blue-600 dark:text-blue-400",
+      borderColor: "border-blue-200 dark:border-blue-700"
+    },
+    {
+      id: "daily",
+      title: "Daily Life Highlights",
+      icon: Star,
+      description: "Rate my coffee shop experience or outfit choice - friends have to guess my exact rating to unlock the photo reveal!",
+      popularWith: "Gen Z, lifestyle enthusiasts",
+      color: "pink",
+      gradient: "from-pink-500 to-rose-500",
+      bgColor: "bg-pink-50 dark:bg-pink-900/20",
+      iconColor: "text-pink-600 dark:text-pink-400",
+      borderColor: "border-pink-200 dark:border-pink-700"
+    },
+    {
+      id: "announcements",
+      title: "Special Announcements",
+      icon: Gift,
+      description: "Make big news unforgettable! Create scratch reveals or Q&A challenges for pregnancy announcements and relationship updates.",
+      popularWith: "Couples, families, close friends",
       color: "red",
       gradient: "from-red-500 to-pink-500",
       bgColor: "bg-red-50 dark:bg-red-900/20",
@@ -124,8 +124,8 @@ const UseCasesSection = () => {
     <div className="px-4 sm:px-6 py-12 sm:py-16 bg-gray-50 dark:bg-gray-900/50">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 px-2">Perfect For Every Private Moment</h2>
-          <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 px-2">See how others are using OnlyForYou to protect their privacy</p>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 px-2">Turn Every Moment Into Fun</h2>
+          <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 px-2">See how people are making photo sharing more engaging and interactive</p>
         </div>
         
         {/* Mobile Layout - Stack vertically */}
@@ -242,34 +242,34 @@ const UseCasesSection = () => {
                 </blockquote>
               </div>
 
-              {/* Benefits - Mobile: 2x2 grid */}
+              {/* Game Features - Updated for fun focus */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="text-green-600 dark:text-green-400 text-sm font-bold">✓</span>
+                  <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <span className="text-purple-600 dark:text-purple-400 text-sm font-bold">🎮</span>
                   </div>
-                  <span className="text-sm text-gray-700 dark:text-gray-300">One-time view only</span>
+                  <span className="text-sm text-gray-700 dark:text-gray-300">Interactive games</span>
                 </div>
                 
                 <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                   <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="text-blue-600 dark:text-blue-400 text-sm font-bold">🔒</span>
+                    <span className="text-blue-600 dark:text-blue-400 text-sm font-bold">⚡</span>
                   </div>
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Watermark protection</span>
+                  <span className="text-sm text-gray-700 dark:text-gray-300">Instant engagement</span>
                 </div>
                 
                 <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                   <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="text-orange-600 dark:text-orange-400 text-sm font-bold">⏱️</span>
+                    <span className="text-orange-600 dark:text-orange-400 text-sm font-bold">🎯</span>
                   </div>
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Auto-delete timer</span>
+                  <span className="text-sm text-gray-700 dark:text-gray-300">Challenge friends</span>
                 </div>
                 
                 <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="text-purple-600 dark:text-purple-400 text-sm font-bold">🔔</span>
+                  <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <span className="text-green-600 dark:text-green-400 text-sm font-bold">🎉</span>
                   </div>
-                  <span className="text-sm text-gray-700 dark:text-gray-300">View notifications</span>
+                  <span className="text-sm text-gray-700 dark:text-gray-300">Memorable sharing</span>
                 </div>
               </div>
 
@@ -280,7 +280,7 @@ const UseCasesSection = () => {
                     onClick={() => handleUseCaseAction(useCases[activeUseCase].title)}
                     className={`w-full flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r ${useCases[activeUseCase].gradient} text-white font-medium rounded-xl hover:shadow-lg transition-all duration-200 active:scale-95 touch-manipulation`}
                   >
-                    Create for {useCases[activeUseCase].title}
+                    Try for {useCases[activeUseCase].title}
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 ) : (
@@ -371,34 +371,34 @@ const UseCasesSection = () => {
                   </blockquote>
                 </div>
 
-                {/* Benefits for this use case */}
+                {/* Game Features - Updated for fun focus */}
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-                      <span className="text-green-600 dark:text-green-400 text-sm font-bold">✓</span>
+                    <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
+                      <span className="text-purple-600 dark:text-purple-400 text-sm font-bold">🎮</span>
                     </div>
-                    <span className="text-sm text-gray-700 dark:text-gray-300">One-time view only</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">Interactive games</span>
                   </div>
                   
                   <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                     <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-                      <span className="text-blue-600 dark:text-blue-400 text-sm font-bold">🔒</span>
+                      <span className="text-blue-600 dark:text-blue-400 text-sm font-bold">⚡</span>
                     </div>
-                    <span className="text-sm text-gray-700 dark:text-gray-300">Watermark protection</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">Instant engagement</span>
                   </div>
                   
                   <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                     <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
-                      <span className="text-orange-600 dark:text-orange-400 text-sm font-bold">⏱️</span>
+                      <span className="text-orange-600 dark:text-orange-400 text-sm font-bold">🎯</span>
                     </div>
-                    <span className="text-sm text-gray-700 dark:text-gray-300">Auto-delete timer</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">Challenge friends</span>
                   </div>
                   
                   <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
-                      <span className="text-purple-600 dark:text-purple-400 text-sm font-bold">🔔</span>
+                    <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
+                      <span className="text-green-600 dark:text-green-400 text-sm font-bold">🎉</span>
                     </div>
-                    <span className="text-sm text-gray-700 dark:text-gray-300">View notifications</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">Memorable sharing</span>
                   </div>
                 </div>
 
@@ -409,7 +409,7 @@ const UseCasesSection = () => {
                       onClick={() => handleUseCaseAction(useCases[activeUseCase].title)}
                       className={`inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r ${useCases[activeUseCase].gradient} text-white font-medium rounded-xl hover:shadow-lg transition-all duration-200 hover:scale-105`}
                     >
-                      Create for {useCases[activeUseCase].title}
+                      Try for {useCases[activeUseCase].title}
                       <ChevronRight className="w-4 h-4" />
                     </button>
                   ) : (
