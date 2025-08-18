@@ -69,9 +69,7 @@ export default function FunTestimonialsSection() {
     <div className="px-4 sm:px-6 py-12 sm:py-16 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-900/20 dark:via-purple-900/20 dark:to-pink-900/20">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8 sm:mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] rounded-full mb-4">
-            <span className="text-2xl">🎉</span>
-          </div>
+         
           <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">Early testers are excited!</h2>
           <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400">Feedback from our beta testing community</p>
         </div>

@@ -79,7 +79,7 @@ export default function FinalCta({ userCount }: FinalCtaProps) {
           {/* Social proof mini testimonial */}
           <div className="bg-gray-100 dark:bg-gray-800 rounded-xl p-4 max-w-md mx-auto">
             <p className="text-gray-700 dark:text-gray-300 text-sm italic">
-              "My friend group is obsessed! We spend hours trying to guess each other's ratings" 
+              &ldquo;My friend group is obsessed! We spend hours trying to guess each other&apos;s ratings&ldquo; 
             </p>
             <p className="text-gray-500 dark:text-gray-400 text-xs mt-2">- Maya, early tester</p>
           </div>

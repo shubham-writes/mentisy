@@ -100,9 +100,7 @@ export default function FunFeaturesComparison() {
     <div className="px-4 sm:px-6 py-12 sm:py-16 bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-purple-900/20 dark:via-pink-900/20 dark:to-orange-900/20">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-8 sm:mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] rounded-full mb-4">
-            <span className="text-2xl">🎮</span>
-          </div>
+         
           <h3 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 px-2">Why OnlyForYou is the ultimate fun platform</h3>
           <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 px-2">The only platform that turns photo sharing into epic games</p>
         </div>

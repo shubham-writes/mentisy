@@ -21,7 +21,7 @@ import UseCasesSection from "./_sections/UseCasesSection";
 import AuthenticatedDashboard from "./_sections/AuthenticatedDashboard";
 
 export default function Home() {
-  const [userCount, setUserCount] = useState(12300);
+  const [userCount, setUserCount] = useState(1032);
 
   useEffect(() => {
     const originalScrollBehavior = document.documentElement.style.scrollBehavior;
