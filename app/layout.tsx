@@ -5,8 +5,13 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ConvexClientProvider } from "@/components/convex-provider";
 import { Navbar } from "./_home/navbar";
+import { Plus_Jakarta_Sans } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"] });
+const jakarta = Plus_Jakarta_Sans({ 
+  subsets: ["latin"],
+  variable: '--font-jakarta' 
+});
 
 export const metadata: Metadata = {
   title: "Secret Messages - Share Self-Destructing Messages Securely",
@@ -58,13 +63,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className="no-scrollbar">
+    <html lang="en" suppressHydrationWarning className="no-scrollbar ">
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
-      <body className={`${inter.className} no-scrollbar`}>
+      <body className={`${jakarta.variable} no-scrollbar `}>
         <ConvexClientProvider>
           <ThemeProvider
             attribute="class"

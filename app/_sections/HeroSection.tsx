@@ -44,15 +44,21 @@ export default function HeroSection({ userCount = 2847 }: HeroSectionProps) {
             {/* Left Side - Content - Always first on mobile, first on desktop */}
             <div className="text-center  space-y-4 sm:space-y-6 lg:space-y-1">
               {/* Premium Badge */}
-              <div className="relative inline-block pt-4 sm:pt-0">
-                <span className="text-base sm:text-xs mt-12 md:text-lg lg:text-xl font-bold tracking-[0.2em] bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] bg-clip-text text-transparent">
-                  FOR SHARES THAT PLAY
-                </span>
-              </div>
+              <div className="relative mb-6 sm:mb-10 inline-block pt-4 sm:pt-0">
+  <span className="text-[10px] sm:text-xs  font-semibold 
+    px-4 py-2 rounded-full
+    bg-gradient-to-r from-pink-500 via-red-400 to-yellow-400
+    text-white shadow-md shadow-pink-200/50
+    ring-2 ring-pink-300/50
+     hover:scale-105 t">
+    ✨ FOR SHARES THAT PLAY
+  </span>
+</div>
+
               
               {/* Main Headline with Enhanced Typography */}
-              <div className="space-y-4 sm:space-y-6">
-                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black leading-tight tracking-tight">
+              <div className="space-y-6 sm:space-y-8 ">
+                <h1 className="text-4xl font-semibold sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-tight tracking-tight">
                   Why only snap it…<br /> when your friends can <br />
                   <span className="bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] bg-clip-text text-transparent">
                     play for it?
@@ -60,7 +66,7 @@ export default function HeroSection({ userCount = 2847 }: HeroSectionProps) {
                 </h1>
                 
                 <div className="space-y-3 sm:space-y-4">
-                  <p className="text-lg sm:text-xl md:text-xl lg:text-2xl text-gray-600 dark:text-gray-300 max-w-2xl leading-relaxed font-light mx-auto ">
+                  <p className="text-md sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl leading-relaxed font-light mx-auto ">
                     <strong className="font-bold text-gray-900 dark:text-white">Forget plain snaps.</strong> Send dares, challenges, and inside jokes that spark instant fun — then disappear in style.
                   </p>
                 </div>
@@ -70,7 +76,7 @@ export default function HeroSection({ userCount = 2847 }: HeroSectionProps) {
               <div className="flex justify-center  pt-4 sm:pt-6">
                 <Unauthenticated>
                   
-                    <button className="group relative inline-flex items-center justify-center gap-2 sm:gap-3 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] text-white font-bold py-3 sm:py-4 lg:py-5 px-8 sm:px-12 lg:px-16 rounded-xl sm:rounded-2xl hover:shadow-2xl hover:shadow-[#FF75A0]/30 transition-all duration-300 hover:scale-105 text-base sm:text-lg overflow-hidden min-w-[280px] sm:min-w-[320px] touch-manipulation">
+                    <button className="group relative inline-flex items-center justify-center gap-2 sm:gap-3 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] text-white font-bold py-3 sm:py-3  px-8 sm:px-7  rounded-xl sm:rounded-2xl hover:shadow-2xl hover:shadow-[#FF75A0]/30 transition-all duration-300 hover:scale-105 text-base sm:text-lg overflow-hidden min-w-[280px]  touch-manipulation">
                       <div className="absolute inset-0 bg-gradient-to-r from-[#e65a85] to-[#e6955a] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       <SignUpButton mode="modal">
                       <span className="relative z-10">🎮 Try Free — Get 5 Plays</span>

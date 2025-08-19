@@ -68,6 +68,12 @@ const config = {
           to: { height: "0" },
         },
       },
+
+      fontFamily: {
+        jakarta: ['"Plus Jakarta Sans"', 'sans-serif'],
+        dancing: ['"Dancing Script"', 'cursive'],
+        lobster: ['"Lobster"', 'cursive'],
+      },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",

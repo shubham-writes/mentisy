@@ -89,7 +89,7 @@ export default function GamingPricingSection() {
             <div className="mt-0">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] rounded-xl flex items-center justify-center">
-                  <CloudUpload  className="w-6 h-6 text-white" />
+                  <Trophy  className="w-6 h-6 text-white" />
                 </div>
                 <div>
                   <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Pro Plan</h3>
