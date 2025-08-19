@@ -23,6 +23,8 @@ import { GameModeSelector } from "./formComponents/game-mode-selector";
 import { QAFormFields } from "./qa-form-fields";
 import { MicroQuestFormFields } from "./reveal-rush-form-fields";
 
+import { FeedbackModal } from "@/components/feedback/FeedbackModal";
+
 // Updated GameMode type to match backend expectations
 type GameMode = "none" | "scratch_and_see" | "qa_challenge" | "reveal_rush";
 type MicroQuestType = "group_qa" | "rate_my";
@@ -47,6 +49,8 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     const [showSignupPrompt, setShowSignupPrompt] = useState(false);
     const [showTips, setShowTips] = useState(false);
     const [templateApplied, setTemplateApplied] = useState(false);
+    // feedback modal state
+     const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
     
     // Game mode state
     const [gameMode, setGameMode] = useState<GameMode>("none");
@@ -74,6 +78,10 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
         if (generatedLink) {
             setGeneratedLink("");
         }
+    };
+
+    const handleGameFeedbackClick = () => {
+        setIsFeedbackModalOpen(true);
     };
 
     // Pre-fill form with use case template - FIRST PRIORITY
@@ -484,6 +492,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                     onModeChange={handleGameModeChange}
                                     isGameModeDisabled={isGameModeDisabled}
                                     uploadedFile={uploadedFile}
+                                    onFeedbackClick={handleGameFeedbackClick}
                                 />
                             </div>
 
@@ -753,6 +762,11 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                 isVisible={showSignupPrompt}
                 onClose={() => setShowSignupPrompt(false)}
                 formData={formData}
+            />
+             <FeedbackModal 
+                isOpen={isFeedbackModalOpen} 
+                onClose={() => setIsFeedbackModalOpen(false)}
+                defaultTab="game" // This will open with game suggestion tab
             />
         </div>
     );

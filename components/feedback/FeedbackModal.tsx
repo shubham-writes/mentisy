@@ -144,7 +144,7 @@ export function FeedbackModal({ isOpen, onClose, defaultTab = 'game' }: Feedback
       icon: Bug, 
       title: 'Report Bug', 
       description: 'Help us fix what\'s broken',
-      emoji: '🐛',
+      emoji: '🛠',
       gradient: 'from-[#FFAA70] to-[#e6955a]',
       hoverGradient: 'hover:from-[#FFAA70]/10 hover:to-[#e6955a]/10',
       borderColor: 'border-[#FFAA70]',
@@ -208,8 +208,8 @@ export function FeedbackModal({ isOpen, onClose, defaultTab = 'game' }: Feedback
   }
 
   return (
-    <div className="fixed inset-0 z-50 pb-96 flex items-end justify-center bg-white/40 dark:bg-black/60 backdrop-blur-sm p-4">
-      <div className="w-full max-w-2xl max-h-[100vh] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border-0 my-4 animate-in zoom-in-95 duration-300 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/40 dark:bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
+      <div className="w-full max-w-2xl max-h-[95vh] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border-0 my-auto animate-in zoom-in-95 duration-300 overflow-hidden">
         {/* Header - Compact version */}
         <div className="relative bg-gradient-to-br from-[#FF75A0]/10 to-[#FFAA70]/10 dark:from-[#FF75A0]/20 dark:to-[#FFAA70]/20 p-4 border-b border-[#FF75A0]/20 dark:border-[#FFAA70]/30">
           {/* Background decorative elements */}
@@ -241,7 +241,7 @@ export function FeedbackModal({ isOpen, onClose, defaultTab = 'game' }: Feedback
           </div>
         </div>
 
-        <div className="p-4 space-y-5 overflow-y-auto max-h-[calc(90vh-140px)]">
+        <div className="p-4 space-y-5 overflow-y-auto max-h-[calc(90vh-200px)]">
           {error && (
             <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 border-2 border-solid border-red-200 dark:border-red-700 rounded-xl animate-in slide-in-from-top-2 duration-300">
               <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
@@ -316,7 +316,7 @@ export function FeedbackModal({ isOpen, onClose, defaultTab = 'game' }: Feedback
             <div className="space-y-2">
               <label className="block text-sm font-bold text-gray-800 dark:text-gray-200">
                 {selectedType === 'game_suggestion' ? '🎮 Game Name *' : 
-                 selectedType === 'bug_report' ? '🐛 What went wrong? *' :
+                 selectedType === 'bug_report' ? '🛠 What went wrong? *' :
                  selectedType === 'feature_request' ? '💡 Feature Name *' : '💭 Subject *'}
               </label>
               <input
@@ -406,7 +406,7 @@ export function FeedbackModal({ isOpen, onClose, defaultTab = 'game' }: Feedback
         </div>
 
         {/* Action Buttons - Compact version */}
-        <div className="flex flex-col sm:flex-row justify-end gap-3 p-4 pt-0 bg-gradient-to-t from-gray-50/50 to-transparent dark:from-gray-800/50 border-t border-gray-100 dark:border-gray-700">
+        <div className="flex flex-col pt-6 sm:flex-row justify-end gap-3 p-4 bg-gradient-to-t from-gray-50/50 to-transparent dark:from-gray-800/50 border-t border-gray-100 dark:border-gray-700">
           <button 
             onClick={handleClose} 
             disabled={isSubmitting}
