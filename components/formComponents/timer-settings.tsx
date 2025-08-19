@@ -24,7 +24,7 @@ const normalDurationValues = normalDurations.map(d => d.value);
 const gameDurations = [
     { value: "30", label: "30 Sec", description: "Enough to play", icon: "🕹️" },
     { value: "60", label: "1 Min", description: "Take your time", icon: "⏳" },
-    { value: "120", label: "2 Mins", description: "No rush", icon: "🐢" },
+    { value: "120", label: "2 Mins", description: "No rush please", icon: "🐢" },
 ];
 const gameDurationValues = gameDurations.map(d => d.value);
 

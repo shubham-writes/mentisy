@@ -1,11 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { ConvexClientProvider } from "@/components/convex-provider";
 import { Navbar } from "./_home/navbar";
-import { Plus_Jakarta_Sans } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"] });
 const jakarta = Plus_Jakarta_Sans({ 
@@ -14,15 +13,37 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Secret Messages - Share Self-Destructing Messages Securely",
-  description: "Create and share self-destructing secret messages and files that disappear after viewing. Secure, private, and easy to use.",
+  title: "OnlyForYou - Fun Sharing Platform 🎉",
+  description: "Share fun links, play with friends, and spark joy ✨",
   metadataBase: new URL(process.env.NEXT_PUBLIC_URL!),
   manifest: "/manifest.json",
-  applicationName: "Secret Messages",
+  applicationName: "OnlyForYou",
+  openGraph: {
+    title: "OnlyForYou - Fun Sharing Platform 🎉",
+    description: "Share fun links, play with friends, and spark joy ✨",
+    url: process.env.NEXT_PUBLIC_URL,
+    siteName: "OnlyForYou",
+    images: [
+      {
+        url: "/og-image.png", // 👈 Add your preview image to /public/og-image.png
+        width: 1200,
+        height: 630,
+        alt: "OnlyForYou - Fun Sharing Preview",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "OnlyForYou - Fun Sharing Platform 🎉",
+    description: "Share fun links, play with friends, and spark joy ✨",
+    images: ["/og-image.png"], // 👈 same preview image
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "SecretMsg",
+    title: "OnlyForYou",
   },
   icons: {
     icon: [
@@ -63,13 +84,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className="no-scrollbar ">
+    <html lang="en" suppressHydrationWarning className="no-scrollbar">
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
-      <body className={`${jakarta.variable} no-scrollbar `}>
+      <body className={`${jakarta.variable} no-scrollbar`}>
         <ConvexClientProvider>
           <ThemeProvider
             attribute="class"
@@ -79,9 +100,7 @@ export default function RootLayout({
           >
             <div className="min-h-full flex flex-col justify-between no-scrollbar">
               <Navbar />
-              <main className="flex-1 no-scrollbar">
-                {children}
-              </main>
+              <main className="flex-1 no-scrollbar">{children}</main>
             </div>
           </ThemeProvider>
         </ConvexClientProvider>
