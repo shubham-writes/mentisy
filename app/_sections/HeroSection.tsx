@@ -58,7 +58,7 @@ export default function HeroSection({ userCount = 2847 }: HeroSectionProps) {
               
               {/* Main Headline with Enhanced Typography */}
               <div className="space-y-6 sm:space-y-8 ">
-                <h1 className="text-4xl font-semibold sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-tight tracking-tight">
+                <h1 className="text-3xl font-bold sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-tight tracking-tight">
                   Why only snap it…<br /> when your friends can <br />
                   <span className="bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] bg-clip-text text-transparent">
                     play for it?
@@ -66,7 +66,7 @@ export default function HeroSection({ userCount = 2847 }: HeroSectionProps) {
                 </h1>
                 
                 <div className="space-y-3 sm:space-y-4">
-                  <p className="text-md sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl leading-relaxed font-light mx-auto ">
+                  <p className="text-sm sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl leading-relaxed font-light mx-auto ">
                     <strong className="font-bold text-gray-900 dark:text-white">Forget plain snaps.</strong> Send dares, challenges, and inside jokes that spark instant fun — then disappear in style.
                   </p>
                 </div>

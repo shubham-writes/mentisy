@@ -148,12 +148,12 @@ export default function GamingPricingSection() {
               </div>
               
               <SignUpButton mode="modal">
-                <button className="w-full py-4 px-6 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] text-white rounded-xl font-bold text-lg hover:shadow-xl hover:shadow-[#FF75A0]/30 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden group">
+                <button className="w-full py-3 px-4 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] text-white rounded-xl font-bold text-md hover:shadow-xl hover:shadow-[#FF75A0]/30 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden group">
                   <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <div className="relative flex items-center justify-center gap-2">
-                    <span className="text-lg">🎉</span>
+                    
                     <span>Start FREE 15-Day Trial</span>
-                    <span className="text-lg">🚀</span>
+                    
                   </div>
                 </button>
               </SignUpButton>
