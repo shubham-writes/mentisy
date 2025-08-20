@@ -19,7 +19,7 @@ export default function Footer() {
         <div className="max-w-4xl mx-auto">
           <div className="grid md:grid-cols-3 gap-8">
             <div>
-              <h4 className="font-bold text-lg mb-4">OnlyForYou</h4>
+              <h4 className="font-bold text-lg mb-4">Mentisy</h4>
               <p className="text-gray-400 mb-4">Share laughs. Spark joy. Play together.</p>
               <div className="flex items-center gap-2 text-sm">
                 <span className="text-orange-500">🇮🇳</span>
@@ -66,7 +66,7 @@ export default function Footer() {
           
           <div className="border-t border-gray-800 mt-8 pt-8 text-center">
             <p className="text-gray-400 text-sm">
-              © 2025 &nbsp;OnlyForYou. &nbsp;Made for fun, built for friends.
+              © 2025 &nbsp;Mentisy. &nbsp;Made for fun, built for friends.
             </p>
           </div>
         </div>

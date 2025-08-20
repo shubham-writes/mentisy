@@ -7,9 +7,10 @@ import { SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import { 
     GithubIcon, 
     LoaderCircle, 
-    Zap, 
+    SquareMenu ,
+    WandSparkles, 
     Sparkles, 
-    User, 
+    NotepadText, 
     LogIn,
     Menu,
     X,
@@ -107,15 +108,15 @@ export const Navbar = () => {
     return (
         <>
             <nav className={cn(
-                "z-[100] fixed top-0 w-full transition-all duration-300",
+                "z-[100] fixed top-0 w-full  transition-all duration-300",
                 scrolled 
                     ? "bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 shadow-lg" 
                     : "bg-transparent"
             )}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between h-16">
+                    <div className="flex items-center justify-between  h-16">
                         {/* Logo Section - Always visible */}
-                        <div className="flex items-center space-x-4">
+                        <div className="flex items-cente space-x-4">
                             <Logo />
                         </div>
 
@@ -234,7 +235,7 @@ export const Navbar = () => {
                     <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
                         <div className="flex items-center space-x-2">
                             <div className="w-8 h-8 bg-gradient-to-br from-[#FF75A0] to-[#FFAA70] rounded-lg flex items-center justify-center">
-                                <Zap className="w-5 h-5 text-white" />
+                                <SquareMenu  className="w-5 h-5 text-white" />
                             </div>
                             <span className="font-semibold text-lg">Menu</span>
                         </div>
@@ -325,8 +326,8 @@ export const Navbar = () => {
                                             }, 500);
                                         }}
                                     >
-                                        <Zap className="w-5 h-5 mr-3 text-[#FF75A0]" />
-                                        Upload Secret
+                                        <WandSparkles  className="w-5 h-5 mr-3 text-[#FF75A0]" />
+                                        Create a Moment
                                     </Button>
                                     <Button 
                                         variant="ghost" 
@@ -343,8 +344,8 @@ export const Navbar = () => {
                                             }, 500);
                                         }}
                                     >
-                                        <User className="w-5 h-5 mr-3 text-purple-500" />
-                                        My Secrets
+                                        <NotepadText className="w-5 h-5 mr-3 text-purple-500" />
+                                        My Moments
                                     </Button>
                                 </div>
                             </div>
@@ -355,7 +356,7 @@ export const Navbar = () => {
                     <div className="p-4 border-t border-gray-200 dark:border-gray-800">
                         <div className="text-center">
                             <p className="text-xs text-gray-500 dark:text-gray-400">
-                                OnlyForYou • Privacy First
+                                Mentisy • Privacy First
                             </p>
                         </div>
                     </div>

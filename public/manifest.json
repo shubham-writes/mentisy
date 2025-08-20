@@ -1,6 +1,6 @@
 {
-  "name": "OnlyForYou",
-  "short_name": "OnlyForYou",
+  "name": "Mentisy",
+  "short_name": "Mentisy",
   "description": "Create and share self-destructing secret messages, photos, and videos.",
   "start_url": "/",
   "display": "standalone",
@@ -13,25 +13,25 @@
   "categories": ["utilities", "productivity", "security"],
   "icons": [
     {
-      "src": "/logo.png",
+      "src": "/mentisyLogo-light.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/logo-dark.png",
+      "src": "/mentisyLogo-dark.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/logo.png",
+      "src": "/mentisyLogo-light.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/logo-dark.png",
+      "src": "/mentisyLogo-dark.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"

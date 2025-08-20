@@ -13,22 +13,22 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "OnlyForYou - Fun Sharing Platform 🎉",
+  title: "Mentisy - Fun Sharing Platform 🎉",
   description: "Share fun links, play with friends, and spark joy ✨",
   metadataBase: new URL(process.env.NEXT_PUBLIC_URL!),
   manifest: "/manifest.json",
-  applicationName: "OnlyForYou",
+  applicationName: "Mentisy",
   openGraph: {
-    title: "OnlyForYou - Fun Sharing Platform 🎉",
+    title: "Mentisy - Fun Sharing Platform 🎉",
     description: "Share fun links, play with friends, and spark joy ✨",
     url: process.env.NEXT_PUBLIC_URL,
-    siteName: "OnlyForYou",
+    siteName: "Mentisy",
     images: [
       {
         url: "/og-image.png", // 👈 Add your preview image to /public/og-image.png
         width: 1200,
         height: 630,
-        alt: "OnlyForYou - Fun Sharing Preview",
+        alt: "Mentisy - Fun Sharing Preview",
       },
     ],
     locale: "en_US",
@@ -36,14 +36,14 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "OnlyForYou - Fun Sharing Platform 🎉",
+    title: "Mentisy - Fun Sharing Platform 🎉",
     description: "Share fun links, play with friends, and spark joy ✨",
     images: ["/og-image.png"], // 👈 same preview image
   },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "OnlyForYou",
+    title: "Mentisy",
   },
   icons: {
     icon: [
