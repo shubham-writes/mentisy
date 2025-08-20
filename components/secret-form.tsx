@@ -84,6 +84,26 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
         setIsFeedbackModalOpen(true);
     };
 
+     useEffect(() => {
+        const sharedFileData = sessionStorage.getItem("sharedFile");
+        if (sharedFileData) {
+            try {
+                const fileData = JSON.parse(sharedFileData);
+                if (fileData.url && fileData.type) {
+                    console.log("📂 Found shared file in sessionStorage, applying to form.", fileData);
+                    // Set the file in the form's state
+                    setUploadedFile({ url: fileData.url, type: fileData.type as "image" | "video" });
+                    
+                    // Clear the item from storage so it's not reused
+                    sessionStorage.removeItem("sharedFile");
+                }
+            } catch (error) {
+                console.error("Failed to parse shared file data:", error);
+                sessionStorage.removeItem("sharedFile");
+            }
+        }
+    }, []); // Empty dependency array means this runs once on component mount
+
     // Pre-fill form with use case template - FIRST PRIORITY
     useEffect(() => {
         console.log("Template useEffect triggered with useCase:", useCase);
@@ -318,12 +338,23 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     };
 
     // Game mode change handler
+     // UPDATED: Game mode change handler with timer logic
     const handleGameModeChange = (newMode: GameMode) => {
         if (generatedLink) {
             clearGeneratedLink();
         }
         setGameMode(newMode);
         
+        // --- NEW: AUTOMATIC TIMER LOGIC ---
+        if (newMode === 'qa_challenge' || newMode === 'reveal_rush') {
+            setDuration("60"); // Set to 60 seconds (1 minute) for interactive games
+            console.log(`⏱️ Game mode set to "${newMode}", timer auto-set to 60s.`);
+        } else {
+            setDuration("10"); // Default to 10 seconds for classic and scratch-off
+            console.log(`⏱️ Game mode set to "${newMode}", timer auto-set to 10s.`);
+        }
+        // --- END OF NEW LOGIC ---
+
         // Clear QA fields when switching away from QA mode
         if (newMode !== 'qa_challenge') {
             setQaQuestion("");

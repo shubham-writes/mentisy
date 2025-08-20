@@ -14,13 +14,27 @@ export function ServiceWorkerProvider({ children }: { children: React.ReactNode 
         .catch((err) => console.log("❌ SW registration failed:", err));
       
       // Listen for messages from service worker
-      navigator.serviceWorker.addEventListener("message", (event) => {
-        if (event.data.type === "SHARE_TARGET") {
-          console.log("📩 Received shared data:", event.data);
-          // Redirect to your main page or share handling page
-          router.push("/hello?shared=true");
+      const handleMessage = (event: MessageEvent) => {
+        if (event.data.type === "SHARE_TARGET" && event.data.data.url) {
+          console.log("📩 Received shared data from SW:", event.data);
+          
+          // Store file data in sessionStorage to survive the redirect
+          sessionStorage.setItem("sharedFile", JSON.stringify(event.data.data));
+
+          // Redirect to the main page to use the file
+          // The SW already redirects, but this is a good fallback
+          if (!window.location.pathname.includes("/hello")) {
+            router.push("/hello?shared=true");
+          }
         }
-      });
+      };
+
+      navigator.serviceWorker.addEventListener("message", handleMessage);
+
+      // Cleanup listener on component unmount
+      return () => {
+        navigator.serviceWorker.removeEventListener("message", handleMessage);
+      };
     }
   }, [router]);
 

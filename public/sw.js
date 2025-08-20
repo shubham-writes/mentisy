@@ -18,7 +18,7 @@ self.addEventListener("fetch", (event) => {
 
   // Handle Share Target POST requests
   if (url.pathname === "/share" && event.request.method === "POST") {
-    event.respondWith(handleShareTarget(event.request));
+    event.respondWith(handleShareTarget(event)); // Pass the whole event
     return;
   }
 
@@ -51,38 +51,36 @@ self.addEventListener("fetch", (event) => {
 });
 
 // Handle Share Target POST requests
-async function handleShareTarget(request) {
+async function handleShareTarget(event) {
   try {
-    const formData = await request.formData();
-    const title = formData.get("title");
-    const text = formData.get("text");
-    const url = formData.get("url");
+    const formData = await event.request.formData();
     const file = formData.get("file");
 
-    console.log("📩 Share Target received:", { title, text, url, file: file?.name });
+    if (!file) {
+      console.log("📩 Share Target received: No file found.");
+      return Response.redirect("/", 303);
+    }
 
-    // Send message to all open clients
-    const allClients = await self.clients.matchAll({ 
-      type: "window",
-      includeUncontrolled: true 
-    });
+    console.log("📩 Share Target received file:", file.name, file.type);
+
+    // Get the client that initiated the share
+    const client = await self.clients.get(event.resultingClientId || event.clientId);
     
-    for (const client of allClients) {
+    if (client) {
+      // Create a Blob URL to pass the file to the page
+      const blobUrl = URL.createObjectURL(file);
+      
       client.postMessage({
         type: "SHARE_TARGET",
         data: {
-          title: title || "",
-          text: text || "",
-          url: url || "",
-          fileName: file?.name || null,
-          fileSize: file?.size || null,
-          fileType: file?.type || null
+          url: blobUrl,
+          type: file.type.startsWith("image/") ? "image" : "video",
         }
       });
     }
 
-    // Redirect to main app
-    return Response.redirect("/", 303);
+    // Redirect to the appropriate page
+    return Response.redirect("/hello?shared=true", 303);
   } catch (error) {
     console.error("❌ Error handling share target:", error);
     return Response.redirect("/", 303);
