@@ -2,6 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
+// --- NEW: Import ClerkProvider ---
+import { ClerkProvider } from '@clerk/nextjs'
+
 import { ThemeProvider } from "@/components/theme-provider";
 import { ConvexClientProvider } from "@/components/convex-provider";
 import { ServiceWorkerProvider } from "@/components/service-worker-provider";
@@ -13,7 +16,9 @@ const jakarta = Plus_Jakarta_Sans({
   variable: '--font-jakarta' 
 });
 
+// Your metadata and viewport exports remain the same...
 export const metadata: Metadata = {
+  // ... (no changes here)
   title: "Mentisy - Fun Sharing Platform 🎉",
   description: "Share fun links, play with friends, and spark joy ✨",
   metadataBase: new URL(process.env.NEXT_PUBLIC_URL!),
@@ -70,6 +75,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
+  // ... (no changes here)
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
     { media: "(prefers-color-scheme: dark)", color: "#000000" }
@@ -79,35 +85,40 @@ export const viewport: Viewport = {
   maximumScale: 1,
 };
 
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className="no-scrollbar">
-      <head>
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="mobile-web-app-capable" content="yes" />
-      </head>
-      <body className={`${jakarta.variable} no-scrollbar`}>
-        <ConvexClientProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <ServiceWorkerProvider>
-              <div className="min-h-full flex flex-col justify-between no-scrollbar">
-                <Navbar />
-                <main className="flex-1 no-scrollbar">{children}</main>
-              </div>
-            </ServiceWorkerProvider>
-          </ThemeProvider>
-        </ConvexClientProvider>
-      </body>
-    </html>
+    // --- NEW: Wrap the <html> tag with ClerkProvider ---
+    <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY} afterSignOutUrl="/">
+      <html lang="en" suppressHydrationWarning className="no-scrollbar">
+        <head>
+          <meta name="apple-mobile-web-app-capable" content="yes" />
+          <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+          <meta name="mobile-web-app-capable" content="yes" />
+        </head>
+        <body className={`${jakarta.variable} no-scrollbar`}>
+          {/* ConvexClientProvider no longer contains ClerkProvider */}
+          <ConvexClientProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <ServiceWorkerProvider>
+                <div className="min-h-full flex flex-col justify-between no-scrollbar">
+                  <Navbar />
+                  <main className="flex-1 no-scrollbar">{children}</main>
+                </div>
+              </ServiceWorkerProvider>
+            </ThemeProvider>
+          </ConvexClientProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
