@@ -11,46 +11,60 @@ self.addEventListener("activate", (event) => {
 
 // Simple caching strategy
 const CACHE_NAME = "mentisy-cache-v1";
-const URLS_TO_CACHE = ["/", "/hello", "/offline.html"];
 
+// Handle fetch events
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
 
-  // Handle Share Target POST requests
+  // --- START OF NEW, SAFER LOGIC ---
+
+  // 1. Immediately handle the Share Target POST request and exit.
   if (url.pathname === "/share" && event.request.method === "POST") {
-    event.respondWith(handleShareTarget(event)); // Pass the whole event
+    event.respondWith(handleShareTarget(event));
     return;
   }
 
-  // Handle regular GET requests with caching
-  if (event.request.method === "GET") {
-    event.respondWith(
-      caches.match(event.request).then((response) => {
-        if (response) {
-          return response;
-        }
-        
-        return fetch(event.request)
-          .then((response) => {
-            // Cache successful responses
-            if (response.status === 200) {
-              const responseClone = response.clone();
-              caches.open(CACHE_NAME).then((cache) => {
-                cache.put(event.request, responseClone);
-              });
-            }
-            return response;
-          })
-          .catch(() => {
-            // Return offline page if available
-            return caches.match("/offline.html");
-          });
-      })
-    );
+  // 2. Ignore all other non-GET requests (like POSTs for file uploads or API calls).
+  //    This is the most important fix. It lets them pass through to the network untouched.
+  if (event.request.method !== "GET") {
+    return;
   }
+
+  // 3. Ignore requests to third-party domains to avoid interfering with auth, APIs, etc.
+  if (url.origin !== self.location.origin) {
+    return;
+  }
+  
+  // --- END OF NEW LOGIC ---
+
+  // 4. For all remaining same-origin GET requests, apply the caching strategy.
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      if (response) {
+        return response; // Serve from cache if found
+      }
+      
+      return fetch(event.request)
+        .then((networkResponse) => {
+          // Cache successful responses
+          if (networkResponse.status === 200) {
+            const responseClone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseClone);
+            });
+          }
+          return networkResponse;
+        })
+        .catch(() => {
+          // On network failure, return the offline page if you have one.
+          // Make sure "/offline.html" is cached during the 'install' event if you use this.
+          return caches.match("/offline.html");
+        });
+    })
+  );
 });
 
-// Handle Share Target POST requests
+// The handleShareTarget function remains the same as before
 async function handleShareTarget(event) {
   try {
     const formData = await event.request.formData();
@@ -63,11 +77,9 @@ async function handleShareTarget(event) {
 
     console.log("📩 Share Target received file:", file.name, file.type);
 
-    // Get the client that initiated the share
     const client = await self.clients.get(event.resultingClientId || event.clientId);
     
     if (client) {
-      // Create a Blob URL to pass the file to the page
       const blobUrl = URL.createObjectURL(file);
       
       client.postMessage({
@@ -79,7 +91,6 @@ async function handleShareTarget(event) {
       });
     }
 
-    // Redirect to the appropriate page
     return Response.redirect("/hello?shared=true", 303);
   } catch (error) {
     console.error("❌ Error handling share target:", error);
