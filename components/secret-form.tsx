@@ -23,6 +23,8 @@ import { GameModeSelector } from "./formComponents/game-mode-selector";
 import { QAFormFields } from "./qa-form-fields";
 import { MicroQuestFormFields } from "./reveal-rush-form-fields";
 
+import { useSearchParams, useRouter } from 'next/navigation';
+
 import { FeedbackModal } from "@/components/feedback/FeedbackModal";
 
 // Updated GameMode type to match backend expectations
@@ -84,25 +86,52 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
         setIsFeedbackModalOpen(true);
     };
 
-     useEffect(() => {
-        const sharedFileData = sessionStorage.getItem("sharedFile");
-        if (sharedFileData) {
-            try {
-                const fileData = JSON.parse(sharedFileData);
-                if (fileData.url && fileData.type) {
-                    console.log("📂 Found shared file in sessionStorage, applying to form.", fileData);
-                    // Set the file in the form's state
-                    setUploadedFile({ url: fileData.url, type: fileData.type as "image" | "video" });
-                    
-                    // Clear the item from storage so it's not reused
-                    sessionStorage.removeItem("sharedFile");
+     const searchParams = useSearchParams(); // Get URL search params
+    const router = useRouter(); // Get router to clean up URL
+
+    useEffect(() => {
+        // Check if the page was loaded from a share action
+        if (searchParams.get('shared') === 'true') {
+            console.log("📂 Page loaded from share, attempting to read from IndexedDB...");
+
+            const DB_NAME = "MentisyShareDB";
+            const STORE_NAME = "shared-files";
+
+            const request = indexedDB.open(DB_NAME, 1);
+
+            request.onsuccess = (event) => {
+                const db = (event.target as IDBOpenDBRequest).result;
+                if (!db.objectStoreNames.contains(STORE_NAME)) {
+                    console.log("Store not found, nothing to load.");
+                    return;
                 }
-            } catch (error) {
-                console.error("Failed to parse shared file data:", error);
-                sessionStorage.removeItem("sharedFile");
-            }
+                const tx = db.transaction(STORE_NAME, "readwrite");
+                const store = tx.objectStore(STORE_NAME);
+                const getRequest = store.get("shared-file");
+
+                getRequest.onsuccess = () => {
+                    const sharedItem = getRequest.result;
+                    if (sharedItem && sharedItem.file) {
+                        console.log("✅ Found shared file in DB:", sharedItem);
+                        const fileUrl = URL.createObjectURL(sharedItem.file);
+                        setUploadedFile({ url: fileUrl, type: sharedItem.type });
+                        
+                        // Clean up the database
+                        store.clear();
+                    }
+                };
+                
+                // Clean up the URL
+                const newUrl = new URL(window.location.href);
+                newUrl.searchParams.delete('shared');
+                router.replace(newUrl.pathname + newUrl.search, { scroll: false });
+            };
+
+            request.onerror = (event) => {
+                console.error("Error opening IndexedDB:", (event.target as IDBOpenDBRequest).error);
+            };
         }
-    }, []); // Empty dependency array means this runs once on component mount
+    }, [searchParams, router]); 
 
     // Pre-fill form with use case template - FIRST PRIORITY
     useEffect(() => {
