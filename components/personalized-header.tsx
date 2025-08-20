@@ -117,7 +117,7 @@ export function PersonalizedHeader({ useCase, isLandingPage }: PersonalizedHeade
     return (
         <div className="text-center mt-16 mb-8">
             <h2 className="text-3xl font-bold mb-4 text-gray-800 dark:text-white">
-                {isNewUser ? "Welcome! 👋" : "Welcome Back! 👋"}
+                {isNewUser ? "Welcome! 👋" : ""}
             </h2>
             <p className="text-lg text-gray-600 dark:text-gray-400">
                 {isNewUser 

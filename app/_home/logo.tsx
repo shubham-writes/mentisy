@@ -16,7 +16,7 @@ export const Logo = () => {
         alt="Mentisy Logo"
         width={130}
         height={130}
-        className="rounded-full dark:hidden"
+        className="rounded-full dark:hidden w-24 sm:w-24 md:w-28 lg:w-32 h-auto"
         priority
       />
 
@@ -26,7 +26,7 @@ export const Logo = () => {
         alt="Mentisy Logo Dark"
         width={130}
         height={130}
-        className="rounded-full hidden dark:block"
+        className="rounded-full hidden dark:block w-24 sm:w-24 md:w-28 lg:w-32 h-auto"
         priority
       />
 

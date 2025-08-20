@@ -49,13 +49,13 @@ export const metadata: Metadata = {
     icon: [
       {
         media: "(prefers-color-scheme: light)",
-        url: "/logo.png",
-        href: "/logo.png",
+        url: "/mentisyLogo-light.png",
+        href: "/mentisyLogo-light.png",
       },
       {
         media: "(prefers-color-scheme: dark)",
-        url: "/logo-dark.png",
-        href: "/logo-dark.png",
+        url: "/mentisyLogo-dark.png",
+        href: "/mentisyLogo-dark.png",
       }
     ],
     apple: [

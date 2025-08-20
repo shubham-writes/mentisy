@@ -5,7 +5,7 @@ import { useTheme } from "next-themes";
 import { useConvexAuth } from "convex/react";
 import { SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import { 
-    GithubIcon, 
+    
     LoaderCircle, 
     SquareMenu ,
     WandSparkles, 
@@ -18,13 +18,14 @@ import {
     Moon,
     Monitor
 } from "lucide-react";
-import Link from "next/link";
+
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 import useStoreUserEffect from "@/hooks/useStoreUserEffect";
 import { useScrollTop } from "@/hooks/use-scroll-top";
 import { cn } from "@/lib/utils";
-import { ModeToggle } from "@/components/ui/mode-toggle";
+
 import { Button } from "@/components/ui/button";
 import { Logo } from "./logo";
 
@@ -108,15 +109,12 @@ export const Navbar = () => {
     return (
         <>
             <nav className={cn(
-                "z-[100] fixed top-0 w-full  transition-all duration-300",
-                scrolled 
-                    ? "bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 shadow-lg" 
-                    : "bg-transparent"
+                "z-[100] fixed top-0 w-full transition-all duration-300 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 shadow-lg"
             )}>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between  h-16">
+                <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
+                    <div className="flex items-center justify-between h-14 sm:h-16">
                         {/* Logo Section - Always visible */}
-                        <div className="flex items-cente space-x-4">
+                        <div className="flex items-center space-x-4">
                             <Logo />
                         </div>
 
@@ -195,7 +193,7 @@ export const Navbar = () => {
                                         afterSignOutUrl="/"
                                         appearance={{
                                             elements: {
-                                                avatarBox: "w-8 h-8 rounded-full ring-2 ring-[#FF75A0]"
+                                                avatarBox: "w-6 h-6 rounded-full ring-2 ring-[#FF75A0]"
                                             }
                                         }}
                                     />
@@ -227,52 +225,68 @@ export const Navbar = () => {
 
             {/* Mobile Menu Slide-out */}
             <div className={cn(
-                "md:hidden fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white dark:bg-gray-900 z-50 transform transition-transform duration-300 ease-in-out border-l border-gray-200 dark:border-gray-800",
+                "md:hidden fixed top-0 right-0 h-full w-72 max-w-[80vw] bg-white dark:bg-gray-900 z-50 transform transition-transform duration-300 ease-in-out border-l border-gray-200 dark:border-gray-800 shadow-2xl",
                 isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
             )}>
                 <div className="flex flex-col h-full">
                     {/* Mobile Menu Header */}
-                    <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
+                    <div className="flex items-center justify-between p-3 border-b border-gray-200 dark:border-gray-800 bg-gradient-to-r from-gray-50/50 to-white dark:from-gray-800/50 dark:to-gray-900">
                         <div className="flex items-center space-x-2">
-                            <div className="w-8 h-8 bg-gradient-to-br from-[#FF75A0] to-[#FFAA70] rounded-lg flex items-center justify-center">
-                                <SquareMenu  className="w-5 h-5 text-white" />
+                            {/* Updated mobile menu logo - smaller size with Next.js Image */}
+                            <div className="w-5 h-5 relative">
+                                <Image
+                                    src="/mentisyLogo-light.png"
+                                    alt="Mentisy Logo"
+                                    width={20}
+                                    height={20}
+                                    className="rounded-full dark:hidden"
+                                    priority
+                                />
+                                <Image
+                                    src="/mentisyLogo-dark.png"
+                                    alt="Mentisy Logo Dark"
+                                    width={20}
+                                    height={20}
+                                    className="rounded-full hidden dark:block"
+                                    priority
+                                />
                             </div>
-                            <span className="font-semibold text-lg">Menu</span>
+                            <span className="font-medium text-base">Menu</span>
                         </div>
                         <button
                             onClick={() => setIsMobileMenuOpen(false)}
-                            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                         >
-                            <X className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                            <X className="w-4 h-4 text-gray-600 dark:text-gray-300" />
                         </button>
                     </div>
 
                     {/* Mobile Menu Content */}
-                    <div className="flex-1 p-4 space-y-6">
+                    <div className="flex-1 p-3 space-y-4 overflow-y-auto">
                         {/* Authentication Section */}
                         {!isAuthenticated && !isLoading && (
-                            <div className="space-y-3">
-                                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                            <div className="space-y-2">
+                                <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide px-2">
                                     Account
                                 </h3>
-                                <div className="space-y-3">
+                                <div className="space-y-2">
                                     <SignInButton mode="modal" fallbackRedirectUrl="/hello" forceRedirectUrl="/hello">
                                         <Button 
                                             variant="ghost" 
-                                            className="w-full justify-start rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 h-12"
+                                            className="w-full justify-start rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 h-10 text-sm"
                                             onClick={() => setIsMobileMenuOpen(false)}
                                         >
-                                            <LogIn className="w-5 h-5 mr-3" />
+                                            <LogIn className="w-4 h-4 mr-2" />
                                             Sign In
                                         </Button>
                                     </SignInButton>
                                     
                                     <SignUpButton mode="modal" fallbackRedirectUrl="/hello" forceRedirectUrl="/hello">
                                         <Button 
-                                            className="w-full justify-start rounded-xl bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-purple-600 hover:to-pink-600 border-0 shadow-lg h-12"
+                                            className="w-full justify-start rounded-lg bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-purple-600 hover:to-pink-600 border-0 shadow-md h-10 text-sm"
                                             onClick={() => setIsMobileMenuOpen(false)}
                                         >
-                                            <Sparkles className="w-5 h-5 mr-3" />
+                                            <Sparkles className="w-4 h-4 mr-2" />
                                             Get Started
                                         </Button>
                                     </SignUpButton>
@@ -281,39 +295,41 @@ export const Navbar = () => {
                         )}
 
                         {/* Settings Section */}
-                        <div className="space-y-3">
-                            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                        <div className="space-y-2">
+                            <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide px-2">
                                 Settings
                             </h3>
-                            <div className="flex items-center justify-between p-3 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-[#FF75A0]/30 transition-all duration-200">
-                                <div className="flex items-center space-x-3">
-                                    <div className="w-8 h-8 bg-gradient-to-br from-[#FF75A0]/20 to-[#FFAA70]/20 rounded-lg flex items-center justify-center border border-[#FF75A0]/20">
-                                        {mounted && theme === "light" && <Sun className="w-4 h-4 text-amber-500" />}
-                                        {mounted && theme === "dark" && <Moon className="w-4 h-4 text-blue-400" />}
-                                        {mounted && (theme === "system" || !theme) && <Monitor className="w-4 h-4 text-gray-600 dark:text-gray-300" />}
-                                        {!mounted && <div className="w-4 h-4 bg-gray-300 dark:bg-gray-600 rounded animate-pulse" />}
+                            <div className="flex items-center justify-between p-2.5 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#FF75A0]/30 transition-all duration-200">
+                                <div className="flex items-center space-x-2.5">
+                                    <div className="w-6 h-6 bg-gradient-to-br from-[#FF75A0]/20 to-[#FFAA70]/20 rounded-md flex items-center justify-center border border-[#FF75A0]/20">
+                                        {mounted && theme === "light" && <Sun className="w-3 h-3 text-amber-500" />}
+                                        {mounted && theme === "dark" && <Moon className="w-3 h-3 text-blue-400" />}
+                                        {mounted && (theme === "system" || !theme) && <Monitor className="w-3 h-3 text-gray-600 dark:text-gray-300" />}
+                                        {!mounted && <div className="w-3 h-3 bg-gray-300 dark:bg-gray-600 rounded animate-pulse" />}
                                     </div>
                                     <div>
-                                        <span className="text-sm font-medium">Theme</span>
+                                        <span className="text-xs font-medium">Theme</span>
                                         <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">
                                             {mounted ? (theme || "system") : "Loading..."}
                                         </p>
                                     </div>
                                 </div>
-                                <EnhancedModeToggle />
+                                <div className="scale-75">
+                                    <EnhancedModeToggle />
+                                </div>
                             </div>
                         </div>
 
                         {/* Quick Actions (when authenticated) */}
                         {isAuthenticated && (
-                            <div className="space-y-3">
-                                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                            <div className="space-y-2">
+                                <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide px-2">
                                     Quick Actions
                                 </h3>
-                                <div className="space-y-2">
+                                <div className="space-y-1.5">
                                     <Button 
                                         variant="ghost" 
-                                        className="w-full justify-start rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 h-12"
+                                        className="w-full justify-start rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 h-10 text-sm"
                                         onClick={() => {
                                             setIsMobileMenuOpen(false);
                                             // Navigate to hello page and scroll to form
@@ -326,12 +342,12 @@ export const Navbar = () => {
                                             }, 500);
                                         }}
                                     >
-                                        <WandSparkles  className="w-5 h-5 mr-3 text-[#FF75A0]" />
+                                        <WandSparkles  className="w-4 h-4 mr-2 text-[#FF75A0]" />
                                         Create a Moment
                                     </Button>
                                     <Button 
                                         variant="ghost" 
-                                        className="w-full justify-start rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 h-12"
+                                        className="w-full justify-start rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 h-10 text-sm"
                                         onClick={() => {
                                             setIsMobileMenuOpen(false);
                                             // Navigate to hello page and scroll to secrets list
@@ -344,7 +360,7 @@ export const Navbar = () => {
                                             }, 500);
                                         }}
                                     >
-                                        <NotepadText className="w-5 h-5 mr-3 text-purple-500" />
+                                        <NotepadText className="w-4 h-4 mr-2 text-purple-500" />
                                         My Moments
                                     </Button>
                                 </div>
@@ -353,7 +369,7 @@ export const Navbar = () => {
                     </div>
 
                     {/* Mobile Menu Footer */}
-                    <div className="p-4 border-t border-gray-200 dark:border-gray-800">
+                    <div className="p-3 border-t border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
                         <div className="text-center">
                             <p className="text-xs text-gray-500 dark:text-gray-400">
                                 Mentisy • Privacy First
