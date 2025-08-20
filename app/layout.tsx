@@ -4,6 +4,7 @@ import "./globals.css";
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { ConvexClientProvider } from "@/components/convex-provider";
+import { ServiceWorkerProvider } from "@/components/service-worker-provider";
 import { Navbar } from "./_home/navbar";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
     siteName: "Mentisy",
     images: [
       {
-        url: "/og-image.png", // 👈 Add your preview image to /public/og-image.png
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "Mentisy - Fun Sharing Preview",
@@ -38,7 +39,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Mentisy - Fun Sharing Platform 🎉",
     description: "Share fun links, play with friends, and spark joy ✨",
-    images: ["/og-image.png"], // 👈 same preview image
+    images: ["/og-image.png"],
   },
   appleWebApp: {
     capable: true,
@@ -98,10 +99,12 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <div className="min-h-full flex flex-col justify-between no-scrollbar">
-              <Navbar />
-              <main className="flex-1 no-scrollbar">{children}</main>
-            </div>
+            <ServiceWorkerProvider>
+              <div className="min-h-full flex flex-col justify-between no-scrollbar">
+                <Navbar />
+                <main className="flex-1 no-scrollbar">{children}</main>
+              </div>
+            </ServiceWorkerProvider>
           </ThemeProvider>
         </ConvexClientProvider>
       </body>
