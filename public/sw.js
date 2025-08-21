@@ -15,33 +15,39 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-  const url = new URL(event.request.ufsUrl);
+  try {
+    const url = new URL(event.request.url); // ✅ fixed
 
-  // Intercept Web Share Target POST
-  if (url.pathname === "/share" && event.request.method === "POST") {
-    event.respondWith(handleShareTarget(event.request));
-    return;
+    // Intercept Web Share Target POST
+    if (url.pathname === "/share" && event.request.method === "POST") {
+      event.respondWith(handleShareTarget(event.request));
+      return;
+    }
+
+    if (event.request.method !== "GET" || url.origin !== self.location.origin) {
+      return;
+    }
+
+    event.respondWith(
+      caches.match(event.request).then((response) => {
+        if (response) return response;
+
+        return fetch(event.request).then((networkResponse) => {
+          if (networkResponse.status === 200) {
+            const responseClone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseClone);
+            });
+          }
+          return networkResponse;
+        });
+      })
+    );
+  } catch (err) {
+    console.error("SW fetch handler failed:", err, event.request);
   }
-
-  if (event.request.method !== "GET" || url.origin !== self.location.origin) {
-    return;
-  }
-
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      if (response) return response;
-      return fetch(event.request).then((networkResponse) => {
-        if (networkResponse.status === 200) {
-          const responseClone = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseClone);
-          });
-        }
-        return networkResponse;
-      });
-    })
-  );
 });
+
 
 // ---- IDB helpers (native IndexedDB -> Promise) ----
 function idbRequestToPromise(req) {
