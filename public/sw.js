@@ -17,16 +17,16 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
 
+  // Intercept Web Share Target POST
   if (url.pathname === "/share" && event.request.method === "POST") {
-    event.respondWith(handleShareTarget(event));
+    event.respondWith(handleShareTarget(event.request));
     return;
   }
 
   if (event.request.method !== "GET" || url.origin !== self.location.origin) {
-    return; // Ignore non-GET requests and third-party requests
+    return;
   }
 
-  // Apply caching strategy for same-origin GET requests
   event.respondWith(
     caches.match(event.request).then((response) => {
       if (response) return response;
@@ -43,36 +43,20 @@ self.addEventListener("fetch", (event) => {
   );
 });
 
-async function handleShareTarget(event) {
-  try {
-    const formData = await event.request.formData();
-    const file = formData.get("file");
-    if (!file) return Response.redirect("/", 303);
-
-    console.log("📩 Share Target received file, saving to IndexedDB...");
-
-    // --- Save file to IndexedDB ---
-    const db = await openDB();
-    const tx = db.transaction(STORE_NAME, "readwrite");
-    const store = tx.objectStore(STORE_NAME);
-    // Clear any old files first
-    await store.clear(); 
-    // Add the new file
-    await store.add({
-      id: "shared-file", // Use a fixed key
-      file: file,
-      type: file.type.startsWith("image/") ? "image" : "video",
-    });
-    await tx.done;
-
-    console.log("✅ File saved to IndexedDB.");
-    return Response.redirect("/hello?shared=true", 303);
-  } catch (error) {
-    console.error("❌ Error handling share target:", error);
-    return Response.redirect("/", 303);
-  }
+// ---- IDB helpers (native IndexedDB -> Promise) ----
+function idbRequestToPromise(req) {
+  return new Promise((resolve, reject) => {
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
 }
-
+function idbTxDone(tx) {
+  return new Promise((resolve, reject) => {
+    tx.oncomplete = () => resolve();
+    tx.onabort = () => reject(tx.error || new Error("IDB transaction aborted"));
+    tx.onerror = () => reject(tx.error || new Error("IDB transaction error"));
+  });
+}
 function openDB() {
   return new Promise((resolve, reject) => {
     const request = self.indexedDB.open(DB_NAME, 1);
@@ -85,4 +69,43 @@ function openDB() {
     request.onsuccess = (event) => resolve(event.target.result);
     request.onerror = (event) => reject(event.target.error);
   });
+}
+
+async function handleShareTarget(request) {
+  try {
+    const formData = await request.formData();
+    const file = formData.get("file");
+    if (!file) return Response.redirect("/", 303);
+
+    console.log("📩 Share Target received file, saving to IndexedDB...");
+
+    // Convert to bytes for robust cross-context storage
+    const arrayBuffer = await file.arrayBuffer();
+
+    const db = await openDB();
+    const tx = db.transaction(STORE_NAME, "readwrite");
+    const store = tx.objectStore(STORE_NAME);
+
+    // Clear previous, then put new entry
+    await idbRequestToPromise(store.clear());
+    await idbRequestToPromise(
+      store.put({
+        id: "shared-file",
+        file: {
+          name: file.name || "shared",
+          type: file.type || "application/octet-stream",
+          data: arrayBuffer, // <— bytes
+        },
+        type: (file.type || "").startsWith("image/") ? "image" : "video",
+      })
+    );
+    await idbTxDone(tx);
+
+    console.log("✅ File saved to IndexedDB.");
+    // Redirect to your page that reads ?shared=true
+    return Response.redirect("/hello?shared=true", 303);
+  } catch (error) {
+    console.error("❌ Error handling share target:", error);
+    return Response.redirect("/", 303);
+  }
 }

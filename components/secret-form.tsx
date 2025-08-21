@@ -94,64 +94,76 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     }, [clearGeneratedLink]);
 
     // --- FIXED: THE useEffect HOOK WITH UPLOAD LOGIC ---
-    useEffect(() => {
-        const handleSharedFile = async () => {
-            if (searchParams.get('shared') === 'true') {
-                console.log("📂 Page loaded from share, handling file...");
+  useEffect(() => {
+  const handleSharedFile = async () => {
+    if (searchParams.get("shared") === "true") {
+      console.log("📂 Page loaded from share, handling file...");
 
-                const DB_NAME = "MentisyShareDB";
-                const STORE_NAME = "shared-files";
-                const request = indexedDB.open(DB_NAME, 1);
+      const DB_NAME = "MentisyShareDB";
+      const STORE_NAME = "shared-files";
+      const request = indexedDB.open(DB_NAME, 1);
 
-                request.onsuccess = (event) => {
-                    const db = (event.target as IDBOpenDBRequest).result;
-                    if (!db.objectStoreNames.contains(STORE_NAME)) return;
+      request.onsuccess = (event) => {
+        const db = (event.target as IDBOpenDBRequest).result;
+        if (!db.objectStoreNames.contains(STORE_NAME)) return;
 
-                    const tx = db.transaction(STORE_NAME, "readwrite");
-                    const store = tx.objectStore(STORE_NAME);
-                    const getRequest = store.get("shared-file");
+        const tx = db.transaction(STORE_NAME, "readwrite");
+        const store = tx.objectStore(STORE_NAME);
+        const getRequest = store.get("shared-file");
 
-                    getRequest.onsuccess = async () => {
-                        const sharedItem = getRequest.result;
-                        if (sharedItem && sharedItem.file) {
-  console.log("✅ Found shared file, starting upload...", sharedItem);
-  setIsUploading(true);
+        getRequest.onsuccess = async () => {
+          const sharedItem = getRequest.result;
+          if (sharedItem && sharedItem.file) {
+            setIsUploading(true);
+            try {
+              let fileForUpload: File;
 
-  try {
-    const endpoint = sharedItem.type === 'image' 
-      ? 'imageUploader' 
-      : 'videoUploader';
+              if (sharedItem.file.data) {
+                // New (recommended) shape
+                const blob = new Blob([sharedItem.file.data], {
+                  type: sharedItem.file.type,
+                });
+                fileForUpload = new File([blob], sharedItem.file.name || "shared", {
+                  type: sharedItem.file.type,
+                });
+              } else if (sharedItem.file instanceof Blob) {
+                // Fallback if you ever stored a Blob/File directly
+                const blob = sharedItem.file;
+                fileForUpload = new File([blob], sharedItem.file.name || "shared", {
+                  type: blob.type,
+                });
+              } else {
+                throw new Error("No file bytes found in IndexedDB");
+              }
 
-    const fileBlob = new Blob([sharedItem.file.data], { type: sharedItem.file.type });
-    const file = new File([fileBlob], sharedItem.file.name, { type: sharedItem.file.type });
+              const endpoint =
+                sharedItem.type === "image" ? "imageUploader" : "videoUploader";
+              const res = await uploadFiles(endpoint, { files: [fileForUpload] });
 
-    const res = await uploadFiles(endpoint, { files: [file] });
-
-
-                                if (res && res.length > 0) {
-                                    console.log("✅ Upload complete:", res);
-                                    handleFileUpload({ url: res[0].url, type: sharedItem.type });
-                                } else {
-                                    throw new Error("Upload failed to return a valid response.");
-                                }
-                            } catch (error) {
-                                console.error("❌ Upload failed:", error);
-                                alert(`ERROR! ${(error as Error).message}`);
-                            } finally {
-                                setIsUploading(false);
-                                store.clear();
-                            }
-                        }
-                    };
-                };
-
-                const newUrl = new URL(window.location.href);
-                newUrl.searchParams.delete('shared');
-                router.replace(newUrl.pathname + newUrl.search, { scroll: false });
+              if (res && res.length > 0) {
+                console.log("✅ Upload complete:", res);
+                handleFileUpload({ url: res[0].url, type: sharedItem.type });
+              } else {
+                throw new Error("Upload failed to return a valid response.");
+              }
+            } catch (error) {
+              console.error("❌ Upload failed:", error);
+              alert(`ERROR! ${(error as Error).message}`);
+            } finally {
+              setIsUploading(false);
+              store.clear(); // clear DB entry
+              // Clean up URL
+              const newUrl = new URL(window.location.href);
+              newUrl.searchParams.delete("shared");
+              router.replace(newUrl.pathname + newUrl.search, { scroll: false });
             }
+          }
         };
-        handleSharedFile();
-    }, [searchParams, router, handleFileUpload]);
+      };
+    }
+  };
+  handleSharedFile();
+}, [searchParams, router, handleFileUpload]);
 
 
     // ... (The rest of your file is fine, no changes needed below this line)
