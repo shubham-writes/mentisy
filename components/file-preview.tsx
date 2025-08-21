@@ -78,7 +78,7 @@ export function FilePreview({ file, onRemove, recipientName, showWatermark = fal
             <div className="relative w-full h-full">
               <Image
                 ref={imageRef}
-                src={file.ufsUrl}
+                src={file.url}
                 alt="Uploaded preview"
                 fill
                 style={{ objectFit: "contain" }}
@@ -112,7 +112,7 @@ export function FilePreview({ file, onRemove, recipientName, showWatermark = fal
             <div className="relative w-full h-full flex items-center justify-center">
               <video
                 ref={videoRef}
-                src={file.ufsUrl}
+                src={file.url}
                 controls
                 playsInline
                 preload="metadata"
