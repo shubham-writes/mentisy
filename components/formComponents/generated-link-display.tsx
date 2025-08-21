@@ -1,4 +1,4 @@
-import { ShareButton } from "../share-button";
+import { ShareButton, SocialShareButtons } from "../share-button";
 import { useState } from "react";
 import { Copy, Check } from "lucide-react";
 
@@ -45,9 +45,8 @@ export function GeneratedLinkDisplay({ generatedLink, publicNote }: GeneratedLin
                         <div className="flex-1 p-3 pr-12 overflow-hidden">
                             <div className="text-sm">
                                 <span className="font-medium text-gray-800 dark:text-gray-200">
-  {publicNote && `${publicNote} : `}
-</span>
-
+                                    {publicNote && `${publicNote} : `}
+                                </span>
                                 <span className="text-[#FF75A0] dark:text-[#FF75A0] font-mono break-all sm:break-normal whitespace-nowrap sm:whitespace-normal overflow-hidden text-ellipsis">
                                     {generatedLink}
                                 </span>
@@ -77,14 +76,41 @@ export function GeneratedLinkDisplay({ generatedLink, publicNote }: GeneratedLin
                 )}
             </div>
             
-            {/* Share button - responsive */}
-            <div className="flex justify-center">
-                <div className="w-full sm:w-fit">
-                    <ShareButton
+            {/* Share buttons section */}
+            <div className="space-y-3">
+                {/* Social Media Share Buttons */}
+                <div>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-2 font-medium uppercase tracking-wide text-center">
+                        Share directly to:
+                    </p>
+                    <SocialShareButtons
                         title="A Secret Message"
                         text={publicNote}
                         url={generatedLink}
                     />
+                </div>
+                
+                {/* Divider */}
+                <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 px-2 text-gray-500 dark:text-gray-400">
+                            or
+                        </span>
+                    </div>
+                </div>
+                
+                {/* General Share Button */}
+                <div className="flex justify-center">
+                    <div className="w-full sm:w-fit">
+                        <ShareButton
+                            title="A Secret Message"
+                            text={publicNote}
+                            url={generatedLink}
+                        />
+                    </div>
                 </div>
             </div>
         </div>

@@ -112,13 +112,13 @@ export default function SecretPage({ params }: { params: { id: string } }) {
     }
 
     if (secret && secret.recipientName) {
-      return `A Surprise For ${secret.recipientName}`;
+      return ` ${secret.recipientName}`;
     }
-    return "A Surprise Just For You";
+    return "";
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#FF75A0]/5 via-white to-[#FFAA70]/5 dark:from-[#FF75A0]/10 dark:via-gray-950 dark:to-[#FFAA70]/10 flex flex-col items-center justify-center  px-2 sm:px-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#FF75A0]/5 via-white to-[#FFAA70]/5 dark:from-[#FF75A0]/10 dark:via-gray-950 dark:to-[#FFAA70]/10 flex flex-col items-center justify-center sm:py-8 px-2 sm:px-4">
       <div className="w-full max-w-full mt-16 sm:max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-6 sm:mb-8">

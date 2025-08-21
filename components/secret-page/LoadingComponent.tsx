@@ -14,7 +14,7 @@ export function LoadingComponent({ type = 'revealing', progress }: LoadingCompon
           🔐
         </div>
         <p className="text-lg sm:text-xl text-gray-700 dark:text-gray-200 font-medium mb-2 text-center">
-          Revealing your secret...
+          Get ready… fun incoming!
         </p>
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 text-center">
           Almost there...
@@ -33,7 +33,7 @@ export function LoadingComponent({ type = 'revealing', progress }: LoadingCompon
         📦
       </div>
       <h3 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-gray-200 mb-2 text-center">
-        Unwrapping Your Secret...
+        Unwrapping Your Moment...
       </h3>
       <p className="text-gray-600 dark:text-gray-400 mb-4 sm:mb-6 text-center">
         {Math.floor(progress || 0)}% loaded

@@ -15,7 +15,7 @@ const handleAuth = async () => {
 // Define your FileRouter: which files can be uploaded and by whom
 export const ourFileRouter = {
   // Define an uploader for images
-  imageUploader: f({ image: { maxFileSize: "4MB" } })
+  imageUploader: f({ image: { maxFileSize: "16MB" } })
     .middleware(() => handleAuth()) // Run this middleware on every upload
     .onUploadComplete(async ({ metadata, file }) => {
       // This code RUNS ON YOUR SERVER after upload
@@ -25,7 +25,7 @@ export const ourFileRouter = {
     }),
 
   // Define an uploader for videos
-  videoUploader: f({ video: { maxFileSize: "16MB" } })
+  videoUploader: f({ video: { maxFileSize: "32MB" } })
     .middleware(() => handleAuth())
     .onUploadComplete(async ({ metadata, file }) => {
       console.log("Upload complete for userId:", metadata.userId);

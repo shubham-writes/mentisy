@@ -121,14 +121,14 @@ export function PersonalizedHeader({ useCase, isLandingPage }: PersonalizedHeade
             </h2>
             <p className="text-lg text-gray-600 dark:text-gray-400">
                 {isNewUser 
-                    ? "Let's create your first secret link"
+                    ? "Let's create your first fun link"
                     : "Create a new fun link or check out your previous ones below"
                 }
             </p>
             {isNewUser && user && (Date.now() - new Date(user.createdAt!).getTime()) < 30 * 60 * 1000 && (
                 <div className="mt-3 p-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                     <p className="text-sm text-green-700 dark:text-green-300">
-                        🎉 Account created successfully! Your secret links will be completely private and secure.
+                        🎉 “Account created! Get ready to share some fun!”
                     </p>
                 </div>
             )}
