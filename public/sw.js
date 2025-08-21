@@ -86,8 +86,7 @@ async function handleShareTarget(request) {
     const tx = db.transaction(STORE_NAME, "readwrite");
     const store = tx.objectStore(STORE_NAME);
 
-    // Clear previous, then put new entry
-    await idbRequestToPromise(store.clear());
+   
     await idbRequestToPromise(
       store.put({
         id: "shared-file",

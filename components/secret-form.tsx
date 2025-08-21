@@ -94,10 +94,15 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     }, [clearGeneratedLink]);
 
     // --- FIXED: THE useEffect HOOK WITH UPLOAD LOGIC ---
-  useEffect(() => {
+ useEffect(() => {
   const handleSharedFile = async () => {
     if (searchParams.get("shared") === "true") {
       console.log("📂 Page loaded from share, handling file...");
+
+      // 🔑 Immediately clean the URL to prevent loops
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete("shared");
+      router.replace(newUrl.pathname + newUrl.search, { scroll: false });
 
       const DB_NAME = "MentisyShareDB";
       const STORE_NAME = "shared-files";
@@ -107,7 +112,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
         const db = (event.target as IDBOpenDBRequest).result;
         if (!db.objectStoreNames.contains(STORE_NAME)) return;
 
-        const tx = db.transaction(STORE_NAME, "readwrite");
+        const tx = db.transaction(STORE_NAME, "readonly");
         const store = tx.objectStore(STORE_NAME);
         const getRequest = store.get("shared-file");
 
@@ -119,19 +124,13 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
               let fileForUpload: File;
 
               if (sharedItem.file.data) {
-                // New (recommended) shape
-                const blob = new Blob([sharedItem.file.data], {
-                  type: sharedItem.file.type,
-                });
+                const blob = new Blob([sharedItem.file.data], { type: sharedItem.file.type });
                 fileForUpload = new File([blob], sharedItem.file.name || "shared", {
                   type: sharedItem.file.type,
                 });
               } else if (sharedItem.file instanceof Blob) {
-                // Fallback if you ever stored a Blob/File directly
                 const blob = sharedItem.file;
-                fileForUpload = new File([blob], sharedItem.file.name || "shared", {
-                  type: blob.type,
-                });
+                fileForUpload = new File([blob], sharedItem.file.name || "shared", { type: blob.type });
               } else {
                 throw new Error("No file bytes found in IndexedDB");
               }
@@ -141,28 +140,18 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
               const res = await uploadFiles(endpoint, { files: [fileForUpload] });
 
               if (res && res.length > 0) {
-  console.log("✅ Upload complete:", res);
-  handleFileUpload({ url: res[0].ufsUrl, type: sharedItem.type });
-} else {
-  throw new Error("Upload failed to return a valid response.");
-}
-
+                console.log("✅ Upload complete:", res);
+                handleFileUpload({ url: res[0].ufsUrl, type: sharedItem.type });
+              } else {
+                throw new Error("Upload failed to return a valid response.");
+              }
             } catch (error) {
               console.error("❌ Upload failed:", error);
               alert(`ERROR! ${(error as Error).message}`);
-            }  finally {
-  setIsUploading(false);
-
-  // Clear DB entry in a new tx
-  const clearTx = db.transaction(STORE_NAME, "readwrite");
-  clearTx.objectStore(STORE_NAME).clear();
-
-  // Clean up URL
-  const newUrl = new URL(window.location.href);
-  newUrl.searchParams.delete("shared");
-  router.replace(newUrl.pathname + newUrl.search, { scroll: false });
-}
-
+            } finally {
+              setIsUploading(false);
+              // ❌ no store.clear()
+            }
           }
         };
       };
@@ -170,6 +159,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
   };
   handleSharedFile();
 }, [searchParams, router, handleFileUpload]);
+
 
 
     // ... (The rest of your file is fine, no changes needed below this line)
