@@ -30,7 +30,7 @@ export function GeneratedLinkDisplay({
             case "scratch_and_see":
                 return "scratch it fast";
             default:
-                return "Check out this secret message 👀";
+                return "A fun message ";
         }
     };
 

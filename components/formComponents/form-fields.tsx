@@ -37,6 +37,9 @@ export function FormFields({
     // Show recipient field only for non-group games
     const showRecipientField = !isGroupGame;
     
+    // NEW: Determine if file is uploaded
+    const hasUploadedFile = !!uploadedFile;
+    
     // Adapt messaging based on context
     const getPublicNoteLabel = () => {
         if (isGroupGame) return "Challenge description";
@@ -50,33 +53,30 @@ export function FormFields({
         return template?.placeholder.publicNote || "you're not ready for this... or whatever fits the vibe";
     };
     
-    // const getMessageLabel = () => {
-    //     if (isGroupGame) return "Winner's reward message";
-    //     if (isSinglePlayerGame) return "Reveal Message / Caption";
-    //     return "Reveal Message / Caption";
-    // };
+    // NEW: Dynamic label and placeholder based on file upload status
+    const getMessageLabel = () => {
+        return hasUploadedFile ? "Caption" : "Message";
+    };
     
     const getMessagePlaceholder = () => {
-        if (isGroupGame) return "Congrats! You solved it first 🏆";
-        if (isSinglePlayerGame) return "You got it right! Here's what I wanted to tell you...";
-        return template?.placeholder.message || "A hidden note, roast, or caption that unlocks with the photo/video";
+        if (hasUploadedFile) {
+            // When file is uploaded, show caption-specific placeholders
+            if (isGroupGame) return "Congrats! You solved it first 🏆";
+            if (isSinglePlayerGame) return "You got it right! Here's what I wanted to tell you...";
+            return "Add a caption to your photo/video...";
+        } else {
+            // When no file is uploaded, show message-specific placeholders
+            return template?.placeholder.message || "Your secret message that will disappear after being read...";
+        }
+    };
+
+    // NEW: Dynamic validation message
+    const getValidationMessage = () => {
+        return hasUploadedFile ? "Caption added" : "Message added";
     };
 
     return (
         <div className="space-y-4">
-            {/* Compact Header - Similar to game headers */}
-            <div className="flex items-center space-x-3 p-3 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-800/50 dark:to-blue-900/20 rounded-lg border border-gray-200/50 dark:border-gray-700/50">
-                <span className="text-lg">✏️</span>
-                <div className="flex-1">
-                    <h4 className="font-semibold text-gray-800 dark:text-gray-200 text-sm">Message Details</h4>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">
-                        {isGroupGame ? "Set up your group challenge" : 
-                         isSinglePlayerGame ? "Configure your puzzle message" : 
-                         "Customize your secret message"}
-                    </p>
-                </div>
-            </div>
-
             {/* Compact form fields */}
             <div className="space-y-3">
                 {/* COMMENTED OUT - Recipient Name Field - Only for non-group games */}
@@ -111,13 +111,13 @@ export function FormFields({
                     />
                 </div> */}
 
-                {/* Caption Field - Simplified for all game modes */}
+                {/* UPDATED: Caption/Message Field - Dynamic based on file upload status */}
                 <div>
-                    <Label htmlFor="caption" className="text-sm font-medium mb-2 block text-gray-800 dark:text-gray-200">
-                        Caption <span className="text-xs text-gray-500 dark:text-gray-400">(Optional)</span>
+                    <Label htmlFor="message" className="text-sm font-medium mb-2 block text-gray-800 dark:text-gray-200">
+                        {getMessageLabel()} <span className="text-xs text-gray-500 dark:text-gray-400">(Optional)</span>
                     </Label>
                     <Input
-                        id="caption"
+                        id="message"
                         placeholder={getMessagePlaceholder()}
                         value={message}
                         onChange={(e) => onMessageChange(e.target.value)}
@@ -126,12 +126,12 @@ export function FormFields({
                 </div>
             </div>
 
-            {/* Context-specific status indicator - Updated to only check for caption */}
+            {/* UPDATED: Context-specific status indicator - Dynamic validation message */}
             {message && (
                 <div className="flex items-center space-x-2 p-2 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200/50 dark:border-green-700/50">
                     <span className="text-green-600 dark:text-green-400">✓</span>
                     <p className="text-sm text-green-700 dark:text-green-300">
-                        Caption added
+                        {getValidationMessage()}
                     </p>
                 </div>
             )}

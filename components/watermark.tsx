@@ -54,7 +54,7 @@ export function Watermark({
           className="whitespace-nowrap opacity-35"
           style={{
             color: "white",
-            fontSize: "0.5rem",
+            fontSize: "1rem",
             fontWeight: "bold",
             textShadow: "0 0 1px #000000, 0 0 1px #000",
             ...(isEven ? animationStyle : reverseAnimationStyle),

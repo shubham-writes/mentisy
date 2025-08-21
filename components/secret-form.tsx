@@ -736,6 +736,8 @@ else {
                     <GeneratedLinkDisplay
                         generatedLink={generatedLink}
                         publicNote={publicNote}
+                        gameMode={gameMode}       
+                        selectedType={microQuestType}
                     />
                 </div>
             )}

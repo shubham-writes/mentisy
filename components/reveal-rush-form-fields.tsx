@@ -157,7 +157,7 @@ export function MicroQuestFormFields({
                                         key={rating}
                                         type="button"
                                         onClick={() => onExpectedRatingChange(rating)}
-                                        className={`w-8 h-8 rounded-md text-xs font-medium transition-all ${
+                                        className={`w-7 h-7 rounded-md text-xs font-medium transition-all ${
                                             mqExpectedRating === rating
                                                 ? 'bg-yellow-500 text-white'
                                                 : 'bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-yellow-400'
