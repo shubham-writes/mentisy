@@ -15,7 +15,7 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-  const url = new URL(event.request.url);
+  const url = new URL(event.request.ufsUrl);
 
   // Intercept Web Share Target POST
   if (url.pathname === "/share" && event.request.method === "POST") {

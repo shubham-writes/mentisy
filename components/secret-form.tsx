@@ -44,6 +44,8 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     const [generatedLink, setGeneratedLink] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [uploadedFile, setUploadedFile] = useState<{ url: string; type: "image" | "video" } | null>(null);
+
+
     const [isUploading, setIsUploading] = useState(false);
     const [addWatermark, setAddWatermark] = useState(true);
     const [duration, setDuration] = useState("10");
@@ -140,9 +142,11 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
               const res = await uploadFiles(endpoint, { files: [fileForUpload] });
 
               if (res && res.length > 0) {
-                console.log("✅ Upload complete:", res);
-                handleFileUpload({ url: res[0].ufsUrl, type: sharedItem.type });
-              } else {
+  const uploaded = res[0];
+  const fileUrl = (uploaded as any).ufsUrl || uploaded.url; // handle v8 + v9
+  handleFileUpload({ url: fileUrl, type: sharedItem.type });
+}
+else {
                 throw new Error("Upload failed to return a valid response.");
               }
             } catch (error) {
@@ -257,10 +261,14 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
         setIsLoading(true);
         try {
             const mutationParams: any = {
-                message: message || undefined, recipientName, publicNote, fileUrl: uploadedFile?.url,
-                fileType: uploadedFile?.type, withWatermark: addWatermark,
-                duration: uploadedFile?.type === 'video' ? undefined : parseInt(duration),
-            };
+  message: message || undefined,
+  recipientName,
+  publicNote,
+  fileUrl: uploadedFile?.url,  // ✅ always normalized here
+  fileType: uploadedFile?.type,
+  withWatermark: addWatermark,
+  duration: uploadedFile?.type === "video" ? undefined : parseInt(duration),
+};
 
             if (uploadedFile?.type === 'image') {
                 mutationParams.gameMode = gameMode;
@@ -345,13 +353,21 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     const handleQaCaseSensitiveChange = (value: boolean) => { clearGeneratedLink(); setQaCaseSensitive(value); };
     const handleQaShowHintsChange = (value: boolean) => { clearGeneratedLink(); setQaShowHints(value); };
 
-    const handleImageUploadComplete = (res: any) => {
-        if (res) handleFileUpload({ url: res[0].url, type: "image" });
-    };
+   const handleImageUploadComplete = (res: any) => {
+  if (res && res.length > 0) {
+    const uploaded = res[0];
+    const fileUrl = (uploaded as any).ufsUrl || uploaded.url;
+    handleFileUpload({ url: fileUrl, type: "image" });
+  }
+};
 
     const handleVideoUploadComplete = (res: any) => {
-        if (res) handleFileUpload({ url: res[0].url, type: "video" });
-    };
+  if (res && res.length > 0) {
+    const uploaded = res[0];
+    const fileUrl = (uploaded as any).ufsUrl || uploaded.url;
+    handleFileUpload({ url: fileUrl, type: "video" });
+  }
+};
 
     const handleUploadError = (error: Error) => {
         alert(`ERROR! ${error.message}`);

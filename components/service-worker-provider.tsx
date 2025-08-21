@@ -15,7 +15,7 @@ export function ServiceWorkerProvider({ children }: { children: React.ReactNode 
       
       // Listen for messages from service worker
       const handleMessage = (event: MessageEvent) => {
-        if (event.data.type === "SHARE_TARGET" && event.data.data.url) {
+        if (event.data.type === "SHARE_TARGET" && event.data.data.ufsUrl) {
           console.log("📩 Received shared data from SW:", event.data);
           
           // Store file data in sessionStorage to survive the redirect
