@@ -141,22 +141,28 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
               const res = await uploadFiles(endpoint, { files: [fileForUpload] });
 
               if (res && res.length > 0) {
-                console.log("✅ Upload complete:", res);
-                handleFileUpload({ url: res[0].url, type: sharedItem.type });
-              } else {
-                throw new Error("Upload failed to return a valid response.");
-              }
+  console.log("✅ Upload complete:", res);
+  handleFileUpload({ url: res[0].ufsUrl, type: sharedItem.type });
+} else {
+  throw new Error("Upload failed to return a valid response.");
+}
+
             } catch (error) {
               console.error("❌ Upload failed:", error);
               alert(`ERROR! ${(error as Error).message}`);
-            } finally {
-              setIsUploading(false);
-              store.clear(); // clear DB entry
-              // Clean up URL
-              const newUrl = new URL(window.location.href);
-              newUrl.searchParams.delete("shared");
-              router.replace(newUrl.pathname + newUrl.search, { scroll: false });
-            }
+            }  finally {
+  setIsUploading(false);
+
+  // Clear DB entry in a new tx
+  const clearTx = db.transaction(STORE_NAME, "readwrite");
+  clearTx.objectStore(STORE_NAME).clear();
+
+  // Clean up URL
+  const newUrl = new URL(window.location.href);
+  newUrl.searchParams.delete("shared");
+  router.replace(newUrl.pathname + newUrl.search, { scroll: false });
+}
+
           }
         };
       };
