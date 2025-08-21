@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     images: {
-        domains: ["utfs.io"], // Allow UploadThing CDN images
+        domains: ["xiymxowfqd.ufs.sh"], // Allow UploadThing CDN images
     },
 };
 
