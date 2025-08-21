@@ -114,17 +114,19 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                     getRequest.onsuccess = async () => {
                         const sharedItem = getRequest.result;
                         if (sharedItem && sharedItem.file) {
-                            console.log("✅ Found shared file, starting upload...", sharedItem);
-                            setIsUploading(true);
+  console.log("✅ Found shared file, starting upload...", sharedItem);
+  setIsUploading(true);
 
-                            try {
-                                const endpoint = sharedItem.type === 'image' 
-                                    ? 'imageUploader' 
-                                    : 'videoUploader';
-                                
-                                const res = await uploadFiles(endpoint, {
-                                    files: [sharedItem.file],
-                                });
+  try {
+    const endpoint = sharedItem.type === 'image' 
+      ? 'imageUploader' 
+      : 'videoUploader';
+
+    const fileBlob = new Blob([sharedItem.file.data], { type: sharedItem.file.type });
+    const file = new File([fileBlob], sharedItem.file.name, { type: sharedItem.file.type });
+
+    const res = await uploadFiles(endpoint, { files: [file] });
+
 
                                 if (res && res.length > 0) {
                                     console.log("✅ Upload complete:", res);
