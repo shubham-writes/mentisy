@@ -50,11 +50,11 @@ export function FormFields({
         return template?.placeholder.publicNote || "you're not ready for this... or whatever fits the vibe";
     };
     
-    const getMessageLabel = () => {
-        if (isGroupGame) return "Winner's reward message";
-        if (isSinglePlayerGame) return "Reveal Message / Caption";
-        return "Reveal Message / Caption";
-    };
+    // const getMessageLabel = () => {
+    //     if (isGroupGame) return "Winner's reward message";
+    //     if (isSinglePlayerGame) return "Reveal Message / Caption";
+    //     return "Reveal Message / Caption";
+    // };
     
     const getMessagePlaceholder = () => {
         if (isGroupGame) return "Congrats! You solved it first 🏆";
@@ -66,7 +66,7 @@ export function FormFields({
         <div className="space-y-4">
             {/* Compact Header - Similar to game headers */}
             <div className="flex items-center space-x-3 p-3 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-800/50 dark:to-blue-900/20 rounded-lg border border-gray-200/50 dark:border-gray-700/50">
-                <span className="text-lg">✍️</span>
+                <span className="text-lg">✏️</span>
                 <div className="flex-1">
                     <h4 className="font-semibold text-gray-800 dark:text-gray-200 text-sm">Message Details</h4>
                     <p className="text-xs text-gray-600 dark:text-gray-400">
@@ -79,8 +79,8 @@ export function FormFields({
 
             {/* Compact form fields */}
             <div className="space-y-3">
-                {/* Recipient Name Field - Only for non-group games */}
-                {showRecipientField && (
+                {/* COMMENTED OUT - Recipient Name Field - Only for non-group games */}
+                {/* {showRecipientField && (
                     <div>
                         <Label htmlFor="recipient" className="text-sm font-medium mb-2 block text-gray-800 dark:text-gray-200">
                             Who&apos;s this for? <span className="text-xs text-gray-500 dark:text-gray-400">(Optional)</span>
@@ -93,10 +93,10 @@ export function FormFields({
                             className="h-11 text-sm rounded-lg border-2 border-gray-200 dark:border-gray-600 focus:border-[#FF75A0] dark:focus:border-[#FF75A0] focus:ring-0 focus:outline-none px-3 transition-colors duration-200"
                         />
                     </div>
-                )}
+                )} */}
 
-                {/* Public Note Field - Contextual labeling */}
-                <div>
+                {/* COMMENTED OUT - Public Note Field - Contextual labeling */}
+                {/* <div>
                     <Label htmlFor="public-note" className="text-sm font-medium mb-2 block text-gray-800 dark:text-gray-200">
                         {getPublicNoteLabel()} <span className="text-xs text-gray-500 dark:text-gray-400">
                             {isGroupGame ? "(What participants see)" : "(What they'll see first)"}
@@ -109,15 +109,15 @@ export function FormFields({
                         onChange={(e) => onPublicNoteChange(e.target.value)}
                         className="h-11 text-sm rounded-lg border-2 border-gray-200 dark:border-gray-600 focus:border-[#FF75A0] dark:focus:border-[#FF75A0] focus:ring-0 focus:outline-none px-3 transition-colors duration-200"
                     />
-                </div>
+                </div> */}
 
-                {/* Secret Message Field - Contextual labeling */}
+                {/* Caption Field - Simplified for all game modes */}
                 <div>
-                    <Label htmlFor="secret-message" className="text-sm font-medium mb-2 block text-gray-800 dark:text-gray-200">
-                        {getMessageLabel()} <span className="text-xs text-gray-500 dark:text-gray-400">(Optional)</span>
+                    <Label htmlFor="caption" className="text-sm font-medium mb-2 block text-gray-800 dark:text-gray-200">
+                        Caption <span className="text-xs text-gray-500 dark:text-gray-400">(Optional)</span>
                     </Label>
                     <Input
-                        id="secret-message"
+                        id="caption"
                         placeholder={getMessagePlaceholder()}
                         value={message}
                         onChange={(e) => onMessageChange(e.target.value)}
@@ -126,14 +126,12 @@ export function FormFields({
                 </div>
             </div>
 
-            {/* Context-specific status indicator */}
-            {(publicNote || message) && (
+            {/* Context-specific status indicator - Updated to only check for caption */}
+            {message && (
                 <div className="flex items-center space-x-2 p-2 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200/50 dark:border-green-700/50">
                     <span className="text-green-600 dark:text-green-400">✓</span>
                     <p className="text-sm text-green-700 dark:text-green-300">
-                        {isGroupGame ? "Challenge configured" : 
-                         isSinglePlayerGame ? "Puzzle message ready" : 
-                         "Message details set"}
+                        Caption added
                     </p>
                 </div>
             )}

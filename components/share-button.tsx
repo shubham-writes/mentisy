@@ -1,4 +1,4 @@
-// Enhanced share-button.tsx with improved Instagram handling
+// Enhanced share-button.tsx with improved Instagram direct messaging
 "use client";
 
 import { useState } from "react";
@@ -116,84 +116,103 @@ export function SocialShareButtons({ title, text, url }: SocialShareButtonsProps
       // First, copy the content to clipboard
       await navigator.clipboard.writeText(fullMessage);
       
-      // Detect if user is on mobile
+      // Detect platform and device
       const userAgent = navigator.userAgent.toLowerCase();
       const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/.test(userAgent);
       const isAndroid = /android/.test(userAgent);
       const isIOS = /iphone|ipad|ipod/.test(userAgent);
+      
+      let instagramOpened = false;
 
       if (isMobile) {
         if (isAndroid) {
-          // Try Android Instagram app first
+          // Try multiple Android Instagram approaches
           try {
-            // Create a hidden link to test if Instagram app opens
-            const testLink = document.createElement('a');
-            testLink.href = 'intent://instagram.com/#Intent;package=com.instagram.android;scheme=https;end';
-            testLink.style.display = 'none';
-            document.body.appendChild(testLink);
+            // Method 1: Try Instagram Direct intent (most specific)
+            const directIntent = 'intent://instagram.com/direct/inbox/#Intent;package=com.instagram.android;scheme=https;end';
+            window.location.href = directIntent;
+            instagramOpened = true;
             
-            // Set up fallback timer
-            const fallbackTimer = setTimeout(() => {
-              // If app doesn't open, go to Play Store or web
-              window.open('https://play.google.com/store/apps/details?id=com.instagram.android', '_blank');
-            }, 2500);
-            
-            // Try to open the app
-            testLink.click();
-            
-            // Clean up
-            document.body.removeChild(testLink);
-            
-            // Clear fallback if app opened successfully
+            // Fallback after short delay if direct doesn't work
             setTimeout(() => {
-              clearTimeout(fallbackTimer);
+              if (!instagramOpened) {
+                // Method 2: Try general Instagram app
+                window.location.href = 'intent://instagram.com/#Intent;package=com.instagram.android;scheme=https;end';
+              }
             }, 1000);
             
           } catch (e) {
-            // If intent fails, try direct app link
-            window.open('instagram://camera', '_blank');
-            setTimeout(() => {
-              window.open('https://www.instagram.com/', '_blank');
-            }, 1500);
+            // Method 3: Try direct Instagram URL schemes
+            try {
+              window.location.href = 'instagram://direct-inbox';
+              instagramOpened = true;
+            } catch (e2) {
+              // Method 4: Try general Instagram scheme
+              window.location.href = 'instagram://camera';
+              instagramOpened = true;
+            }
           }
-        } else if (isIOS) {
-          // For iOS, try the Instagram URL scheme
-          const instagramURL = 'instagram://camera';
-          const fallbackURL = 'https://apps.apple.com/app/instagram/id389801252';
           
-          // Create a hidden iframe to test if app opens
-          const iframe = document.createElement('iframe');
-          iframe.style.display = 'none';
-          iframe.src = instagramURL;
-          document.body.appendChild(iframe);
-          
-          // Set up fallback
+          // Ultimate fallback for Android
           setTimeout(() => {
-            document.body.removeChild(iframe);
-            window.open(fallbackURL, '_blank');
+            if (!instagramOpened) {
+              window.open('https://play.google.com/store/apps/details?id=com.instagram.android', '_blank');
+            }
+          }, 2500);
+          
+        } else if (isIOS) {
+          // iOS Instagram handling
+          try {
+            // Method 1: Try Instagram Direct Messages
+            window.location.href = 'instagram://direct-inbox';
+            instagramOpened = true;
+          } catch (e) {
+            // Method 2: Try general Instagram
+            try {
+              window.location.href = 'instagram://camera';
+              instagramOpened = true;
+            } catch (e2) {
+              // Method 3: Try Instagram main
+              window.location.href = 'instagram://user';
+              instagramOpened = true;
+            }
+          }
+          
+          // iOS fallback
+          setTimeout(() => {
+            if (!instagramOpened) {
+              window.open('https://apps.apple.com/app/instagram/id389801252', '_blank');
+            }
           }, 2000);
         }
       } else {
-        // Desktop: Open Instagram web
-        window.open('https://www.instagram.com/', '_blank');
+        // Desktop: Open Instagram Direct Messages
+        window.open('https://www.instagram.com/direct/inbox/', '_blank');
+        instagramOpened = true;
       }
       
-      // Show success notification
-      showInstagramNotification();
+      // Show enhanced success notification
+      showInstagramNotification(isMobile);
       
     } catch (err) {
+      console.error('Instagram share error:', err);
       // If clipboard fails, show manual copy message
       showManualCopyNotification(fullMessage);
     }
   };
 
-  const showInstagramNotification = () => {
+  const showInstagramNotification = (isMobile: boolean) => {
     // Remove any existing notifications
     const existingNotifications = document.querySelectorAll('[data-instagram-notification]');
     existingNotifications.forEach(notification => notification.remove());
     
     const notification = document.createElement('div');
     notification.setAttribute('data-instagram-notification', 'true');
+    
+    const mobileInstructions = isMobile 
+      ? "Instagram is opening! Tap the message icon or create a story, then paste your link."
+      : "Instagram Direct Messages is opening! Click on a conversation or start a new message, then paste your link.";
+    
     notification.innerHTML = `
       <div style="
         position: fixed;
@@ -218,8 +237,22 @@ export function SocialShareButtons({ title, text, url }: SocialShareButtonsProps
           <div style="font-weight: 600;">Link copied successfully!</div>
         </div>
         <div style="opacity: 0.9; font-size: 13px;">
-          Instagram is opening. Paste your message in a story, post, or DM to share your secret link!
+          ${mobileInstructions}
         </div>
+        ${isMobile ? `
+          <div style="margin-top: 8px; font-size: 12px; opacity: 0.8;">
+            💡 Tip: Look for the message/DM icon in Instagram or swipe right from the main feed
+          </div>
+        ` : ''}
+        <div onclick="this.parentElement.remove()" style="
+          position: absolute;
+          top: 8px;
+          right: 12px;
+          cursor: pointer;
+          opacity: 0.7;
+          font-size: 18px;
+          font-weight: bold;
+        ">×</div>
       </div>
       <style>
         @keyframes slideInDown {
@@ -231,13 +264,13 @@ export function SocialShareButtons({ title, text, url }: SocialShareButtonsProps
     
     document.body.appendChild(notification);
     
-    // Remove notification after 5 seconds
+    // Remove notification after 7 seconds (longer for better UX)
     setTimeout(() => {
       if (notification.parentNode) {
         notification.style.animation = 'slideInDown 0.3s ease-in reverse';
         setTimeout(() => notification.remove(), 300);
       }
-    }, 5000);
+    }, 7000);
   };
 
   const showManualCopyNotification = (message: string) => {
@@ -270,6 +303,12 @@ export function SocialShareButtons({ title, text, url }: SocialShareButtonsProps
           font-size: 12px;
           word-break: break-all;
           margin-bottom: 16px;
+          user-select: all;
+        " onclick="
+          const range = document.createRange();
+          range.selectNode(this);
+          window.getSelection().removeAllRanges();
+          window.getSelection().addRange(range);
         ">${message}</div>
         <button onclick="this.closest('div').closest('div').remove()" style="
           background: #FF75A0;
@@ -285,12 +324,12 @@ export function SocialShareButtons({ title, text, url }: SocialShareButtonsProps
     
     document.body.appendChild(notification);
     
-    // Auto-remove after 10 seconds
+    // Auto-remove after 15 seconds (longer for manual copy)
     setTimeout(() => {
       if (notification.parentNode) {
         notification.remove();
       }
-    }, 10000);
+    }, 15000);
   };
 
   return (
@@ -320,7 +359,7 @@ export function SocialShareButtons({ title, text, url }: SocialShareButtonsProps
         onClick={shareToInstagram}
         className="flex-1 h-11 bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#FCB045] hover:opacity-90 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
         size="sm"
-        title="Copy link & open Instagram"
+        title="Copy link & open Instagram Direct Messages"
       >
         <Instagram className="h-4 w-4 sm:mr-2" />
         <span className="hidden sm:inline">Instagram</span>
