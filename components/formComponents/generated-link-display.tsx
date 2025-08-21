@@ -2,17 +2,43 @@ import { ShareButton, SocialShareButtons } from "../share-button";
 import { useState } from "react";
 import { Copy, Check } from "lucide-react";
 
+type GameMode = "none" | "scratch_and_see" | "qa_challenge" | "reveal_rush";
+type MicroQuestType = "group_qa" | "rate_my";
+
 interface GeneratedLinkDisplayProps {
     generatedLink: string;
     publicNote: string;
+    gameMode?: GameMode;
+    selectedType?: MicroQuestType; // For reveal_rush sub-types
 }
 
-export function GeneratedLinkDisplay({ generatedLink, publicNote }: GeneratedLinkDisplayProps) {
+export function GeneratedLinkDisplay({ 
+    generatedLink, 
+    publicNote, 
+    gameMode = "none",
+    selectedType 
+}: GeneratedLinkDisplayProps) {
     const [copied, setCopied] = useState(false);
+
+    // Function to get the appropriate text based on game mode
+    const getShareText = () => {
+        switch (gameMode) {
+            case "qa_challenge":
+                return "can you answer this question";
+            case "reveal_rush":
+                return selectedType === "rate_my" ? "can you guess my ratings" : "can you answer this question";
+            case "scratch_and_see":
+                return "scratch it fast";
+            default:
+                return "Check out this secret message 👀";
+        }
+    };
+
+    const shareText = getShareText();
 
     const copyToClipboard = async () => {
         try {
-            const textToCopy = `${publicNote} ${generatedLink}`;
+            const textToCopy = `${shareText} ${generatedLink}`;
             await navigator.clipboard.writeText(textToCopy);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
@@ -45,7 +71,7 @@ export function GeneratedLinkDisplay({ generatedLink, publicNote }: GeneratedLin
                         <div className="flex-1 p-3 pr-12 overflow-hidden">
                             <div className="text-sm">
                                 <span className="font-medium text-gray-800 dark:text-gray-200">
-                                    {publicNote && `${publicNote} : `}
+                                    {shareText && `${shareText} : `}
                                 </span>
                                 <span className="text-[#FF75A0] dark:text-[#FF75A0] font-mono break-all sm:break-normal whitespace-nowrap sm:whitespace-normal overflow-hidden text-ellipsis">
                                     {generatedLink}
@@ -84,8 +110,8 @@ export function GeneratedLinkDisplay({ generatedLink, publicNote }: GeneratedLin
                         Share directly to:
                     </p>
                     <SocialShareButtons
-                        title="A Secret Message"
-                        text={publicNote}
+                        title="Secret Message"
+                        text={shareText}
                         url={generatedLink}
                     />
                 </div>
@@ -106,8 +132,8 @@ export function GeneratedLinkDisplay({ generatedLink, publicNote }: GeneratedLin
                 <div className="flex justify-center">
                     <div className="w-full sm:w-fit">
                         <ShareButton
-                            title="A Secret Message"
-                            text={publicNote}
+                            title="Secret Message"
+                            text={shareText}
                             url={generatedLink}
                         />
                     </div>
