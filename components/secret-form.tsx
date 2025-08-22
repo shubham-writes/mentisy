@@ -675,6 +675,7 @@ else {
                                         onRateCategoryChange={handleMqRateCategoryChange}
                                         mqExpectedRating={mqExpectedRating}
                                         onExpectedRatingChange={handleMqExpectedRatingChange}
+                                        timerDuration={duration}
                                     />
                                 </div>
                             )}

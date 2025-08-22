@@ -19,6 +19,7 @@ interface MicroQuestFormFieldsProps {
     mqExpectedRating: number;
     onRateCategoryChange: (value: string) => void;
     onExpectedRatingChange: (value: number) => void;
+    timerDuration?: string; // Add this prop
 }
 
 export function MicroQuestFormFields({
@@ -32,8 +33,24 @@ export function MicroQuestFormFields({
     mqExpectedRating,
     onRateCategoryChange,
     onExpectedRatingChange,
+    timerDuration,
 }: MicroQuestFormFieldsProps) {
     const [showFeedback, setShowFeedback] = useState(false);
+
+    // Helper function to format timer duration
+    const formatTimerDuration = (duration: string) => {
+        const seconds = parseInt(duration);
+        if (seconds >= 60) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            if (remainingSeconds === 0) {
+                return `${minutes} min${minutes > 1 ? 's' : ''}`;
+            } else {
+                return `${minutes}m ${remainingSeconds}s`;
+            }
+        }
+        return `${seconds} sec${seconds > 1 ? 's' : ''}`;
+    };
 
     const questTypes = [
         {
@@ -157,7 +174,7 @@ export function MicroQuestFormFields({
                                         key={rating}
                                         type="button"
                                         onClick={() => onExpectedRatingChange(rating)}
-                                        className={`w-7 h-7 sm:w-8 sm:h-8 rounded-md text-xs font-medium transition-all ${
+                                        className={`w-6 h-6 sm:w-8 sm:h-8 rounded-md text-xs font-medium transition-all ${
                                             mqExpectedRating === rating
                                                 ? 'bg-yellow-500 text-white'
                                                 : 'bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-yellow-400'
@@ -172,13 +189,14 @@ export function MicroQuestFormFields({
                 )}
             </div>
 
-            {/* Status Indicator */}
+            {/* Status Indicator - With Timer */}
             {((microQuestType === "group_qa" && mqGroupQuestion && mqGroupAnswer) ||
               (microQuestType === "rate_my" && mqRateCategory && mqExpectedRating)) && (
                 <div className="flex items-center space-x-2 p-2 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200/50 dark:border-green-700/50">
                     <span className="text-green-600 dark:text-green-400">✓</span>
                     <p className="text-sm text-green-700 dark:text-green-300">
                         {microQuestType === "group_qa" ? "Group Q&A" : "Rate My"} challenge ready
+                        {timerDuration && ` • ${formatTimerDuration(timerDuration)} timer`}
                     </p>
                 </div>
             )}
