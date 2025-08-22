@@ -66,7 +66,7 @@ export function FormFields({
             return "Add a caption to your photo/video...";
         } else {
             // When no file is uploaded, show message-specific placeholders
-            return template?.placeholder.message || "Your secret message that will disappear after being read...";
+            return template?.placeholder.message || "Your message that will disappear after being read...";
         }
     };
 

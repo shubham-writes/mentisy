@@ -89,7 +89,7 @@ function HelloPageContent() {
             
             <Unauthenticated>
                 <div className="flex flex-col items-center justify-center gap-y-4 mb-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                    <div className="animate-spin mt-10 rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
                     <h2 className="text-xl font-semibold">Authentication Required</h2>
                     <p className="text-muted-foreground">
                         Redirecting you to sign in...
@@ -109,7 +109,7 @@ function HelloPageContent() {
 export default function HelloPage() {
     return (
         <Suspense fallback={
-            <div className="flex flex-col items-center justify-center gap-y-4 mb-8">
+            <div className="flex flex-col items-center mt-10 justify-center gap-y-4 mb-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
                 <p>Loading...</p>
             </div>

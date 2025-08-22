@@ -48,8 +48,8 @@ export function VideoContent({
       {/* Warning banner */}
       <div className="mb-3 sm:mb-4 p-3 sm:p-4 bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 border border-red-200/50 dark:border-red-700/50 rounded-xl flex items-center space-x-2">
   <span className="text-xl sm:text-2xl flex-shrink-0">🎉</span>
-  <span className="font-semibold text-red-800 dark:text-red-300 text-xs sm:text-base">Live the Moment!</span>
-  <span className="text-red-700 dark:text-red-400 text-xs sm:text-base">- See it once, feel it forever!</span>
+  <span className="font-semibold text-red-800 dark:text-red-300 text-[13px] sm:text-base">Live the Moment!</span>
+  <span className="text-red-700 dark:text-red-400 text-[13px] sm:text-base">- See it once, feel it forever!</span>
 </div>
 
 

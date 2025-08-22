@@ -13,14 +13,14 @@ export function Watermark({
   animated = false,
   mode = "video",
 }: WatermarkProps) {
-  const watermarkText = `${name || "user"} ; IP: ${ip || "..."} • `;
+  const watermarkText = `IP: ${ip || "..."} • `;
   const repeatedText = Array(20).fill(watermarkText).join("");
 
   const animationStyle = animated
-    ? { animation: "scrollWatermark 40s linear infinite" }
+    ? { animation: "scrollWatermark 30s linear infinite" }
     : {};
   const reverseAnimationStyle = animated
-    ? { animation: "scrollWatermark 40s linear infinite reverse" }
+    ? { animation: "scrollWatermark 30s linear infinite reverse" }
     : {};
 
   // Number of lines & vertical gap based on mode

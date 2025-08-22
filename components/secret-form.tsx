@@ -66,6 +66,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     const [mqExpectedRating, setMqExpectedRating] = useState(0);
     const [mqSuggestionPrompt, setMqSuggestionPrompt] = useState("");
     const [isHydrated, setIsHydrated] = useState(false);
+    const [isInstructionsExpanded, setIsInstructionsExpanded] = useState(false);
 
     const createSecret = useMutation(api.secrets.create);
     const { signIn } = useSignIn();
@@ -304,7 +305,7 @@ else {
             setQaCaseSensitive(false); setQaShowHints(true);
         } catch (error) {
             console.error(error);
-            alert("Failed to create secret message.");
+            alert("Failed to create  message.");
         } finally {
             setIsLoading(false);
         }
@@ -480,124 +481,172 @@ else {
                             </div>
 
                             {/* 2. Dynamic Instructions Panel - Visual Guide (Right after game selection) */}
-                            <div className={`rounded-xl sm:rounded-2xl p-6 border shadow-lg ${
-                                gameMode === 'none' ? 'bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200/50 dark:border-blue-700/50' :
-                                gameMode === 'scratch_and_see' ? 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200/50 dark:border-green-700/50' :
-                                gameMode === 'qa_challenge' ? 'bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 border-purple-200/50 dark:border-purple-700/50' :
-                                'bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-orange-200/50 dark:border-orange-700/50'
-                            }`}>
-                                <div className="text-center">
-                                    {/* Dynamic content based on game mode */}
-                                    {gameMode === 'none' && (
-                                        <>
-                                            <span className="text-3xl mb-3 block">🎮</span>
-                                            <h3 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">Add Some Fun?</h3>
-                                            <p className="text-sm text-blue-600 dark:text-blue-300 mb-4">
-                                                Upload an image to unlock interactive game modes and challenges!
-                                            </p>
-                                            <div className="space-y-2 text-xs text-blue-500 dark:text-blue-400">
-                                                <div className="flex items-center justify-center space-x-2">
-                                                    <span>🤔</span>
-                                                    <span>Q&A Challenges</span>
-                                                </div>
-                                                <div className="flex items-center justify-center space-x-2">
-                                                    <span>🏆</span>
-                                                    <span>Group Competitions</span>
-                                                </div>
-                                                <div className="flex items-center justify-center space-x-2">
-                                                    <span>✨</span>
-                                                    <span>Scratch & Reveal</span>
-                                                </div>
-                                            </div>
-                                        </>
-                                    )}
+                            {/* 2. Elegant Game Mode Instructions - Collapsible */}
+<div className={`rounded-xl sm:rounded-2xl border shadow-lg transition-all duration-300 ${
+    gameMode === 'none' ? 'bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200/50 dark:border-blue-700/50' :
+    gameMode === 'scratch_and_see' ? 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200/50 dark:border-green-700/50' :
+    gameMode === 'qa_challenge' ? 'bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 border-purple-200/50 dark:border-purple-700/50' :
+    'bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-orange-200/50 dark:border-orange-700/50'
+}`}>
+    {/* Compact Header - Always Visible */}
+    <div 
+        className="p-4 sm:p-5 cursor-pointer flex items-center justify-between hover:bg-white/30 dark:hover:bg-black/10 transition-colors duration-200"
+        onClick={() => setIsInstructionsExpanded(!isInstructionsExpanded)}
+    >
+        <div className="flex items-center space-x-3">
+            {/* Mode Icon */}
+            <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-white/50 dark:bg-black/20">
+                <span className="text-lg">
+                    {gameMode === 'none' && '🎮'}
+                    {gameMode === 'scratch_and_see' && '✨'}
+                    {gameMode === 'qa_challenge' && '🤔'}
+                    {gameMode === 'reveal_rush' && '🏆'}
+                </span>
+            </div>
+            
+            {/* Mode Title & Quick Description */}
+            <div className="flex-1 min-w-0">
+                <h3 className={`font-semibold text-sm sm:text-base ${
+                    gameMode === 'none' ? 'text-blue-800 dark:text-blue-200' :
+                    gameMode === 'scratch_and_see' ? 'text-green-800 dark:text-green-200' :
+                    gameMode === 'qa_challenge' ? 'text-purple-800 dark:text-purple-200' :
+                    'text-orange-800 dark:text-orange-200'
+                }`}>
+                    {gameMode === 'none' && 'Add Some Fun?'}
+                    {gameMode === 'scratch_and_see' && 'Scratch & Reveal Magic'}
+                    {gameMode === 'qa_challenge' && 'Brain Teaser Mode'}
+                    {gameMode === 'reveal_rush' && 'Competition Mode'}
+                </h3>
+                <p className={`text-xs opacity-70 truncate ${
+                    gameMode === 'none' ? 'text-blue-600 dark:text-blue-300' :
+                    gameMode === 'scratch_and_see' ? 'text-green-600 dark:text-green-300' :
+                    gameMode === 'qa_challenge' ? 'text-purple-600 dark:text-purple-300' :
+                    'text-orange-600 dark:text-orange-300'
+                }`}>
+                    {gameMode === 'none' && 'Upload an image to unlock interactive modes'}
+                    {gameMode === 'scratch_and_see' && 'Interactive scratching experience'}
+                    {gameMode === 'qa_challenge' && 'Answer correctly to unlock content'}
+                    {gameMode === 'reveal_rush' && 'Multi-player competition mode'}
+                </p>
+            </div>
+        </div>
 
-                                    {gameMode === 'scratch_and_see' && (
-                                        <>
-                                            <span className="text-3xl mb-3 block">✨</span>
-                                            <h3 className="font-semibold text-green-800 dark:text-green-200 mb-2">Scratch & Reveal Magic</h3>
-                                            <p className="text-sm text-green-600 dark:text-green-300 mb-4">
-                                                They&apos;ll see a blurred version first, then scratch to gradually reveal your image!
-                                            </p>
-                                            <div className="space-y-2 text-xs text-green-500 dark:text-green-400">
-                                                <div className="flex items-center justify-center space-x-2">
-                                                    <span>👆</span>
-                                                    <span>Interactive scratching experience</span>
-                                                </div>
-                                                <div className="flex items-center justify-center space-x-2">
-                                                    <span>🎨</span>
-                                                    <span>Gradual image reveal</span>
-                                                </div>
-                                                <div className="flex items-center justify-center space-x-2">
-                                                    <span>📱</span>
-                                                    <span>Perfect for mobile & desktop</span>
-                                                </div>
-                                            </div>
-                                        </>
-                                    )}
+        {/* Expand/Collapse Icon */}
+        <div className={`flex-shrink-0 w-6 h-6 flex items-center justify-center transition-transform duration-200 ${
+            isInstructionsExpanded ? 'rotate-180' : 'rotate-0'
+        }`}>
+            <svg className="w-4 h-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+        </div>
+    </div>
 
-                                    {gameMode === 'qa_challenge' && (
-                                        <>
-                                            <span className="text-3xl mb-3 block">🤔</span>
-                                            <h3 className="font-semibold text-purple-800 dark:text-purple-200 mb-2">Brain Teaser Mode</h3>
-                                            <p className="text-sm text-purple-600 dark:text-purple-300 mb-4">
-                                                They must answer your question correctly to unlock the secret content!
-                                            </p>
-                                            <div className="space-y-2 text-xs text-purple-500 dark:text-purple-400">
-                                                <div className="flex items-center justify-center space-x-2">
-                                                    <span>❓</span>
-                                                    <span>Custom question & answer</span>
-                                                </div>
-                                                <div className="flex items-center justify-center space-x-2">
-                                                    <span>🎯</span>
-                                                    <span>Multiple attempts allowed</span>
-                                                </div>
-                                                <div className="flex items-center justify-center space-x-2">
-                                                    <span>💡</span>
-                                                    <span>Optional hints system</span>
-                                                </div>
-                                            </div>
-                                        </>
-                                    )}
+    {/* Expandable Content */}
+    <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
+        isInstructionsExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+    }`}>
+        <div className="px-4 sm:px-5 pb-4 sm:pb-5 border-t border-current/10">
+            <div className="pt-4">
+                {/* Detailed Description */}
+                <p className={`text-sm mb-4 ${
+                    gameMode === 'none' ? 'text-blue-600 dark:text-blue-300' :
+                    gameMode === 'scratch_and_see' ? 'text-green-600 dark:text-green-300' :
+                    gameMode === 'qa_challenge' ? 'text-purple-600 dark:text-purple-300' :
+                    'text-orange-600 dark:text-orange-300'
+                }`}>
+                    {gameMode === 'none' && 'Upload an image to unlock interactive game modes and challenges that make your moments more engaging!'}
+                    {gameMode === 'scratch_and_see' && 'Recipients will see a blurred version first, then scratch to gradually reveal your image with smooth interactive animations.'}
+                    {gameMode === 'qa_challenge' && 'Recipients must answer your custom question correctly to unlock the moment. Perfect for personal security or fun challenges.'}
+                    {gameMode === 'reveal_rush' && 'Multiple people compete to solve your challenge! The first correct answer wins access to your moment.'}
+                </p>
 
-                                    {gameMode === 'reveal_rush' && (
-                                        <>
-                                            <span className="text-3xl mb-3 block">🏆</span>
-                                            <h3 className="font-semibold text-orange-800 dark:text-orange-200 mb-2">Competition Mode</h3>
-                                            <p className="text-sm text-orange-600 dark:text-orange-300 mb-4">
-                                                Multiple people compete! First to solve the challenge wins access to your secret.
-                                            </p>
-                                            <div className="space-y-2 text-xs text-orange-500 dark:text-orange-400">
-                                                <div className="flex items-center justify-center space-x-2">
-                                                    <span>👥</span>
-                                                    <span>Multi-player competition</span>
-                                                </div>
-                                                <div className="flex items-center justify-center space-x-2">
-                                                    <span>⚡</span>
-                                                    <span>First correct answer wins</span>
-                                                </div>
-                                                <div className="flex items-center justify-center space-x-2">
-                                                    <span>🎉</span>
-                                                    <span>Great for group chats</span>
-                                                </div>
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
-
-                                {/* Pro tip section - changes based on mode */}
-                                <div className="mt-4 pt-4 border-t border-current/20">
-                                    <div className="flex items-start space-x-2">
-                                        <span className="text-sm">💡</span>
-                                        <p className="text-xs opacity-80">
-                                            {gameMode === 'none' && "Pro tip: Games make your secrets more engaging and memorable!"}
-                                            {gameMode === 'scratch_and_see' && "Pro tip: Works best with photos, artwork, or visual surprises!"}
-                                            {gameMode === 'qa_challenge' && "Pro tip: Use inside jokes or personal questions for better security!"}
-                                            {gameMode === 'reveal_rush' && "Pro tip: Perfect for friend groups, teams, or family challenges!"}
-                                        </p>
-                                    </div>
-                                </div>
+                {/* Feature List */}
+                <div className="space-y-2 mb-4">
+                    {gameMode === 'none' && (
+                        <>
+                            <div className="flex items-center space-x-2 text-xs text-blue-500 dark:text-blue-400">
+                                <span>🤔</span>
+                                <span>Q&A Challenges</span>
                             </div>
+                            <div className="flex items-center space-x-2 text-xs text-blue-500 dark:text-blue-400">
+                                <span>🏆</span>
+                                <span>Group Competitions</span>
+                            </div>
+                            <div className="flex items-center space-x-2 text-xs text-blue-500 dark:text-blue-400">
+                                <span>✨</span>
+                                <span>Scratch & Reveal</span>
+                            </div>
+                        </>
+                    )}
+
+                    {gameMode === 'scratch_and_see' && (
+                        <>
+                            <div className="flex items-center space-x-2 text-xs text-green-500 dark:text-green-400">
+                                <span>👆</span>
+                                <span>Interactive scratching experience</span>
+                            </div>
+                            <div className="flex items-center space-x-2 text-xs text-green-500 dark:text-green-400">
+                                <span>🎨</span>
+                                <span>Gradual image reveal</span>
+                            </div>
+                            <div className="flex items-center space-x-2 text-xs text-green-500 dark:text-green-400">
+                                <span>📱</span>
+                                <span>Perfect for mobile & desktop</span>
+                            </div>
+                        </>
+                    )}
+
+                    {gameMode === 'qa_challenge' && (
+                        <>
+                            <div className="flex items-center space-x-2 text-xs text-purple-500 dark:text-purple-400">
+                                <span>❓</span>
+                                <span>Custom question & answer</span>
+                            </div>
+                            <div className="flex items-center space-x-2 text-xs text-purple-500 dark:text-purple-400">
+                                <span>🎯</span>
+                                <span>Multiple attempts allowed</span>
+                            </div>
+                            <div className="flex items-center space-x-2 text-xs text-purple-500 dark:text-purple-400">
+                                <span>💡</span>
+                                <span>Optional hints system</span>
+                            </div>
+                        </>
+                    )}
+
+                    {gameMode === 'reveal_rush' && (
+                        <>
+                            <div className="flex items-center space-x-2 text-xs text-orange-500 dark:text-orange-400">
+                                <span>👥</span>
+                                <span>Multi-player competition</span>
+                            </div>
+                            <div className="flex items-center space-x-2 text-xs text-orange-500 dark:text-orange-400">
+                                <span>⚡</span>
+                                <span>First correct answer wins</span>
+                            </div>
+                            <div className="flex items-center space-x-2 text-xs text-orange-500 dark:text-orange-400">
+                                <span>🎉</span>
+                                <span>Great for group chats</span>
+                            </div>
+                        </>
+                    )}
+                </div>
+
+                {/* Pro Tip */}
+                <div className="pt-3 border-t border-current/10">
+                    <div className="flex items-start space-x-2">
+                        <span className="text-sm flex-shrink-0">💡</span>
+                        <p className="text-xs opacity-80 leading-relaxed">
+                            {gameMode === 'none' && "Pro tip: Games make your moments more engaging and memorable! Perfect for special occasions."}
+                            {gameMode === 'scratch_and_see' && "Pro tip: Works best with photos, artwork, or visual surprises that benefit from gradual reveal."}
+                            {gameMode === 'qa_challenge' && "Pro tip: Use inside jokes or personal questions for better security and more fun interactions."}
+                            {gameMode === 'reveal_rush' && "Pro tip: Perfect for friend groups, teams, or family challenges. Great conversation starter!"}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
                             {/* 3. Game-Specific Forms (Conditional - After instructions) */}
                             {gameMode === 'qa_challenge' && uploadedFile?.type === 'image' && (
@@ -717,10 +766,10 @@ else {
                                 ) : isLoading ? (
                                     <>
                                         <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-white mr-2 sm:mr-3"></div>
-                                        Creating your secret link...
+                                        Creating your fun link...
                                     </>
                                 ) : isLandingPage ? (
-                                    "🚀 Create Account & Send This Secret"
+                                    "🚀 Create Account & Send some fun"
                                 ) : (
                                     "✨ Generate Fun Link"
                                 )}

@@ -100,8 +100,8 @@ export function FilePreview({ file, onRemove, recipientName, showWatermark = fal
                   }}
                 >
                   <Watermark
-                    name={recipientName || "Preview User"}
-                    ip="123.456.789.011"
+                    
+                    ip="123.456.789.011 •"
                     animated={false}
                     mode="image"
                   />
@@ -145,8 +145,8 @@ export function FilePreview({ file, onRemove, recipientName, showWatermark = fal
                   }}
                 >
                   <Watermark
-                    name={recipientName || "Preview User"}
-                    ip="123.456.789.011"
+                    
+                    ip="123.456.789.011 •"
                     animated={true}
                   />
                 </div>
@@ -198,9 +198,9 @@ export function FilePreview({ file, onRemove, recipientName, showWatermark = fal
               </p>
               <p className="text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-200">
                 {showWatermark ? (
-                  <span className="text-green-600 dark:text-green-400">Protected</span>
+                  <span className="text-green-600 dark:text-green-400">Play Safe</span>
                 ) : (
-                  <span className="text-amber-600 dark:text-amber-400">Basic</span>
+                  <span className="text-amber-600 dark:text-amber-400">Free Flow</span>
                 )}
               </p>
             </div>
@@ -211,7 +211,7 @@ export function FilePreview({ file, onRemove, recipientName, showWatermark = fal
               <div className="flex items-center space-x-2">
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                 <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">
-                  Watermark will show recipient&apos;s actual details
+                  Overlay will show recipient&apos;s actual IP
                 </p>
               </div>
             </div>

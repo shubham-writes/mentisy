@@ -151,13 +151,13 @@ export function MicroQuestFormFields({
                             <Label className="text-sm font-medium mb-2 block text-gray-700 dark:text-gray-300">
                                 Your self-rating (1-10) <span className="text-red-500">*</span>
                             </Label>
-                            <div className="flex gap-1 flex-wrap">
+                            <div className="flex gap-1 flex-wrap justify-center">
                                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((rating) => (
                                     <button
                                         key={rating}
                                         type="button"
                                         onClick={() => onExpectedRatingChange(rating)}
-                                        className={`w-7 h-7 rounded-md text-xs font-medium transition-all ${
+                                        className={`w-7 h-7 sm:w-8 sm:h-8 rounded-md text-xs font-medium transition-all ${
                                             mqExpectedRating === rating
                                                 ? 'bg-yellow-500 text-white'
                                                 : 'bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-yellow-400'
