@@ -195,7 +195,7 @@ export function MicroQuestFormFields({
                 <div className="flex items-center space-x-2 p-2 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200/50 dark:border-green-700/50">
                     <span className="text-green-600 dark:text-green-400">✓</span>
                     <p className="text-sm text-green-700 dark:text-green-300">
-                        {microQuestType === "group_qa" ? "Group Q&A" : "Rate My"} challenge ready
+                        {microQuestType === "group_qa" ? "Group Q&A" : "Rate My"} ready
                         {timerDuration && ` • ${formatTimerDuration(timerDuration)} timer`}
                     </p>
                 </div>

@@ -2,49 +2,64 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, Gamepad2, Users, Trophy, Sparkles } from "lucide-react";
+import { ChevronDown, Gamepad2, Users, Trophy, Sparkles, Smartphone } from "lucide-react";
 
 export default function FaqSection() {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
   const faqData = [
-    {
-      question: "How do the photo games work?",
-      answer: "Choose from 4 fun games: Scratch & See (scratch to reveal), Q&A Challenge (answer correctly to unlock), Reveal Rush group games (first to answer wins), and Rate My... (guess the sender's rating). Each game makes sharing photos way more interactive and entertaining!",
-      icon: Gamepad2,
-      color: "from-purple-500 to-pink-500"
-    },
-    {
-      question: "Can I play these games with groups?",
-      answer: "Absolutely! Reveal Rush is designed for groups - send a Q&A challenge where the first person to answer correctly gets to see your photo, or play Rate My... where everyone tries to guess your rating. Perfect for friend groups and family chats!",
-      icon: Users,
-      color: "from-blue-500 to-cyan-500"
-    },
-    {
-      question: "What happens if no one gets the answer right?",
-      answer: "Don't worry! For Q&A games, you can set multiple attempts or provide hints. For Rate My..., if no one guesses your exact rating, the closest guess wins. You're always in control of when and how your photo gets revealed.",
-      icon: Trophy,
-      color: "from-orange-500 to-red-500"
-    },
-    {
-      question: "Do I need to download an app?",
-      answer: "Nope! Everything works directly in your browser. We've optimized it as a Progressive Web App (PWA), so you can add it to your home screen for quick access - but no app store downloads required!",
-      icon: Sparkles,
-      color: "from-green-500 to-emerald-500"
-    },
-    {
-      question: "How long do my photo games stay active?",
-      answer: "Your games stay active until someone completes them or you decide to delete them. You can manage all your active games from your dashboard and see who's played, who's still trying, and how many attempts everyone has made.",
-      icon: Gamepad2,
-      color: "from-indigo-500 to-purple-500"
-    },
-    {
-      question: "Can I customize the difficulty of my games?",
-      answer: "Yes! For Q&A challenges, you control the question difficulty. For Rate My..., you can give hints like 'between 1-10' or 'higher than 5'. For Scratch & See, you can adjust how much needs to be scratched. Make it as easy or challenging as you want!",
-      icon: Sparkles,
-      color: "from-pink-500 to-rose-500"
-    }
-  ];
+  {
+    question: "What makes Mentisy different from normal sharing apps?",
+    answer:
+      "Instead of just sending a plain photo or video, Mentisy turns it into a playful game! Scratch to reveal, answer a question, race your friends, or guess a rating — every share becomes an experience, not just a file.",
+    icon: Gamepad2,
+    color: "from-purple-500 to-pink-500",
+  },
+  {
+    question: "Do I need to install an app?",
+    answer:
+      "Nope! Mentisy works right in your browser. But since it's a PWA, you can add it to your home screen in just two taps — like having a fun app without the app store hassle!",
+    icon: Sparkles,
+    color: "from-green-500 to-emerald-500",
+  },
+  {
+  question: "Can I install Mentisy like an app?",
+  answer:
+    "Yep! Mentisy is a Progressive Web App (PWA). That means you can add it to your home screen in just a couple of taps. No app store, no downloads — and it works just like a real app, lightning fast and always updated!",
+  icon: Smartphone,
+  color: "from-teal-500 to-green-500",
+},
+
+  {
+    question: "Can I play these games in groups?",
+    answer:
+      "Absolutely! Mentisy is designed for friends. Try 'Reveal Rush' in group chats (first to answer wins) or 'Rate My...' where everyone guesses together. It's made to spark laughs and keep group chats alive!",
+    icon: Users,
+    color: "from-blue-500 to-cyan-500",
+  },
+  {
+    question: "What kind of games can I create?",
+    answer:
+      "Right now you can play Scratch & See, Q&A Challenge, Reveal Rush, and Rate My... More fun formats are coming soon — like polls, dares, and story-style reveals!",
+    icon: Trophy,
+    color: "from-orange-500 to-red-500",
+  },
+  {
+    question: "How long does my shared content last?",
+    answer:
+      "It lasts until the game is completed — once your friends unlock it, it disappears. Mentisy is all about living in the moment, not storing forever!",
+    icon: Gamepad2,
+    color: "from-indigo-500 to-purple-500",
+  },
+  {
+    question: "Is it safe to use?",
+    answer:
+      "Yes — Mentisy is built for fun, not for spying or storing private data. Your content disappears after the game ends, and you stay in control. Remember: it's about playful moments, not permanent storage.",
+    icon: Sparkles,
+    color: "from-pink-500 to-rose-500",
+  },
+];
+
 
   return (
     <div className="px-4 sm:px-6 py-12 sm:py-16 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-900/10 dark:via-purple-900/10 dark:to-pink-900/10">

@@ -68,6 +68,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     const [isHydrated, setIsHydrated] = useState(false);
     const [isInstructionsExpanded, setIsInstructionsExpanded] = useState(false);
     const [isMoreSettingsExpanded, setIsMoreSettingsExpanded] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
 
     const createSecret = useMutation(api.secrets.create);
     const { signIn } = useSignIn();
@@ -105,74 +106,112 @@ useEffect(() => {
     }, [clearGeneratedLink]);
 
     // --- FIXED: THE useEffect HOOK WITH UPLOAD LOGIC ---
- useEffect(() => {
-  const handleSharedFile = async () => {
-    if (searchParams.get("shared") === "true") {
-      console.log("📂 Page loaded from share, handling file...");
+  useEffect(() => {
+        const handleSharedFile = async () => {
+            if (searchParams.get("shared") === "true") {
+                console.log("📂 Page loaded from share, handling file...");
 
-      // 🔑 Immediately clean the URL to prevent loops
-      const newUrl = new URL(window.location.href);
-      newUrl.searchParams.delete("shared");
-      router.replace(newUrl.pathname + newUrl.search, { scroll: false });
+                // 🔒 Immediately clean the URL to prevent loops
+                const newUrl = new URL(window.location.href);
+                newUrl.searchParams.delete("shared");
+                router.replace(newUrl.pathname + newUrl.search, { scroll: false });
 
-      const DB_NAME = "MentisyShareDB";
-      const STORE_NAME = "shared-files";
-      const request = indexedDB.open(DB_NAME, 1);
+                const DB_NAME = "MentisyShareDB";
+                const STORE_NAME = "shared-files";
+                const request = indexedDB.open(DB_NAME, 1);
 
-      request.onsuccess = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result;
-        if (!db.objectStoreNames.contains(STORE_NAME)) return;
+                request.onsuccess = (event) => {
+                    const db = (event.target as IDBOpenDBRequest).result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) return;
 
-        const tx = db.transaction(STORE_NAME, "readonly");
-        const store = tx.objectStore(STORE_NAME);
-        const getRequest = store.get("shared-file");
+                    const tx = db.transaction(STORE_NAME, "readonly");
+                    const store = tx.objectStore(STORE_NAME);
+                    const getRequest = store.get("shared-file");
 
-        getRequest.onsuccess = async () => {
-          const sharedItem = getRequest.result;
-          if (sharedItem && sharedItem.file) {
-            setIsUploading(true);
-            try {
-              let fileForUpload: File;
+                    getRequest.onsuccess = async () => {
+                        const sharedItem = getRequest.result;
+                        if (sharedItem && sharedItem.file) {
+                            setIsUploading(true);
+                            
+                            let fileForUpload: File;
+                            let fileSizeBytes = 0;
 
-              if (sharedItem.file.data) {
-                const blob = new Blob([sharedItem.file.data], { type: sharedItem.file.type });
-                fileForUpload = new File([blob], sharedItem.file.name || "shared", {
-                  type: sharedItem.file.type,
-                });
-              } else if (sharedItem.file instanceof Blob) {
-                const blob = sharedItem.file;
-                fileForUpload = new File([blob], sharedItem.file.name || "shared", { type: blob.type });
-              } else {
-                throw new Error("No file bytes found in IndexedDB");
-              }
+                            // Prepare file and get size
+                            if (sharedItem.file.data) {
+                                const blob = new Blob([sharedItem.file.data], { type: sharedItem.file.type });
+                                fileForUpload = new File([blob], sharedItem.file.name || "shared", {
+                                    type: sharedItem.file.type,
+                                });
+                                fileSizeBytes = blob.size;
+                            } else if (sharedItem.file instanceof Blob) {
+                                const blob = sharedItem.file;
+                                fileForUpload = new File([blob], sharedItem.file.name || "shared", { type: blob.type });
+                                fileSizeBytes = blob.size;
+                            } else {
+                                throw new Error("No file bytes found in IndexedDB");
+                            }
 
-              const endpoint =
-                sharedItem.type === "image" ? "imageUploader" : "videoUploader";
-              const res = await uploadFiles(endpoint, { files: [fileForUpload] });
+                            // 🆕 Size-aware progress simulation
+                            const simulateProgressBasedOnFileSize = (sizeBytes: number) => {
+                                // Estimate upload time based on file size (assuming 1MB/s)
+                                const estimatedUploadTimeMs = Math.max(
+                                    2000, // Minimum 2 seconds
+                                    (sizeBytes / (1024 * 1024)) * 1000 // 1 second per MB
+                                );
+                                
+                                const updateIntervalMs = Math.min(300, estimatedUploadTimeMs / 30);
+                                const totalUpdates = Math.floor(estimatedUploadTimeMs / updateIntervalMs);
+                                const incrementPerUpdate = 90 / totalUpdates;
+                                
+                                console.log(`📊 File size: ${(sizeBytes / (1024 * 1024)).toFixed(1)}MB`);
+                                console.log(`⏱️ Estimated upload: ${(estimatedUploadTimeMs / 1000).toFixed(1)}s`);
+                                
+                                let progress = 0;
+                                const interval = setInterval(() => {
+                                    progress += incrementPerUpdate + (Math.random() * 2 - 1); // ±1% variation
+                                    progress = Math.max(0, Math.min(90, progress)); // Keep between 0-90%
+                                    setUploadProgress(Math.round(progress)); // ✅ Now in correct scope
+                                }, updateIntervalMs);
+                                
+                                return interval;
+                            };
 
-              if (res && res.length > 0) {
-  const uploaded = res[0];
-  const fileUrl = (uploaded as any).ufsUrl || uploaded.url; // handle v8 + v9
-  handleFileUpload({ url: fileUrl, type: sharedItem.type });
-}
-else {
-                throw new Error("Upload failed to return a valid response.");
-              }
-            } catch (error) {
-              console.error("❌ Upload failed:", error);
-              alert(`ERROR! ${(error as Error).message}`);
-            } finally {
-              setIsUploading(false);
-              // ❌ no store.clear()
+                            const progressInterval = simulateProgressBasedOnFileSize(fileSizeBytes);
+
+                            try {
+                                const endpoint = sharedItem.type === "image" ? "imageUploader" : "videoUploader";
+                                const res = await uploadFiles(endpoint, { files: [fileForUpload] });
+
+                                // Complete progress animation
+                                clearInterval(progressInterval);
+                                setUploadProgress(100);
+                                
+                                setTimeout(() => {
+                                    setUploadProgress(0);
+                                }, 1000);
+
+                                if (res && res.length > 0) {
+                                    const uploaded = res[0];
+                                    const fileUrl = (uploaded as any).ufsUrl || uploaded.url;
+                                    handleFileUpload({ url: fileUrl, type: sharedItem.type });
+                                } else {
+                                    throw new Error("Upload failed to return a valid response.");
+                                }
+                            } catch (error) {
+                                console.error("❌ Upload failed:", error);
+                                clearInterval(progressInterval);
+                                setUploadProgress(0);
+                                alert(`ERROR! ${(error as Error).message}`);
+                            } finally {
+                                setIsUploading(false);
+                            }
+                        }
+                    };
+                };
             }
-          }
         };
-      };
-    }
-  };
-  handleSharedFile();
-}, [searchParams, router, handleFileUpload]);
-
+        handleSharedFile();
+    }, [searchParams, router, handleFileUpload]);
 
 
     // ... (The rest of your file is fine, no changes needed below this line)
@@ -447,6 +486,7 @@ else {
                                 <FileUploadArea
                                     isLandingPage={isLandingPage}
                                     isUploading={isUploading}
+                                    uploadProgress={uploadProgress}
                                     onSaveFormData={saveFormData}
                                     onShowSignupPrompt={() => setShowSignupPrompt(true)}
                                     onImageUploadBegin={() => setIsUploading(true)}

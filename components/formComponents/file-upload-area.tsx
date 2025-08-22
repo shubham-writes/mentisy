@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { UploadButton } from "../uploadthing";
 import { useState } from "react";
@@ -5,6 +6,7 @@ import { useState } from "react";
 interface FileUploadAreaProps {
     isLandingPage: boolean;
     isUploading: boolean;
+    uploadProgress?: number; 
     onSaveFormData: () => void;
     onShowSignupPrompt: () => void;
     onImageUploadBegin: () => void;
@@ -18,6 +20,7 @@ interface FileUploadAreaProps {
 export function FileUploadArea({ 
     isLandingPage, 
     isUploading, 
+    uploadProgress = 0, // 🆕 Accept external progress with default 0
     onSaveFormData, 
     onShowSignupPrompt,
     onImageUploadBegin,
@@ -27,7 +30,10 @@ export function FileUploadArea({
     onVideoUploadComplete,
     onVideoUploadError
 }: FileUploadAreaProps) {
-    const [uploadProgress, setUploadProgress] = useState(0);
+    const [internalProgress, setInternalProgress] = useState(0);
+    
+    // 🆕 Use external progress if it's > 0 (from share uploads), otherwise use internal progress (from button uploads)
+    const displayProgress = uploadProgress > 0 ? uploadProgress : internalProgress;
 
     const handleLandingPageUpload = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -37,24 +43,24 @@ export function FileUploadArea({
     };
 
     const handleImageUploadBegin = () => {
-        setUploadProgress(0);
+        setInternalProgress(0);
         onImageUploadBegin();
     };
 
     const handleVideoUploadBegin = () => {
-        setUploadProgress(0);
+        setInternalProgress(0);
         onVideoUploadBegin();
     };
 
     const handleImageUploadComplete = (res: any) => {
-        setUploadProgress(100);
-        setTimeout(() => setUploadProgress(0), 1000);
+        setInternalProgress(100);
+        setTimeout(() => setInternalProgress(0), 1000);
         onImageUploadComplete(res);
     };
 
     const handleVideoUploadComplete = (res: any) => {
-        setUploadProgress(100);
-        setTimeout(() => setUploadProgress(0), 1000);
+        setInternalProgress(100);
+        setTimeout(() => setInternalProgress(0), 1000);
         onVideoUploadComplete(res);
     };
 
@@ -73,7 +79,7 @@ export function FileUploadArea({
                     </h4>
                     <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-sm sm:text-base lg:text-lg px-2 sm:px-4">
                         {isLandingPage 
-                            ? "Upload anything — we’ll turn it into laughs with scratch, guess, or rate." 
+                            ? "Upload anything — we'll turn it into laughs with scratch, guess, or rate." 
                             : "Make every share a game — scratch it, guess it, race it, or rate it with friends."
                         }
                     </p>
@@ -111,7 +117,7 @@ export function FileUploadArea({
                                         onUploadBegin={handleImageUploadBegin}
                                         onClientUploadComplete={handleImageUploadComplete}
                                         onUploadError={onImageUploadError}
-                                        onUploadProgress={(progress) => setUploadProgress(progress)}
+                                        onUploadProgress={(progress) => setInternalProgress(progress)}
                                         appearance={{
                                             button: "bg-gradient-to-r from-[#FF75A0] to-[#e65a85] border-0 rounded-lg sm:rounded-xl px-4 sm:px-6 py-3 h-12 font-medium text-white shadow-lg hover:shadow-xl active:scale-98 transition-all duration-150 w-full sm:w-auto text-sm sm:text-base",
                                             allowedContent: "hidden",
@@ -131,7 +137,7 @@ export function FileUploadArea({
                                         onUploadBegin={handleVideoUploadBegin}
                                         onClientUploadComplete={handleVideoUploadComplete}
                                         onUploadError={onVideoUploadError}
-                                        onUploadProgress={(progress) => setUploadProgress(progress)}
+                                        onUploadProgress={(progress) => setInternalProgress(progress)}
                                         appearance={{
                                             button: "bg-gradient-to-r from-[#FFAA70] to-[#e6955a] border-0 rounded-lg sm:rounded-xl px-4 sm:px-6 py-3 h-12 font-medium text-white shadow-lg hover:shadow-xl active:scale-98 transition-all duration-150 w-full sm:w-auto text-sm sm:text-base",
                                             allowedContent: "hidden",
@@ -155,14 +161,14 @@ export function FileUploadArea({
                         <div className="w-full max-w-xs sm:max-w-md mx-auto">
                             <div className="flex items-center justify-between text-xs sm:text-sm text-[#FF75A0] dark:text-[#FF75A0] mb-2">
                                 <span className="font-medium">
-                                    {uploadProgress < 100 ? 'Uploading...' : 'Almost done!'}
+                                    {displayProgress < 100 ? 'Uploading...' : 'Almost done!'}
                                 </span>
-                                <span className="font-bold">{Math.round(uploadProgress)}%</span>
+                                <span className="font-bold">{Math.round(displayProgress)}%</span>
                             </div>
                             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 sm:h-3 overflow-hidden">
                                 <div 
                                     className="h-full bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] rounded-full transition-all duration-300 ease-out"
-                                    style={{ width: `${uploadProgress}%` }}
+                                    style={{ width: `${displayProgress}%` }}
                                 />
                             </div>
                         </div>
