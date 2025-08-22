@@ -158,12 +158,12 @@ useEffect(() => {
                             
                             // Check if it's an image type
                             if (fileType === "image") {
-                                estimatedUploadTimeMs = 6000; // Fixed 6 seconds for images
+                                estimatedUploadTimeMs = 8000; // Fixed 6 seconds for images
                                 maxProgress = 99; // Reach 99% for images
                             } else {
                                 // For videos or other files, use 7 seconds
-                                estimatedUploadTimeMs = 7000; // Fixed 7 seconds for other files
-                                maxProgress = 90; // Keep 90% for other files
+                                estimatedUploadTimeMs = 12000; // Fixed 7 seconds for other files
+                                maxProgress = 98; // Keep 90% for other files
                             }
                             
                             const updateIntervalMs = Math.min(300, estimatedUploadTimeMs / 30);
