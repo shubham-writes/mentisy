@@ -40,7 +40,7 @@ export function WatermarkSettings({ addWatermark, onWatermarkChange }: Watermark
             {!addWatermark && (
                 <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
                     <p className="text-xs text-red-700 dark:text-red-300 flex items-center space-x-1">
-                        <span>⚠️</span>
+                        
                         <span>No overlay — friends can screenshot if they want 😜</span>
                     </p>
                 </div>

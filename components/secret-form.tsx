@@ -67,6 +67,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     const [mqSuggestionPrompt, setMqSuggestionPrompt] = useState("");
     const [isHydrated, setIsHydrated] = useState(false);
     const [isInstructionsExpanded, setIsInstructionsExpanded] = useState(false);
+    const [isMoreSettingsExpanded, setIsMoreSettingsExpanded] = useState(false);
 
     const createSecret = useMutation(api.secrets.create);
     const { signIn } = useSignIn();
@@ -77,6 +78,13 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     useEffect(() => {
         setIsHydrated(true);
     }, []);
+
+    // Auto-collapse More Settings when file is uploaded
+useEffect(() => {
+    if (uploadedFile && isMoreSettingsExpanded) {
+        setIsMoreSettingsExpanded(false);
+    }
+}, [uploadedFile, isMoreSettingsExpanded]);
 
     // --- FIXED: WRAPPED IN useCallback ---
     const clearGeneratedLink = useCallback(() => {
@@ -450,20 +458,7 @@ else {
                                 />
                             )}
 
-                            {/* 2. Message Details - Core Content (Desktop: below file/watermark, Mobile: before timer) */}
-                            <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg lg:block hidden">
-                                <FormFields
-                                    recipientName={recipientName}
-                                    publicNote={publicNote}
-                                    message={message}
-                                    onRecipientNameChange={handleRecipientNameChange}
-                                    onPublicNoteChange={handlePublicNoteChange}
-                                    onMessageChange={handleMessageChange}
-                                    useCase={useCase}
-                                    gameMode={gameMode}
-                                    uploadedFile={uploadedFile}
-                                />
-                            </div>
+                            
                         </div>
 
                         {/* RIGHT COLUMN - Game Features & Settings (Better organized hierarchy) */}
@@ -482,7 +477,7 @@ else {
 
                             {/* 2. Dynamic Instructions Panel - Visual Guide (Right after game selection) */}
                             {/* 2. Elegant Game Mode Instructions - Collapsible */}
-<div className={`rounded-xl sm:rounded-2xl border shadow-lg transition-all duration-300 ${
+<div className={`rounded-xl sm:rounded-2xl border shadow-lg transition-all duration-150 ${
     gameMode === 'none' ? 'bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200/50 dark:border-blue-700/50' :
     gameMode === 'scratch_and_see' ? 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200/50 dark:border-green-700/50' :
     gameMode === 'qa_challenge' ? 'bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 border-purple-200/50 dark:border-purple-700/50' :
@@ -490,15 +485,15 @@ else {
 }`}>
     {/* Compact Header - Always Visible */}
     <div 
-        className="p-4 sm:p-5 cursor-pointer flex items-center justify-between hover:bg-white/30 dark:hover:bg-black/10 transition-colors duration-200"
+        className="p-4 sm:p-5 cursor-pointer flex items-center justify-between hover:bg-white/30 dark:hover:bg-black/10 transition-colors duration-100"
         onClick={() => setIsInstructionsExpanded(!isInstructionsExpanded)}
     >
         <div className="flex items-center space-x-3">
             {/* Mode Icon */}
             <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-white/50 dark:bg-black/20">
                 <span className="text-lg">
-                    {gameMode === 'none' && '🎮'}
-                    {gameMode === 'scratch_and_see' && '✨'}
+                    {gameMode === 'none' && 'ⓘ'}
+                    {gameMode === 'scratch_and_see' && '🐾'}
                     {gameMode === 'qa_challenge' && '🤔'}
                     {gameMode === 'reveal_rush' && '🏆'}
                 </span>
@@ -532,7 +527,7 @@ else {
         </div>
 
         {/* Expand/Collapse Icon */}
-        <div className={`flex-shrink-0 w-6 h-6 flex items-center justify-center transition-transform duration-200 ${
+        <div className={`flex-shrink-0 w-6 h-6 flex items-center justify-center transition-transform duration-150 ${
             isInstructionsExpanded ? 'rotate-180' : 'rotate-0'
         }`}>
             <svg className="w-4 h-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -542,7 +537,7 @@ else {
     </div>
 
     {/* Expandable Content */}
-    <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
+    <div className={`overflow-hidden transition-all duration-150 ease-in-out ${
         isInstructionsExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
     }`}>
         <div className="px-4 sm:px-5 pb-4 sm:pb-5 border-t border-current/10">
@@ -573,7 +568,7 @@ else {
                                 <span>Group Competitions</span>
                             </div>
                             <div className="flex items-center space-x-2 text-xs text-blue-500 dark:text-blue-400">
-                                <span>✨</span>
+                                <span>🐾</span>
                                 <span>Scratch & Reveal</span>
                             </div>
                         </>
@@ -683,42 +678,77 @@ else {
                                 </div>
                             )}
 
-                            {/* 4. Timer Settings - Technical Configuration (Desktop Only - Final step in right column) */}
-                            <div className="hidden lg:block bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
-                                <TimerSettings
-                                    duration={duration}
-                                    onDurationChange={setDuration}
-                                    isTimerDisabled={isTimerDisabled}
-                                    gameMode={gameMode}
-                                />
-                            </div>
+                            
                         </div>
                     </div>
 
                     {/* Mobile-Only Message Details - Positioned before Timer Settings in mobile flow */}
-                    <div className="lg:hidden bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg mt-6 sm:mt-8">
-                        <FormFields
-                            recipientName={recipientName}
-                            publicNote={publicNote}
-                            message={message}
-                            onRecipientNameChange={handleRecipientNameChange}
-                            onPublicNoteChange={handlePublicNoteChange}
-                            onMessageChange={handleMessageChange}
-                            useCase={useCase}
-                            gameMode={gameMode}
-                            uploadedFile={uploadedFile}
-                        />
-                    </div>
+                   {/* More Settings Panel - Collapsible Caption + Timer */}
+<div className={`rounded-xl sm:rounded-2xl border shadow-lg transition-all duration-150 mt-6 sm:mt-8 ${
+    'bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border-gray-200/50 dark:border-gray-700/50'
+}`}>
+    {/* Header - Always Visible */}
+    <div 
+        className="p-4 sm:p-5 cursor-pointer flex items-center justify-between hover:bg-white/30 dark:hover:bg-black/10 transition-colors duration-100"
+        onClick={() => setIsMoreSettingsExpanded(!isMoreSettingsExpanded)}
+    >
+        <div className="flex items-center space-x-3">
+            {/* Settings Icon */}
+            <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-white/50 dark:bg-black/20">
+                <span className="text-lg">⚙️</span>
+            </div>
+            
+            {/* Title & Description */}
+            <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-sm sm:text-base text-gray-800 dark:text-gray-200">
+                    More Settings
+                </h3>
+                <p className="text-xs opacity-70 truncate text-gray-600 dark:text-gray-300">
+                    {uploadedFile ? 'Caption & timer settings' : 'Message & timer settings'}
+                </p>
+            </div>
+        </div>
 
-                    {/* Mobile-Only Timer Settings - Final step before generate button */}
-                    <div className="lg:hidden bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg mt-4 sm:mt-6">
-                        <TimerSettings
-                            duration={duration}
-                            onDurationChange={setDuration}
-                            isTimerDisabled={isTimerDisabled}
-                            gameMode={gameMode}
-                        />
-                    </div>
+        {/* Expand/Collapse Icon */}
+        <div className={`flex-shrink-0 w-6 h-6 flex items-center justify-center transition-transform duration-150 ${
+            isMoreSettingsExpanded ? 'rotate-180' : 'rotate-0'
+        }`}>
+            <svg className="w-4 h-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+        </div>
+    </div>
+
+    {/* Expandable Content */}
+    <div className={`overflow-hidden transition-all duration-150 ease-in-out ${
+        isMoreSettingsExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+    }`}>
+        <div className="px-4 sm:px-5 pb-4 sm:pb-5 border-t border-gray-200/30 dark:border-gray-700/30">
+            <div className="pt-4 space-y-6">
+                {/* Caption/Message Fields */}
+                <FormFields
+                    recipientName={recipientName}
+                    publicNote={publicNote}
+                    message={message}
+                    onRecipientNameChange={handleRecipientNameChange}
+                    onPublicNoteChange={handlePublicNoteChange}
+                    onMessageChange={handleMessageChange}
+                    useCase={useCase}
+                    gameMode={gameMode}
+                    uploadedFile={uploadedFile}
+                />
+                
+                {/* Timer Settings */}
+                <TimerSettings
+                    duration={duration}
+                    onDurationChange={setDuration}
+                    isTimerDisabled={isTimerDisabled}
+                    gameMode={gameMode}
+                />
+            </div>
+        </div>
+    </div>
+</div>
 
                     {/* Generate Button - Centered, Full Width */}
                     <div className="mt-6 sm:mt-8 lg:mt-12">
