@@ -13,7 +13,7 @@ export function Watermark({
   animated = false,
   mode = "video",
 }: WatermarkProps) {
-  const watermarkText = `IP: ${ip || "..."} • `;
+  const watermarkText = `•IP: ${ip || "..."} `;
   const repeatedText = Array(20).fill(watermarkText).join("");
 
   const animationStyle = animated

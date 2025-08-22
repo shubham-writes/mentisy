@@ -22,17 +22,25 @@ export function GeneratedLinkDisplay({
 
     // Function to get the appropriate text based on game mode
     const getShareText = () => {
-        switch (gameMode) {
-            case "qa_challenge":
-                return "can you answer this question";
-            case "reveal_rush":
-                return selectedType === "rate_my" ? "can you guess my ratings" : "can you answer this question";
-            case "scratch_and_see":
-                return "scratch it fast";
-            default:
-                return "A fun message ";
-        }
-    };
+    console.log('🐛 DEBUG - gameMode:', gameMode);
+    console.log('🐛 DEBUG - selectedType:', selectedType);
+    
+    switch (gameMode) {
+        case "qa_challenge":
+            console.log('🐛 Returning: can you answer this question');
+            return "can you answer this question";
+        case "reveal_rush":
+            const text = selectedType === "rate_my" ? "can you guess my ratings" : "can you answer this question";
+            console.log('🐛 Returning:', text);
+            return text;
+        case "scratch_and_see":
+            console.log('🐛 Returning: scratch it fast');
+            return "scratch it fast";
+        default:
+            console.log('🐛 Returning DEFAULT: Check out this secret message 👀');
+            return "Check out this secret message 👀";
+    }
+};
 
     const shareText = getShareText();
 
