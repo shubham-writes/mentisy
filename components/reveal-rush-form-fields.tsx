@@ -175,7 +175,7 @@ export function MicroQuestFormFields({
                                         type="button"
                                         onClick={() => onExpectedRatingChange(rating)}
                                         className={`w-6 h-6 sm:w-8 sm:h-8 rounded-md text-xs font-medium transition-all ${
-                                            mqExpectedRating === rating
+                                            mqExpectedRating === rating && mqExpectedRating > 0
                                                 ? 'bg-yellow-500 text-white'
                                                 : 'bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-yellow-400'
                                         }`}
@@ -191,7 +191,7 @@ export function MicroQuestFormFields({
 
             {/* Status Indicator - With Timer */}
             {((microQuestType === "group_qa" && mqGroupQuestion && mqGroupAnswer) ||
-              (microQuestType === "rate_my" && mqRateCategory && mqExpectedRating)) && (
+              (microQuestType === "rate_my" && mqRateCategory && mqExpectedRating > 0)) && (
                 <div className="flex items-center space-x-2 p-2 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200/50 dark:border-green-700/50">
                     <span className="text-green-600 dark:text-green-400">✓</span>
                     <p className="text-sm text-green-700 dark:text-green-300">

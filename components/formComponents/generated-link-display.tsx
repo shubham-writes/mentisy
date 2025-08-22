@@ -118,7 +118,7 @@ export function GeneratedLinkDisplay({
                         Share directly to:
                     </p>
                     <SocialShareButtons
-                        title="Secret Message"
+                        title=""
                         text={shareText}
                         url={generatedLink}
                     />
@@ -140,7 +140,7 @@ export function GeneratedLinkDisplay({
                 <div className="flex justify-center">
                     <div className="w-full sm:w-fit">
                         <ShareButton
-                            title="Secret Message"
+                            title=""
                             text={shareText}
                             url={generatedLink}
                         />
