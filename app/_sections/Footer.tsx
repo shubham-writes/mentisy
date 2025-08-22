@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { MessageCircle } from "lucide-react";
 import { FeedbackModal } from "@/components/feedback/FeedbackModal";
 
@@ -64,10 +65,27 @@ export default function Footer() {
             </div>
           </div>
           
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center">
-            <p className="text-gray-400 text-sm">
-              © 2025 &nbsp;Mentisy. &nbsp;Made for fun, built for friends.
-            </p>
+          <div className="border-t border-gray-800 mt-8 pt-8">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+              <p className="text-gray-400 text-sm">
+                © 2025 Mentisy. Made for fun, built for friends.
+              </p>
+              <div className="flex items-center gap-4 text-sm">
+                <Link 
+                  href="/privacy" 
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  Privacy Policy
+                </Link>
+                <span className="text-gray-600">•</span>
+                <Link 
+                  href="/terms" 
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  Terms & Conditions
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </footer>
