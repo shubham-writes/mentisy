@@ -81,10 +81,10 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
 
     // Auto-collapse More Settings when file is uploaded
 useEffect(() => {
-    if (uploadedFile && isMoreSettingsExpanded) {
+    if (uploadedFile) {
         setIsMoreSettingsExpanded(false);
     }
-}, [uploadedFile, isMoreSettingsExpanded]);
+}, [uploadedFile]);
 
     // --- FIXED: WRAPPED IN useCallback ---
     const clearGeneratedLink = useCallback(() => {
@@ -458,40 +458,8 @@ else {
                                 />
                             )}
 
-                             {/* Message Details and Timer Settings - Visible when no file uploaded */}
-{!uploadedFile && (
-    <div className="space-y-4 sm:space-y-6">
-        {/* Message Details */}
-        <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
-            <FormFields
-                recipientName={recipientName}
-                publicNote={publicNote}
-                message={message}
-                onRecipientNameChange={handleRecipientNameChange}
-                onPublicNoteChange={handlePublicNoteChange}
-                onMessageChange={handleMessageChange}
-                useCase={useCase}
-                gameMode={gameMode}
-                uploadedFile={uploadedFile}
-            />
-        </div>
-        
-        {/* Timer Settings */}
-        <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
-            <TimerSettings
-                duration={duration}
-                onDurationChange={setDuration}
-                isTimerDisabled={isTimerDisabled}
-                gameMode={gameMode}
-            />
-        </div>
-    </div>
-)}
-                        
                             
                         </div>
-
-                       
 
                         {/* RIGHT COLUMN - Game Features & Settings (Better organized hierarchy) */}
                         <div className="space-y-4 sm:space-y-6 order-2">
@@ -675,111 +643,114 @@ else {
     </div>
 </div>
 
-                            {/* 4. Game-Specific Forms (Conditional - After more settings) */}
-    {gameMode === 'qa_challenge' && uploadedFile?.type === 'image' && (
-        <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
-            <QAFormFields
-                qaQuestion={qaQuestion}
-                qaAnswer={qaAnswer}
-                qaMaxAttempts={qaMaxAttempts}
-                qaCaseSensitive={qaCaseSensitive}
-                qaShowHints={qaShowHints}
-                onQuestionChange={handleQaQuestionChange}
-                onAnswerChange={handleQaAnswerChange}
-                onMaxAttemptsChange={handleQaMaxAttemptsChange}
-                onCaseSensitiveChange={handleQaCaseSensitiveChange}
-                onShowHintsChange={handleQaShowHintsChange}
-            />
-        </div>
-    )}
+                            {/* 3. Game-Specific Forms (Conditional - After instructions) */}
+                            {gameMode === 'qa_challenge' && uploadedFile?.type === 'image' && (
+                                <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
+                                    <QAFormFields
+                                        qaQuestion={qaQuestion}
+                                        qaAnswer={qaAnswer}
+                                        qaMaxAttempts={qaMaxAttempts}
+                                        qaCaseSensitive={qaCaseSensitive}
+                                        qaShowHints={qaShowHints}
+                                        timerDuration={duration}
+                                        onQuestionChange={handleQaQuestionChange}
+                                        onAnswerChange={handleQaAnswerChange}
+                                        onMaxAttemptsChange={handleQaMaxAttemptsChange}
+                                        onCaseSensitiveChange={handleQaCaseSensitiveChange}
+                                        onShowHintsChange={handleQaShowHintsChange}
+                                    />
+                                </div>
+                            )}
 
-    {gameMode === 'reveal_rush' && uploadedFile?.type === 'image' && (
-        <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
-            <MicroQuestFormFields
-                microQuestType={microQuestType}
-                onTypeChange={handleMicroQuestTypeChange}
-                mqGroupQuestion={mqGroupQuestion}
-                onGroupQuestionChange={handleMqGroupQuestionChange}
-                mqGroupAnswer={mqGroupAnswer}
-                onGroupAnswerChange={handleMqGroupAnswerChange}
-                mqRateCategory={mqRateCategory}
-                onRateCategoryChange={handleMqRateCategoryChange}
-                mqExpectedRating={mqExpectedRating}
-                onExpectedRatingChange={handleMqExpectedRatingChange}
-            />
-        </div>
-    )}
+                            {gameMode === 'reveal_rush' && uploadedFile?.type === 'image' && (
+                                <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
+                                    <MicroQuestFormFields
+                                        microQuestType={microQuestType}
+                                        onTypeChange={handleMicroQuestTypeChange}
+                                        mqGroupQuestion={mqGroupQuestion}
+                                        onGroupQuestionChange={handleMqGroupQuestionChange}
+                                        mqGroupAnswer={mqGroupAnswer}
+                                        onGroupAnswerChange={handleMqGroupAnswerChange}
+                                        mqRateCategory={mqRateCategory}
+                                        onRateCategoryChange={handleMqRateCategoryChange}
+                                        mqExpectedRating={mqExpectedRating}
+                                        onExpectedRatingChange={handleMqExpectedRatingChange}
+                                    />
+                                </div>
+                            )}
 
-               {/* More Settings - Collapsible (when file uploaded) */}
-{uploadedFile && (
-    <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-lg transition-all duration-150">
-        {/* More Settings Header */}
-        <div 
-            className="p-4 sm:p-5 cursor-pointer flex items-center justify-between hover:bg-white/30 dark:hover:bg-black/10 transition-colors duration-100"
-            onClick={() => setIsMoreSettingsExpanded(!isMoreSettingsExpanded)}
-        >
-            <div className="flex items-center space-x-3">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-white/50 dark:bg-black/20">
-                    <span className="text-lg">⚙️</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-sm sm:text-base text-gray-800 dark:text-gray-200">
-                        More Settings
-                    </h3>
-                    <p className="text-xs opacity-70 truncate text-gray-600 dark:text-gray-300">
-                        Message details, timer & advanced options
-                    </p>
-                </div>
+                            {/* More Settings Panel - Collapsible Caption + Timer */}
+<div className={`rounded-xl sm:rounded-2xl border shadow-lg transition-all duration-150 mt-6 sm:mt-8 ${
+    'bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border-gray-200/50 dark:border-gray-700/50'
+}`}>
+    {/* Header - Always Visible */}
+    <div 
+        className="p-4 sm:p-5 cursor-pointer flex items-center justify-between hover:bg-white/30 dark:hover:bg-black/10 transition-colors duration-100"
+        onClick={() => setIsMoreSettingsExpanded(!isMoreSettingsExpanded)}
+    >
+        <div className="flex items-center space-x-3">
+            {/* Settings Icon */}
+            <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-white/50 dark:bg-black/20">
+                <span className="text-lg">⚙️</span>
             </div>
-            <div className={`flex-shrink-0 w-6 h-6 flex items-center justify-center transition-transform duration-150 ${
-                isMoreSettingsExpanded ? 'rotate-180' : 'rotate-0'
-            }`}>
-                <svg className="w-4 h-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
+            
+            {/* Title & Description */}
+            <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-sm sm:text-base text-gray-800 dark:text-gray-200">
+                    More Settings
+                </h3>
+                <p className="text-xs opacity-70 truncate text-gray-600 dark:text-gray-300">
+                    {uploadedFile ? 'Caption & timer settings' : 'Message & timer settings'}
+                </p>
             </div>
         </div>
 
-        {/* Expandable Content */}
-        <div className={`overflow-hidden transition-all duration-150 ease-in-out ${
-            isMoreSettingsExpanded ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
+        {/* Expand/Collapse Icon */}
+        <div className={`flex-shrink-0 w-6 h-6 flex items-center justify-center transition-transform duration-150 ${
+            isMoreSettingsExpanded ? 'rotate-180' : 'rotate-0'
         }`}>
-            <div className="px-4 sm:px-5 pb-4 sm:pb-5 border-t border-gray-200/30 dark:border-gray-700/30">
-                <div className="pt-4 space-y-6">
-                    {/* Message Details */}
-                    <div>
-                        <h4 className="font-medium text-sm text-gray-800 dark:text-gray-200 mb-3">Message Details</h4>
-                        <FormFields
-                            recipientName={recipientName}
-                            publicNote={publicNote}
-                            message={message}
-                            onRecipientNameChange={handleRecipientNameChange}
-                            onPublicNoteChange={handlePublicNoteChange}
-                            onMessageChange={handleMessageChange}
-                            useCase={useCase}
-                            gameMode={gameMode}
-                            uploadedFile={uploadedFile}
-                        />
-                    </div>
-                    
-                    {/* Timer Settings */}
-                    <div>
-                        <h4 className="font-medium text-sm text-gray-800 dark:text-gray-200 mb-3">Timer Settings</h4>
-                        <TimerSettings
-                            duration={duration}
-                            onDurationChange={setDuration}
-                            isTimerDisabled={isTimerDisabled}
-                            gameMode={gameMode}
-                        />
-                    </div>
-                </div>
+            <svg className="w-4 h-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+        </div>
+    </div>
+
+    {/* Expandable Content */}
+    <div className={`overflow-hidden transition-all duration-150 ease-in-out ${
+        isMoreSettingsExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+    }`}>
+        <div className="px-4 sm:px-5 pb-4 sm:pb-5 border-t border-gray-200/30 dark:border-gray-700/30">
+            <div className="pt-4 space-y-6">
+                {/* Caption/Message Fields */}
+                <FormFields
+                    recipientName={recipientName}
+                    publicNote={publicNote}
+                    message={message}
+                    onRecipientNameChange={handleRecipientNameChange}
+                    onPublicNoteChange={handlePublicNoteChange}
+                    onMessageChange={handleMessageChange}
+                    useCase={useCase}
+                    gameMode={gameMode}
+                    uploadedFile={uploadedFile}
+                />
+                
+                {/* Timer Settings */}
+                <TimerSettings
+                    duration={duration}
+                    onDurationChange={setDuration}
+                    isTimerDisabled={isTimerDisabled}
+                    gameMode={gameMode}
+                />
             </div>
         </div>
     </div>
-)}             
+</div>
+
+                            
                         </div>
                     </div>
 
+                    
                    
 
                     {/* Generate Button - Centered, Full Width */}
@@ -841,17 +812,14 @@ else {
                 </div>
             </div>
 
-            
-
             {/* Generated Link Section - Mobile: Full Width Card, Desktop: Below Main Container */}
             {!isLandingPage && generatedLink && (
                 <div className="mt-4 sm:mt-6 lg:mt-8">
-                    
                     <GeneratedLinkDisplay
                         generatedLink={generatedLink}
                         publicNote={publicNote}
-                        gameMode={gameMode as GameMode}
-    selectedType={microQuestType as MicroQuestType}
+                        gameMode={gameMode}       
+                        selectedType={microQuestType}
                     />
                 </div>
             )}

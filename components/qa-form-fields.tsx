@@ -11,6 +11,7 @@ interface QAFormFieldsProps {
     qaMaxAttempts: number;
     qaCaseSensitive: boolean;
     qaShowHints: boolean;
+    timerDuration?: string; // Add this prop
     onQuestionChange: (value: string) => void;
     onAnswerChange: (value: string) => void;
     onMaxAttemptsChange: (value: number) => void;
@@ -24,6 +25,7 @@ export function QAFormFields({
     qaMaxAttempts,
     qaCaseSensitive,
     qaShowHints,
+    timerDuration,
     onQuestionChange,
     onAnswerChange,
     onMaxAttemptsChange,
@@ -34,6 +36,21 @@ export function QAFormFields({
 
     // Auto-expand advanced settings if user has customized them
     const hasCustomSettings = qaMaxAttempts !== 3 || qaCaseSensitive || !qaShowHints;
+
+    // Helper function to format timer duration
+    const formatTimerDuration = (duration: string) => {
+        const seconds = parseInt(duration);
+        if (seconds >= 60) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            if (remainingSeconds === 0) {
+                return `${minutes} min${minutes > 1 ? 's' : ''}`;
+            } else {
+                return `${minutes}m ${remainingSeconds}s`;
+            }
+        }
+        return `${seconds} sec${seconds > 1 ? 's' : ''}`;
+    };
 
     return (
         <div className="space-y-4">
@@ -168,12 +185,13 @@ export function QAFormFields({
                 )}
             </div>
 
-            {/* Status Indicator - Minimal */}
+            {/* Status Indicator - With Timer */}
             {qaQuestion && qaAnswer && (
                 <div className="flex items-center space-x-2 p-2 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200/50 dark:border-green-700/50">
                     <span className="text-green-600 dark:text-green-400">✓</span>
                     <p className="text-sm text-green-700 dark:text-green-300">
                         Challenge ready • {qaMaxAttempts} attempt{qaMaxAttempts > 1 ? 's' : ''}
+                        {timerDuration && ` • ${formatTimerDuration(timerDuration)} timer`}
                     </p>
                 </div>
             )}

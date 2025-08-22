@@ -37,8 +37,8 @@ export function GeneratedLinkDisplay({
             console.log('🐛 Returning: scratch it fast');
             return "scratch it fast";
         default:
-            console.log('🐛 Returning DEFAULT: Check out this secret message 👀');
-            return "Check out this secret message 👀";
+            console.log('');
+            return "";
     }
 };
 
