@@ -1,229 +1,240 @@
 import React from "react";
-import { Shield, Eye, Users, Lock, Heart, Mail } from "lucide-react";
+import { Shield, Mail, Calendar, ExternalLink } from "lucide-react";
 
 export default function PrivacyPolicy() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-pink-600/10"></div>
-        <div className="relative max-w-4xl mx-auto px-6 pt-20 pb-16">
+    <main className="min-h-screen bg-white dark:bg-gray-900">
+      {/* Header */}
+      <div className="border-b border-gray-200 dark:border-gray-700">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
           <div className="text-center">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mb-6 shadow-lg">
-              <Shield className="w-10 h-10 text-white" />
+            <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] rounded-lg mb-4">
+              <Shield className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2">
               Privacy Policy
             </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-6">
-              We believe in transparency. Here&apos;s how we protect and use your data.
-            </p>
-            <div className="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 rounded-full shadow-md border border-gray-200 dark:border-gray-600">
-              <div className="w-3 h-3 bg-green-500 rounded-full mr-2 animate-pulse"></div>
-              <span className="text-sm text-gray-600 dark:text-gray-300">Effective Date: [Insert Date]</span>
+            <div className="flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <Calendar className="w-4 h-4" />
+              <span>Last updated: January 1, 2025</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-6 pb-20">
-        {/* Introduction Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl border border-gray-100 dark:border-gray-700 mb-8">
-          <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center">
-              <Heart className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">Welcome to Mentisy</h2>
-              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                Welcome to <strong>Mentisy.com</strong> (&ldquo;Mentisy&ldquo;, &ldquo;we&ldquo;, &ldquo;our&ldquo;, &ldquo;us&ldquo;).
-                We respect your privacy and are committed to protecting your personal data.
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <div className="prose prose-gray dark:prose-invert prose-sm sm:prose-base max-w-none">
+          
+          {/* Introduction */}
+          <section className="mb-8 sm:mb-12">
+            <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+              Mentisy LLC (&ldquo;Mentisy&ldquo;, &ldquo;we&ldquo;, &ldquo;our&ldquo;, &ldquo;us&ldquo;) operates the website mentisy.com (the &ldquo;Service&ldquo;). 
+              This Privacy Policy describes how we collect, use, disclose, and safeguard your information when you use our Service.
+            </p>
+            <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border-l-4 border-[#FF75A0]">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-0">
+                <strong>Please read this Privacy Policy carefully.</strong> By using our Service, you agree to the collection and use of information in accordance with this policy.
               </p>
             </div>
-          </div>
-        </div>
+          </section>
 
-        {/* Information Collection */}
-        <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl border border-gray-100 dark:border-gray-700 mb-8">
-          <div className="flex items-start gap-4 mb-6">
-            <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center">
-              <Eye className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Information We Collect</h2>
-            </div>
-          </div>
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl p-6 border border-green-200 dark:border-green-800">
-            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-              We may collect account info (email, name), uploaded content (images, videos, notes), 
-              and usage data (logs, IP address, device/browser type). We do <strong>not sell your data</strong> to third parties.
+          {/* Information We Collect */}
+          <section className="mb-8 sm:mb-12">
+            <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6">
+              1. Information We Collect
+            </h2>
+            
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">
+              Personal Information
+            </h3>
+            <p className="mb-4 text-gray-700 dark:text-gray-300">
+              We may collect personal information that you provide directly to us, including:
             </p>
-          </div>
-        </div>
+            <ul className="list-disc pl-6 mb-6 text-gray-700 dark:text-gray-300 space-y-1">
+              <li>Email address</li>
+              <li>Account credentials</li>
+              <li>Profile information</li>
+              <li>Communications with us</li>
+            </ul>
 
-        {/* How We Use Data */}
-        <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl border border-gray-100 dark:border-gray-700 mb-8">
-          <div className="flex items-start gap-4 mb-6">
-            <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl flex items-center justify-center">
-              <Users className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">How We Use Your Data</h2>
-            </div>
-          </div>
-          <div className="grid gap-4">
-            {[
-              "Provide core features (uploading, sharing, expiring links).",
-              "Improve the service (debugging, analytics).",
-              "Keep Mentisy secure (fraud/spam detection).",
-              "Send important service emails (e.g. login, updates)."
-            ].map((item, index) => (
-              <div key={index} className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-                <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                <span className="text-gray-700 dark:text-gray-300">{item}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Data Sharing */}
-        <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl border border-gray-100 dark:border-gray-700 mb-8">
-          <div className="flex items-start gap-4 mb-6">
-            <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center">
-              <Users className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Sharing of Data</h2>
-            </div>
-          </div>
-          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-2xl p-6 border border-indigo-200 dark:border-indigo-800">
-            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-              We do not share your personal data except with trusted providers (hosting, authentication, email services), 
-              or if required by law.
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">
+              Content Information
+            </h3>
+            <p className="mb-4 text-gray-700 dark:text-gray-300">
+              When you use our Service, we may collect:
             </p>
-          </div>
-        </div>
+            <ul className="list-disc pl-6 mb-6 text-gray-700 dark:text-gray-300 space-y-1">
+              <li>Images, videos, and other media files you upload</li>
+              <li>Text content, challenges, and dares you create</li>
+              <li>Interaction data (views, completions, responses)</li>
+            </ul>
 
-        {/* Your Rights */}
-        <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl border border-gray-100 dark:border-gray-700 mb-8">
-          <div className="flex items-start gap-4 mb-6">
-            <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-2xl flex items-center justify-center">
-              <Shield className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Your Rights</h2>
-            </div>
-          </div>
-          <div className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20 rounded-2xl p-6 border border-teal-200 dark:border-teal-800">
-            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-              You may access, update, or delete your data, request account deletion, or opt out of certain 
-              communications depending on your location.
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">
+              Technical Information
+            </h3>
+            <p className="mb-4 text-gray-700 dark:text-gray-300">
+              We automatically collect certain technical information, including:
             </p>
-          </div>
-        </div>
+            <ul className="list-disc pl-6 mb-6 text-gray-700 dark:text-gray-300 space-y-1">
+              <li>IP address and location data</li>
+              <li>Device type, browser, and operating system</li>
+              <li>Usage patterns and Service interactions</li>
+              <li>Cookies and similar tracking technologies</li>
+            </ul>
+          </section>
 
-        {/* Security Section */}
-        <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl border border-gray-100 dark:border-gray-700 mb-8">
-          <div className="flex items-start gap-4 mb-6">
-            <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-red-500 to-pink-500 rounded-2xl flex items-center justify-center">
-              <Lock className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Security</h2>
-            </div>
-          </div>
-          <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
-            We use secure hosting and limited access controls. However:
-          </p>
-          <div className="space-y-3 mb-4">
-            {[
-              { text: "No end-to-end encryption is currently offered.", important: true },
-              { text: "It is technically impossible to fully prevent downloads, screenshots, or recordings once content is visible.", important: false },
-              { text: "We use measures like auto-expiry, watermarking, and view limits, but these are not foolproof.", important: false }
-            ].map((item, index) => (
-              <div key={index} className={`flex items-start gap-3 p-4 rounded-xl ${
-                item.important 
-                  ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800' 
-                  : 'bg-gray-50 dark:bg-gray-700/50'
-              }`}>
-                <div className={`w-2 h-2 rounded-full mt-2 ${
-                  item.important ? 'bg-red-500' : 'bg-gray-400'
-                }`}></div>
-                <span className="text-gray-700 dark:text-gray-300">
-                  {item.important ? <strong>{item.text}</strong> : item.text}
-                </span>
-              </div>
-            ))}
-          </div>
-          <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-2xl p-6 border border-yellow-200 dark:border-yellow-800">
-            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-              <strong>⚠️ Please avoid sharing highly sensitive or confidential information.</strong>
+          {/* How We Use Information */}
+          <section className="mb-8 sm:mb-12">
+            <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6">
+              2. How We Use Your Information
+            </h2>
+            <p className="mb-4 text-gray-700 dark:text-gray-300">
+              We use the information we collect for the following purposes:
             </p>
-          </div>
-        </div>
+            <ul className="list-disc pl-6 mb-6 text-gray-700 dark:text-gray-300 space-y-2">
+              <li><strong>Service Operation:</strong> To provide, maintain, and improve our Service functionality</li>
+              <li><strong>User Support:</strong> To respond to inquiries, provide customer support, and resolve issues</li>
+              <li><strong>Security:</strong> To detect, prevent, and address fraud, abuse, and security vulnerabilities</li>
+              <li><strong>Analytics:</strong> To analyze usage patterns and improve user experience</li>
+              <li><strong>Communications:</strong> To send service-related notifications and updates</li>
+              <li><strong>Legal Compliance:</strong> To comply with applicable laws and regulations</li>
+            </ul>
+          </section>
 
-        {/* Children's Privacy */}
-        <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl border border-gray-100 dark:border-gray-700 mb-8">
-          <div className="flex items-start gap-4 mb-6">
-            <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-pink-500 to-rose-500 rounded-2xl flex items-center justify-center">
-              <Heart className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Children&apos;s Privacy</h2>
-            </div>
-          </div>
-          <div className="bg-gradient-to-r from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 rounded-2xl p-6 border border-pink-200 dark:border-pink-800">
-            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-              Mentisy is not intended for children under 13 (or the age of digital consent in your country).
+          {/* Information Sharing */}
+          <section className="mb-8 sm:mb-12">
+            <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6">
+              3. Information Sharing and Disclosure
+            </h2>
+            <p className="mb-4 text-gray-700 dark:text-gray-300">
+              We do not sell, trade, or otherwise transfer your personal information to third parties except in the following circumstances:
             </p>
-          </div>
-        </div>
+            <ul className="list-disc pl-6 mb-6 text-gray-700 dark:text-gray-300 space-y-2">
+              <li><strong>Service Providers:</strong> With trusted third-party vendors who assist in operating our Service (hosting, authentication, email services)</li>
+              <li><strong>Legal Requirements:</strong> When required by law, court order, or legal process</li>
+              <li><strong>Safety and Security:</strong> To protect the rights, property, or safety of Mentisy, our users, or others</li>
+              <li><strong>Business Transfers:</strong> In connection with a merger, acquisition, or sale of assets</li>
+              <li><strong>Consent:</strong> When you have given explicit consent to share your information</li>
+            </ul>
+          </section>
 
-        {/* Changes */}
-        <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl border border-gray-100 dark:border-gray-700 mb-8">
-          <div className="flex items-start gap-4 mb-6">
-            <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-violet-500 to-purple-500 rounded-2xl flex items-center justify-center">
-              <Shield className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Changes</h2>
-            </div>
-          </div>
-          <div className="bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20 rounded-2xl p-6 border border-violet-200 dark:border-violet-800">
-            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-              We may update this Privacy Policy. The latest version will always be available here.
+          {/* Data Security */}
+          <section className="mb-8 sm:mb-12">
+            <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6">
+              4. Data Security
+            </h2>
+            <p className="mb-4 text-gray-700 dark:text-gray-300">
+              We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.
             </p>
-          </div>
-        </div>
-
-        {/* Contact */}
-        <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-3xl p-8 shadow-xl text-white">
-          <div className="flex items-start gap-4 mb-6">
-            <div className="flex-shrink-0 w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
-              <Mail className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold mb-3">Get in Touch</h2>
-              <p className="text-blue-100 leading-relaxed mb-4">
-                If you have questions, email us at{" "}
-                <a
-                  href="mailto:support@mentisy.com"
-                  className="text-white hover:text-blue-200 transition-colors underline decoration-2 underline-offset-4"
-                >
-                  hello@mentisy.com
-                </a>
+            
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-4">
+              <p className="text-sm text-yellow-800 dark:text-yellow-200 mb-0">
+                <strong>Important Security Notice:</strong> While we implement security measures, no method of transmission over the Internet or electronic storage is 100% secure. We cannot guarantee absolute security of your information.
               </p>
             </div>
-          </div>
-        </div>
 
-        {/* Bottom CTA */}
-        <div className="text-center mt-16">
-          <div className="inline-flex items-center gap-2 px-6 py-3 bg-white dark:bg-gray-800 rounded-full shadow-lg border border-gray-200 dark:border-gray-600">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-sm text-gray-600 dark:text-gray-300">Your privacy matters to us</span>
-            <Heart className="w-4 h-4 text-red-500" />
+            <p className="mb-4 text-gray-700 dark:text-gray-300">
+              Please be aware that:
+            </p>
+            <ul className="list-disc pl-6 mb-6 text-gray-700 dark:text-gray-300 space-y-1">
+              <li>End-to-end encryption is not currently implemented</li>
+              <li>Users can potentially screenshot, record, or download visible content</li>
+              <li>Auto-expiry and watermarking features provide limited protection</li>
+            </ul>
+          </section>
+
+          {/* Your Rights */}
+          <section className="mb-8 sm:mb-12">
+            <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6">
+              5. Your Rights and Choices
+            </h2>
+            <p className="mb-4 text-gray-700 dark:text-gray-300">
+              Depending on your location, you may have the following rights regarding your personal information:
+            </p>
+            <ul className="list-disc pl-6 mb-6 text-gray-700 dark:text-gray-300 space-y-2">
+              <li><strong>Access:</strong> Request access to your personal information</li>
+              <li><strong>Correction:</strong> Request correction of inaccurate or incomplete information</li>
+              <li><strong>Deletion:</strong> Request deletion of your personal information</li>
+              <li><strong>Portability:</strong> Request a copy of your data in a structured format</li>
+              <li><strong>Restriction:</strong> Request restriction of processing in certain circumstances</li>
+              <li><strong>Objection:</strong> Object to processing based on legitimate interests</li>
+              <li><strong>Withdraw Consent:</strong> Withdraw consent where processing is based on consent</li>
+            </ul>
+            <p className="text-gray-700 dark:text-gray-300">
+              To exercise these rights, please contact us using the information provided below.
+            </p>
+          </section>
+
+          {/* Data Retention */}
+          <section className="mb-8 sm:mb-12">
+            <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6">
+              6. Data Retention
+            </h2>
+            <p className="mb-4 text-gray-700 dark:text-gray-300">
+              We retain your personal information for as long as necessary to provide our Service and fulfill the purposes described in this Privacy Policy. Content uploaded to our Service may be automatically deleted according to the expiration settings you choose. Account information is retained until you request deletion or close your account.
+            </p>
+          </section>
+
+          {/* Children's Privacy */}
+          <section className="mb-8 sm:mb-12">
+            <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6">
+              7. Children&apos;s Privacy
+            </h2>
+            <p className="mb-4 text-gray-700 dark:text-gray-300">
+              Our Service is not intended for children under the age of 13 (or the minimum age for digital consent in your jurisdiction). We do not knowingly collect personal information from children under this age. If we become aware that we have collected personal information from a child under the applicable age, we will take steps to delete such information.
+            </p>
+          </section>
+
+          {/* International Transfers */}
+          <section className="mb-8 sm:mb-12">
+            <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6">
+              8. International Data Transfers
+            </h2>
+            <p className="mb-4 text-gray-700 dark:text-gray-300">
+              Your information may be transferred to and processed in countries other than your own. We ensure appropriate safeguards are in place to protect your information in accordance with this Privacy Policy and applicable law.
+            </p>
+          </section>
+
+          {/* Changes to Policy */}
+          <section className="mb-8 sm:mb-12">
+            <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6">
+              9. Changes to This Privacy Policy
+            </h2>
+            <p className="mb-4 text-gray-700 dark:text-gray-300">
+              We may update this Privacy Policy from time to time. We will notify you of any material changes by posting the new Privacy Policy on this page and updating the &ldquo;Last updated&ldquo; date. Your continued use of our Service after such modifications constitutes acceptance of the updated Privacy Policy.
+            </p>
+          </section>
+
+          {/* Contact Information */}
+          <section className="mb-8 sm:mb-12">
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 sm:p-8 border border-gray-200 dark:border-gray-700">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] rounded-lg flex items-center justify-center">
+                  <Mail className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+                    10. Contact Us
+                  </h2>
+                  <p className="text-gray-700 dark:text-gray-300 mb-4">
+                    If you have any questions about this Privacy Policy or our privacy practices, please contact us:
+                  </p>
+                  <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                    <p><strong>Email:</strong> <a href="mailto:hello@mentisy.com" className="text-[#FF75A0] hover:text-[#FFAA70] transition-colors">hello@mentisy.com</a></p>
+                    <p><strong>Website:</strong> <a href="https://mentisy.com" className="text-[#FF75A0] hover:text-[#FFAA70] transition-colors inline-flex items-center gap-1">mentisy.com <ExternalLink className="w-3 h-3" /></a></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Legal Footer */}
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-6 sm:pt-8 text-center">
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+              This Privacy Policy is governed by the laws of [Your Jurisdiction]. 
+              Any disputes arising from this policy shall be subject to the exclusive jurisdiction of the courts of [Your Jurisdiction].
+            </p>
           </div>
         </div>
       </div>
