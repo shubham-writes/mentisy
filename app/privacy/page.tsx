@@ -3,7 +3,7 @@ import { Shield, Mail, Calendar, ExternalLink } from "lucide-react";
 
 export default function PrivacyPolicy() {
   return (
-    <main className="min-h-screen bg-white dark:bg-gray-900 mt-20">
+    <main className="min-h-screen bg-white dark:bg-gray-900">
       {/* Header */}
       <div className="border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">

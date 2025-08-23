@@ -1,6 +1,6 @@
 // sw.js
 
-const CACHE_NAME = "mentisy-cache-v1";
+const CACHE_NAME = "mentisy-cache-v2";
 const DB_NAME = "MentisyShareDB";
 const STORE_NAME = "shared-files";
 
