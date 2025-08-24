@@ -235,21 +235,14 @@ export const Navbar = () => {
                             {/* Updated mobile menu logo - smaller size with Next.js Image */}
                             <div className="w-5 h-5 relative">
                                 <Image
-                                    src="/mentisyLogo-light.png"
+                                    src="/mentisyLogo85.svg"
                                     alt="Mentisy Logo"
                                     width={20}
                                     height={20}
-                                    className="rounded-full dark:hidden"
+                                    className="rounded-full"
                                     priority
                                 />
-                                <Image
-                                    src="/mentisyLogo-dark.png"
-                                    alt="Mentisy Logo Dark"
-                                    width={20}
-                                    height={20}
-                                    className="rounded-full hidden dark:block"
-                                    priority
-                                />
+                                
                             </div>
                             <span className="font-medium text-base">Menu</span>
                         </div>
