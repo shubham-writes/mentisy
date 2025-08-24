@@ -4,7 +4,7 @@
   "description": "Create and share self-destructing secret messages, photos, and videos.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#000000",
   "theme_color": "#111827F2",
   "orientation": "portrait-primary",
   "scope": "/",
