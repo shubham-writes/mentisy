@@ -8,7 +8,6 @@ body {
   height: 100%;
 }
 
-
 html, body {
   font-family: var(--font-jakarta);
 }
@@ -130,5 +129,74 @@ video::-webkit-media-controls-mute-button {
 
   .no-scrollbar::-webkit-scrollbar {
     display: none;
+  }
+}
+
+/* Clerk Authentication Styling */
+@layer components {
+  /* Add "By signing up, you agree..." text to Clerk sign-up modals */
+  .cl-signUp-start .cl-footerAction {
+    position: relative;
+    margin-bottom: 1.5rem;
+  }
+
+  .cl-signUp-start .cl-footerAction::after {
+    content: "By signing up, you agree to our Terms of Service and Privacy Policy.";
+    display: block;
+    position: absolute;
+    bottom: -2.5rem;
+    left: 0;
+    right: 0;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+    font-size: 0.875rem;
+    color: #6b7280;
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  .dark .cl-signUp-start .cl-footerAction::after {
+    border-top-color: #374151;
+    color: #9ca3af;
+  }
+
+  /* Alternative approach for better positioning */
+  .cl-signUp-start .cl-footer {
+    position: relative;
+    padding-bottom: 3rem;
+  }
+
+  .cl-signUp-start .cl-footer::after {
+    content: "By signing up, you agree to our Terms of Service and Privacy Policy.";
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+    font-size: 0.875rem;
+    color: #6b7280;
+    text-align: center;
+    line-height: 1.4;
+    background: inherit;
+  }
+
+  .dark .cl-signUp-start .cl-footer::after {
+    border-top-color: #374151;
+    color: #9ca3af;
+  }
+
+  /* Style the actual terms and privacy links when they appear */
+  .cl-footer a[href="/terms"],
+  .cl-footer a[href="/privacy"] {
+    color: #FF75A0 !important;
+    text-decoration: underline;
+    font-weight: 500;
+  }
+
+  .cl-footer a[href="/terms"]:hover,
+  .cl-footer a[href="/privacy"]:hover {
+    color: #FFAA70 !important;
   }
 }

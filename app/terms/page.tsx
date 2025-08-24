@@ -5,9 +5,9 @@ export default function TermsOfService() {
   return (
     <main className="min-h-screen bg-white dark:bg-gray-900">
       {/* Header */}
-      <div className="border-b border-gray-200 dark:border-gray-700">
+      <div className="border-b border-gray-200 dark:border-gray-700 mt-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-          <div className="text-center">
+          <div className="text-center mt-20">
             <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] rounded-lg mb-4">
               <FileText className="w-6 h-6 text-white" />
             </div>
@@ -208,7 +208,7 @@ export default function TermsOfService() {
               12. Governing Law & Disputes
             </h2>
             <p className="text-gray-700 dark:text-gray-300 mb-3">
-              These Terms are governed by the laws of <strong>[Your State/Region, Country]</strong>, without regard to conflict of laws principles.
+              These Terms are governed by the laws of <strong>India</strong>, without regard to conflict of laws principles.
             </p>
             <p className="text-gray-700 dark:text-gray-300 mb-3">
               Before filing any legal claim, the parties will try to resolve the dispute informally within 30 days of notice. If not resolved, disputes will be subject to the exclusive jurisdiction of the courts located in <strong>[City, State/Region]</strong>. You and the Operator consent to personal jurisdiction there.

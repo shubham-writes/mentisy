@@ -165,7 +165,7 @@ export default function PrivacyPolicy() {
 
           {/* Legal Footer */}
           <div className="border-t border-gray-200 dark:border-gray-700 pt-6 sm:pt-8 text-center">
-            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">This Privacy Policy is governed by the laws of [Your Region/Country]. By using Mentisy, you agree to this policy.</p>
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">This Privacy Policy is governed by the laws of India. By using Mentisy, you agree to this policy.</p>
           </div>
         </div>
       </div>
