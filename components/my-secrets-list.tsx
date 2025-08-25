@@ -151,7 +151,7 @@ export function MySecretsList() {
                         <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-[#FF75A0] to-[#FFAA70] rounded-xl flex items-center justify-center mx-auto mb-4">
                             <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-white"></div>
                         </div>
-                        <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400">Loading your secrets...</p>
+                        <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400">Loading your moments...</p>
                     </div>
                 )}
                 
@@ -164,10 +164,10 @@ export function MySecretsList() {
                                 <span className="text-2xl sm:text-3xl">🤷‍♀️</span>
                             </div>
                             <h5 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                                No secrets yet
+                                No moments yet!
                             </h5>
                             <p className="text-gray-500 dark:text-gray-400">
-                                Create your first secret above to get started!
+                                Create your first fun link above to get started!
                             </p>
                         </div>
                     )}
@@ -404,7 +404,7 @@ export function MySecretsList() {
                         <div className="text-center py-6 sm:py-8">
                             <div className="flex items-center justify-center space-x-3 text-[#FF75A0]">
                                 <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-[#FF75A0]"></div>
-                                <span className="font-medium text-sm sm:text-base">Loading more secrets...</span>
+                                <span className="font-medium text-sm sm:text-base">Loading more moments...</span>
                             </div>
                         </div>
                     )}

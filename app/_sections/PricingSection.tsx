@@ -43,27 +43,31 @@ export default function GamingPricingSection() {
               <div className="space-y-4 mb-8">
                 <div className="flex items-center gap-3">
                   <Check className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-300">5 game challenges per month</span>
+                  <span className="text-gray-700 dark:text-gray-300">Share unlimited images & short videos</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Check className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-300">2 games: <strong>Scratch & See</strong> + <strong>Q&A Challenge</strong></span>
+                  <span className="text-gray-700 dark:text-gray-300">1 fun mode: <strong>Scratch & See</strong></span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Check className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-300">Basic photo protection</span>
+                  <span className="text-gray-700 dark:text-gray-300">Smart overlay</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Check className="w-5 h-5 text-emerald-500 flex-shrink-0" />
                   <span className="text-gray-700 dark:text-gray-300">Auto-delete after viewing</span>
                 </div>
-                <div className="flex items-center gap-3 opacity-50">
-                  <X className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                  <span className="text-gray-500">Group competitions</span>
+                <div className="flex items-center gap-3">
+                  <Check className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                  <span className="text-gray-700 dark:text-gray-300">Seen Tick (basic) — know if your link was opened</span>
                 </div>
                 <div className="flex items-center gap-3 opacity-50">
                   <X className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                  <span className="text-gray-500">Rate My... games</span>
+                  <span className="text-gray-500">Q&A game</span>
+                </div>
+                <div className="flex items-center gap-3 opacity-50">
+                  <X className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                  <span className="text-gray-500">Group games</span>
                 </div>
                 <div className="flex items-center gap-3 opacity-50">
                   <X className="w-5 h-5 text-gray-400 flex-shrink-0" />
@@ -104,7 +108,7 @@ export default function GamingPricingSection() {
                 </div>
                 <p className="text-gray-500 dark:text-gray-400">per month</p>
                 <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-100 to-green-100 dark:from-orange-900/30 dark:to-green-900/30 px-3 py-1 rounded-full mt-2">
-                  <span className="text-sm font-semibold text-orange-700 dark:text-orange-300">🎉 FREE for 15 days!</span>
+                  <span className="text-sm font-semibold text-orange-700 dark:text-orange-300">🎉 FREE for 30 days!</span>
                 </div>
               </div>
               
@@ -113,20 +117,27 @@ export default function GamingPricingSection() {
                   <div className="w-6 h-6 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] rounded-full flex items-center justify-center">
                     <Check className="w-4 h-4 text-white" />
                   </div>
-                  <span className="text-gray-700 dark:text-gray-300"><strong>Unlimited</strong> game challenges</span>
+                  <span className="text-gray-700 dark:text-gray-300"><strong>Unlimited</strong> sharing</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-6 h-6 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] rounded-full flex items-center justify-center">
                     <Check className="w-4 h-4 text-white" />
                   </div>
-                  <span className="text-gray-700 dark:text-gray-300">All 4 games: <strong>Scratch & See</strong>, <strong>Q&A</strong>, <strong>Reveal Rush</strong>, <strong>Rate My...</strong></span>
+                  <span className="text-gray-700 dark:text-gray-300">All games: <strong>Scratch & See</strong>, <strong>Q&A</strong>, <strong>Group Q&A</strong>, <strong>Rate My...</strong></span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-6 h-6 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] rounded-full flex items-center justify-center">
                     <Check className="w-4 h-4 text-white" />
                   </div>
-                  <span className="text-gray-700 dark:text-gray-300">Group competitions & tournaments</span>
+                  <span className="text-gray-700 dark:text-gray-300">Expire It button — instantly kill any link, anytime</span>
                 </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-6 h-6 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] rounded-full flex items-center justify-center">
+                    <Check className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="text-gray-700 dark:text-gray-300">Advanced Seen Tick — track when links are opened & auto-mark expired links</span>
+                </div>
+                 
                 <div className="flex items-center gap-3">
                   <div className="w-6 h-6 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] rounded-full flex items-center justify-center">
                     <Check className="w-4 h-4 text-white" />
@@ -139,12 +150,7 @@ export default function GamingPricingSection() {
                   </div>
                   <span className="text-gray-700 dark:text-gray-300">HD quality uploads</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-6 h-6 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] rounded-full flex items-center justify-center">
-                    <Check className="w-4 h-4 text-white" />
-                  </div>
-                  <span className="text-gray-700 dark:text-gray-300">Advanced watermark customization</span>
-                </div>
+                
               </div>
               
               <SignUpButton mode="modal">
@@ -152,7 +158,7 @@ export default function GamingPricingSection() {
                   <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <div className="relative flex items-center justify-center gap-2">
                     
-                    <span>Start FREE 15-Day Trial</span>
+                    <span>Start FREE 30-Day Trial</span>
                     
                   </div>
                 </button>
@@ -240,9 +246,9 @@ export default function GamingPricingSection() {
           <div className="bg-gradient-to-r from-orange-100 via-white to-green-100 dark:from-orange-900/20 dark:via-gray-800 dark:to-green-900/20 rounded-2xl p-6 sm:p-8 border-2 border-dashed border-orange-300 dark:border-orange-600">
             <h4 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">🇮🇳 Independence Day Limited Offer</h4>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
-              Celebrating 79 years of freedom with 15 days of FREE Pro Gaming! 
+              Celebrating 79 years of freedom with 30 days of FREE Pro! 
               <br className="hidden sm:block" />
-              <span className="font-semibold">Offer valid until August 31st, 2025</span>
+              <span className="font-semibold">Offer valid until September 15th, 2025</span>
             </p>
             <div className="flex items-center justify-center gap-4 text-sm">
               <span className="flex items-center gap-1 text-green-600 dark:text-green-400">
