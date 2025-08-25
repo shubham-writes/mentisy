@@ -122,13 +122,15 @@ export function GeneratedLinkDisplay({
                             url={generatedLink}
                         />
                         
-                        {/* Others button (replacing Instagram) */}
+                        {/* Others button (replacing Instagram) - styled to match other buttons */}
                         <div className="flex-1">
-                            <ShareButton
-                                title=""
-                                text={shareText}
-                                url={generatedLink}
-                            />
+                            <div className="h-11">
+                                <ShareButton
+                                    title=""
+                                    text={shareText}
+                                    url={generatedLink}
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>

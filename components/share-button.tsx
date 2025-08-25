@@ -60,7 +60,7 @@ export function ShareButton({ title, text, url }: ShareButtonProps) {
     <Button 
       onClick={handleShare}
       disabled={isSuccess}
-      className={`w-full h-12 text-sm font-medium rounded-lg border-0 shadow-sm hover:shadow-md transition-all duration-200 ${
+      className={`w-full h-11 text-sm font-medium rounded-lg border-0 shadow-sm hover:shadow-md transition-all duration-200 ${
         isSuccess 
           ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700' 
           : 'bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-[#FF75A0]/90 hover:to-[#FFAA70]/90'
@@ -76,9 +76,9 @@ export function ShareButton({ title, text, url }: ShareButtonProps) {
         <>
           {isWebShareSupported ? (
             <>
-  <Share2 className="mr-2 h-3 w-3" />
-  <span className="text-xs">Others</span>
-</>
+              <Share2 className="mr-2 h-4 w-4" />
+              Others
+            </>
           ) : (
             <>
               <Copy className="mr-2 h-4 w-4" />
