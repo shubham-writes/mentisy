@@ -117,16 +117,16 @@ const clerkAppearance = {
   }
 };
 
-// Your metadata and viewport exports remain the same...
+// Your metadata and viewport exports with enhanced favicon configuration
 export const metadata: Metadata = {
-  title: "Mentisy - Fun Sharing Platform 🎉",
-  description: "Share fun links, play with friends, and spark joy ✨",
+  title: "Mentisy - Fun Sharing Platform ðŸŽ‰",
+  description: "Share fun links, play with friends, and spark joy âœ¨",
   metadataBase: new URL(process.env.NEXT_PUBLIC_URL!),
   manifest: "/manifest.json",
   applicationName: "Mentisy",
   openGraph: {
-    title: "Mentisy - Fun Sharing Platform 🎉",
-    description: "Share fun links, play with friends, and spark joy ✨",
+    title: "Mentisy - Fun Sharing Platform ðŸŽ‰",
+    description: "Share fun links, play with friends, and spark joy âœ¨",
     url: process.env.NEXT_PUBLIC_URL,
     siteName: "Mentisy",
     images: [
@@ -142,8 +142,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Mentisy - Fun Sharing Platform 🎉",
-    description: "Share fun links, play with friends, and spark joy ✨",
+    title: "Mentisy - Fun Sharing Platform ðŸŽ‰",
+    description: "Share fun links, play with friends, and spark joy âœ¨",
     images: ["/og-image.png"],
   },
   appleWebApp: {
@@ -152,7 +152,28 @@ export const metadata: Metadata = {
     title: "Mentisy",
   },
   icons: {
+    // Standard favicon (fallback)
     icon: [
+      {
+        url: "/favicon.ico",
+        sizes: "any",
+      },
+      {
+        url: "/favicon-16x16.png",
+        sizes: "16x16",
+        type: "image/png",
+      },
+      {
+        url: "/favicon-32x32.png",
+        sizes: "32x32",
+        type: "image/png",
+      },
+      {
+        url: "/favicon-48x48.png",
+        sizes: "48x48",
+        type: "image/png",
+      },
+      // Theme-based icons (keeping your existing ones)
       {
         media: "(prefers-color-scheme: light)",
         url: "/mentisyLogo-light.png",
@@ -164,8 +185,10 @@ export const metadata: Metadata = {
         href: "/mentisyLogo-dark.png",
       }
     ],
+    // Apple touch icons
     apple: [
       { url: "/icon-152x152.png", sizes: "152x152", type: "image/png" },
+      { url: "/favicon-192x192.png", sizes: "180x180", type: "image/png" },
       { url: "/icon-180x180.png", sizes: "180x180", type: "image/png" },
     ],
   },
