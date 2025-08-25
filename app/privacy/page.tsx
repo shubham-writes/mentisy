@@ -5,9 +5,9 @@ export default function PrivacyPolicy() {
   return (
     <main className="min-h-screen bg-white dark:bg-gray-900">
       {/* Header */}
-      <div className="border-b border-gray-200 dark:border-gray-700 mt-20">
+      <div className="border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-          <div className="text-center">
+          <div className="text-center mt-20">
             <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] rounded-lg mb-4">
               <Shield className="w-6 h-6 text-white" />
             </div>

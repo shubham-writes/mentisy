@@ -21,35 +21,57 @@ const clerkAppearance = {
   elements: {
     // Form styling to match your brand
     formButtonPrimary: 
-      "bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-purple-600 hover:to-pink-600 text-white font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105",
+      "bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-[#FF75A0] hover:to-[#FFAA70] text-white font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105",
+    
+    // Fixed input field styling for better visibility in dark mode
     formFieldInput: 
-      "border-gray-300 dark:border-gray-600 rounded-lg focus:border-[#FF75A0] focus:ring-[#FF75A0]/20 bg-white dark:bg-gray-800",
+      "border-gray-300 dark:border-gray-600 rounded-lg focus:border-[#FF75A0] focus:ring-[#FF75A0]/20 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400",
+    
     formFieldLabel: 
       "text-gray-700 dark:text-gray-300 font-medium",
+    
     card: 
       "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-2xl",
+    
     headerTitle: 
       "text-gray-900 dark:text-gray-100 font-bold text-xl",
+    
     headerSubtitle: 
       "text-gray-600 dark:text-gray-400",
+    
     footerActionText: 
       "text-gray-600 dark:text-gray-400",
+    
     footerActionLink: 
       "text-[#FF75A0] hover:text-[#FFAA70] font-medium",
     
     // Custom footer styling for privacy and terms
     footer: 
       "mt-6 pt-4 border-t border-gray-200 dark:border-gray-700",
+    
     formFooter: 
       "text-center text-sm text-gray-600 dark:text-gray-400",
     
-    // Social buttons styling
+    // Fixed social buttons styling for better visibility
     socialButtonsBlockButton: 
-      "border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg",
+      "border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100",
+    
+    socialButtonsBlockButtonText: 
+      "text-gray-700 dark:text-gray-300 font-medium",
     
     // Divider styling
     dividerLine: "bg-gray-200 dark:bg-gray-700",
     dividerText: "text-gray-500 dark:text-gray-400",
+    
+    // Additional text elements for better visibility
+    formFieldAction: "text-[#FF75A0] hover:text-[#FFAA70]",
+    identityPreviewText: "text-gray-700 dark:text-gray-300",
+    formFieldSuccessText: "text-green-600 dark:text-green-400",
+    formFieldErrorText: "text-red-600 dark:text-red-400",
+    
+    // Modal overlay
+    modalBackdrop: "bg-black/50",
+    modalContent: "bg-white dark:bg-gray-900",
   },
   
   layout: {
@@ -60,7 +82,7 @@ const clerkAppearance = {
     showTerms: true,
   },
   
-  // Custom localization
+  // Custom localization with terms agreement
   localization: {
     signUp: {
       start: {
@@ -68,6 +90,16 @@ const clerkAppearance = {
         subtitle: "Create your account to start sharing moments",
         actionText: "Already have an account?",
         actionLink: "Sign in instead",
+      },
+      emailLink: {
+        formTitle: "Check your email",
+        formSubtitle: "We sent a verification link to your email",
+        resendButton: "Resend email",
+      },
+      emailCode: {
+        formTitle: "Check your email",
+        formSubtitle: "Enter the verification code sent to your email",
+        resendButton: "Resend code",
       }
     },
     signIn: {
@@ -77,7 +109,11 @@ const clerkAppearance = {
         actionText: "Don't have an account?",
         actionLink: "Sign up for free",
       }
-    }
+    },
+    // Custom footer text for terms agreement
+    footerText: "By signing up, you agree to our {{termsLink}} and {{privacyPolicyLink}}",
+    termsOfService: "Terms of Service",
+    privacyPolicy: "Privacy Policy",
   }
 };
 

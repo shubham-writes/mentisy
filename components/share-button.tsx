@@ -76,9 +76,9 @@ export function ShareButton({ title, text, url }: ShareButtonProps) {
         <>
           {isWebShareSupported ? (
             <>
-              <Share2 className="mr-2 h-4 w-4" />
-              Others
-            </>
+  <Share2 className="mr-2 h-3 w-3" />
+  <span className="text-xs">Others</span>
+</>
           ) : (
             <>
               <Copy className="mr-2 h-4 w-4" />
