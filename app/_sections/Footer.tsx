@@ -68,7 +68,7 @@ export default function Footer() {
           <div className="border-t border-gray-800 mt-8 pt-8">
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
               <p className="text-gray-400 text-sm">
-                © 2025 Mentisy. Made for fun, built for friends.
+                © 2025 Mentisy. All Rights Reserved.
               </p>
               <div className="flex items-center gap-4 text-sm">
                 <Link 

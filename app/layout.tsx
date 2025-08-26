@@ -119,14 +119,14 @@ const clerkAppearance = {
 
 // Your metadata and viewport exports with enhanced favicon configuration
 export const metadata: Metadata = {
-  title: "Mentisy - Fun Sharing Platform ðŸŽ‰",
+  title: "Mentisy - Fun Sharing Platform",
   description: "Share fun links, play with friends, and spark joy âœ¨",
   metadataBase: new URL(process.env.NEXT_PUBLIC_URL!),
   manifest: "/manifest.json",
   applicationName: "Mentisy",
   openGraph: {
-    title: "Mentisy - Fun Sharing Platform ðŸŽ‰",
-    description: "Share fun links, play with friends, and spark joy âœ¨",
+    title: "Mentisy - Fun Sharing Platform",
+    description: "Share fun links, play with friends, and spark joy",
     url: process.env.NEXT_PUBLIC_URL,
     siteName: "Mentisy",
     images: [
