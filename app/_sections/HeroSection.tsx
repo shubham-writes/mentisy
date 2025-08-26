@@ -79,7 +79,7 @@ export default function HeroSection({ userCount = 2847 }: HeroSectionProps) {
                     <button className="group relative inline-flex items-center justify-center gap-2 sm:gap-3 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] text-white font-bold py-3 sm:py-3  px-8 sm:px-7  rounded-xl sm:rounded-2xl hover:shadow-2xl hover:shadow-[#FF75A0]/30 transition-all duration-300 hover:scale-105 text-base sm:text-lg overflow-hidden min-w-[280px]  touch-manipulation">
                       <div className="absolute inset-0 bg-gradient-to-r from-[#e65a85] to-[#e6955a] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       <SignUpButton mode="modal">
-                      <span className="relative z-10">🎮 Try Free — Get 5 Plays</span>
+                      <span className="relative z-10">🎮 Try Free </span>
                       </SignUpButton>
                       <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 relative z-10 group-hover:translate-x-1 transition-transform duration-300" />
                     </button>
