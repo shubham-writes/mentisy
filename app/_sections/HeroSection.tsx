@@ -44,7 +44,7 @@ export default function HeroSection({ userCount = 2847 }: HeroSectionProps) {
 
             {/* Clear, Benefit-Focused Headline */}
             <div className="space-y-4 sm:space-y-6">
-              <h1 className="text-4xl font-bold sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-tight tracking-tight">
+              <h1 className="text-3xl font-bold sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-tight tracking-tight">
                 Turn Your Photos Into <br />
                 <span className="bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] bg-clip-text text-transparent">
                   Fun Games
