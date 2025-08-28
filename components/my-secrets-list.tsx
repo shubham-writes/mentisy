@@ -262,17 +262,17 @@ export function MySecretsList() {
                                                     <div className="flex items-center space-x-3 mb-3">
                                                         <div className="flex items-center space-x-2">
                                                             <span className="text-[#FF75A0] text-sm sm:text-base">🎯</span>
-                                                            <span className="font-semibold text-gray-900 dark:text-white text-sm sm:text-base">
-                                                                Fun Drop Details
+                                                            <span className="font-semibold text-gray-900 dark:text-white text-xs sm:text-">
+                                                                Details
                                                             </span>
                                                         </div>
                                                         {hasAnalytics && (
-                                                            <span className="text-xs text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded-full">
+                                                            <span className="text-[8px] sm:text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded-full">
                                                                 Viewed
                                                             </span>
                                                         )}
                                                         {isExpired && (
-                                                            <span className="text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-2 py-0.5 rounded-full">
+                                                            <span className="text-[8px] sm:text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-2 py-0.5 rounded-full">
                                                                 Expired
                                                             </span>
                                                         )}
@@ -289,18 +289,16 @@ export function MySecretsList() {
                                                 
                                                 {/* Status and Actions */}
                                                 <div className="flex items-center space-x-2 flex-shrink-0">
-                                                    {isExpired ? (
-                                                        <div className="px-2 sm:px-3 py-1 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
-                                                            <span className="text-xs font-semibold text-red-600 dark:text-red-400">EXPIRED</span>
-                                                        </div>
-                                                    ) : secret.isRead ? (
-                                                        <div className="p-1.5 sm:p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
-                                                            <CheckCheck className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400" />
-                                                        </div>
-                                                    ) : (
-                                                        <div className="p-1.5 sm:p-2 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md">
-                                                            <Check className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
-                                                        </div>
+                                                    {!isExpired && (
+                                                        secret.isRead ? (
+                                                            <div className="p-1.5 sm:p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
+                                                                <CheckCheck className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400" />
+                                                            </div>
+                                                        ) : (
+                                                            <div className="p-1.5 sm:p-2 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md">
+                                                                <Check className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
+                                                            </div>
+                                                        )
                                                     )}
                                                     
                                                     <Button 
