@@ -11,13 +11,13 @@ import Footer from "./_sections/Footer";
 
 // Section Components
 import HeroSection from "./_sections/HeroSection";
-import PricingSection from "./_sections/PricingSection";
+
 import FeaturesComparison from "./_sections/FeaturesComparison";
 import TestimonialsSection from "./_sections/TestimonialsSection";
 import FaqSection from "./_sections/FaqSection";
 
 import FinalCta from "./_sections/FinalCta";
-import UseCasesSection from "./_sections/UseCasesSection";
+
 import AuthenticatedDashboard from "./_sections/AuthenticatedDashboard";
 
 export default function Home() {
@@ -58,10 +58,10 @@ export default function Home() {
         </div>
        
 
-        <PricingSection />
+        
         <FeaturesComparison />
         <TestimonialsSection />
-        <UseCasesSection />
+        
         
        
         <FaqSection />

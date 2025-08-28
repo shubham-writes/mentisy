@@ -7,7 +7,7 @@ export default function FunTestimonialsSection() {
   const testimonials = [
     {
       text: "Made my friends guess my pizza rating for 20 minutes straight! 😂 They were so invested in getting it right to see my food pic.",
-      author: "Alex, 21",
+      author: "Rishi, 21",
       game: "Rate My...",
       icon: Heart,
       emoji: "🍕",
@@ -15,7 +15,7 @@ export default function FunTestimonialsSection() {
     },
     {
       text: "My group chat went CRAZY trying to answer my travel trivia first. Everyone was so competitive to see my vacation photos!",
-      author: "Maya, 23", 
+      author: "Shivani, 23", 
       game: "Reveal Rush",
       icon: Trophy,
       emoji: "✈️",
@@ -23,7 +23,7 @@ export default function FunTestimonialsSection() {
     },
     {
       text: "The scratch feature is addictive! My boyfriend kept scratching to reveal different parts of my outfit reveal. So much more fun than just sending a boring pic.",
-      author: "Zara, 20",
+      author: "Arvind, 25",
       game: "Scratch & See",
       icon: Sparkles,
       emoji: "👗",
@@ -31,7 +31,7 @@ export default function FunTestimonialsSection() {
     },
     {
       text: "Asked my bestie 'What's my biggest fear?' and she had to guess 3 times before seeing my skydiving photo. We were both dying laughing! 🪂",
-      author: "Josh, 19",
+      author: "Akshat, 19",
       game: "Q&A Challenge",
       icon: Laugh,
       emoji: "🪂",
@@ -39,7 +39,7 @@ export default function FunTestimonialsSection() {
     },
     {
       text: "My family group is obsessed! Everyone's trying to outdo each other with creative questions and ratings. Photo sharing has never been this entertaining.",
-      author: "Ravi, 25",
+      author: "Kartik, 24",
       game: "All Games",
       icon: Gamepad2,
       emoji: "👨‍👩‍👧‍👦",
@@ -47,7 +47,7 @@ export default function FunTestimonialsSection() {
     },
     {
       text: "I rate my coffee shop experiences and my friends have to match my rating to see the pics. They've become coffee experts just to keep up! ☕",
-      author: "Emma, 22",
+      author: "Sweta, 22",
       game: "Rate My...",
       icon: Star,
       emoji: "☕",
@@ -143,7 +143,7 @@ export default function FunTestimonialsSection() {
               <span className="text-xl">🎉</span>
             </div>
             <div className="text-2xl font-bold bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] bg-clip-text text-transparent">Free</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">During Beta</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Free Forever</div>
           </div>
         </div>
 

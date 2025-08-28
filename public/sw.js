@@ -1,6 +1,6 @@
 // sw.js
 
-const CACHE_NAME = "mentisy-cache-v6";
+const CACHE_NAME = "mentisy-cache-v7"; // bump version
 const DB_NAME = "MentisyShareDB";
 const STORE_NAME = "shared-files";
 
@@ -11,12 +11,26 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("activate", (event) => {
   console.log("✅ Service Worker: Activated");
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    (async () => {
+      // Delete old caches
+      const keys = await caches.keys();
+      await Promise.all(
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            console.log("🗑️ Deleting old cache:", key);
+            return caches.delete(key);
+          }
+        })
+      );
+      await self.clients.claim();
+    })()
+  );
 });
 
 self.addEventListener("fetch", (event) => {
   try {
-    const url = new URL(event.request.url); // ✅ fixed
+    const url = new URL(event.request.url);
 
     // Intercept Web Share Target POST
     if (url.pathname === "/share" && event.request.method === "POST") {
@@ -48,8 +62,7 @@ self.addEventListener("fetch", (event) => {
   }
 });
 
-
-// ---- IDB helpers (native IndexedDB -> Promise) ----
+// ---- IndexedDB helpers ----
 function idbRequestToPromise(req) {
   return new Promise((resolve, reject) => {
     req.onsuccess = () => resolve(req.result);
@@ -85,21 +98,18 @@ async function handleShareTarget(request) {
 
     console.log("📩 Share Target received file, saving to IndexedDB...");
 
-    // Convert to bytes for robust cross-context storage
     const arrayBuffer = await file.arrayBuffer();
-
     const db = await openDB();
     const tx = db.transaction(STORE_NAME, "readwrite");
     const store = tx.objectStore(STORE_NAME);
 
-   
     await idbRequestToPromise(
       store.put({
         id: "shared-file",
         file: {
           name: file.name || "shared",
           type: file.type || "application/octet-stream",
-          data: arrayBuffer, // <— bytes
+          data: arrayBuffer,
         },
         type: (file.type || "").startsWith("image/") ? "image" : "video",
       })
@@ -107,7 +117,6 @@ async function handleShareTarget(request) {
     await idbTxDone(tx);
 
     console.log("✅ File saved to IndexedDB.");
-    // Redirect to your page that reads ?shared=true
     return Response.redirect("/hello?shared=true", 303);
   } catch (error) {
     console.error("❌ Error handling share target:", error);

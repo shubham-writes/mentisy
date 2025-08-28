@@ -65,11 +65,8 @@ export default function FinalCta({ userCount }: FinalCtaProps) {
           </div>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-gray-600 dark:text-gray-300 text-sm">
-            <div className="flex items-center gap-2">
-              <Users className="w-4 h-4" />
-              <span>{userCount.toLocaleString()} early gamers</span>
-            </div>
-            <div className="hidden sm:block w-1 h-1 bg-gray-400 dark:bg-gray-500 rounded-full"></div>
+           
+          
             <div className="flex items-center gap-2">
               <Trophy className="w-4 h-4" />
               <span>Beta access • Free forever</span>
@@ -81,7 +78,7 @@ export default function FinalCta({ userCount }: FinalCtaProps) {
             <p className="text-gray-700 dark:text-gray-300 text-sm italic">
               &ldquo;My friend group is obsessed! We spend hours trying to guess each other&apos;s ratings&ldquo; 
             </p>
-            <p className="text-gray-500 dark:text-gray-400 text-xs mt-2">- Maya, early tester</p>
+            <p className="text-gray-500 dark:text-gray-400 text-xs mt-2">- Sweta, early tester</p>
           </div>
         </div>
       </div>
