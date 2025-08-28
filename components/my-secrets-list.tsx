@@ -108,7 +108,7 @@ export function MySecretsList() {
                     Your Shared Moments
                 </h3>
                 <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300">
-                    Track the joy you’ve created
+                    Track the joy you&apos;ve created
                 </p>
             </div>
 
@@ -122,9 +122,8 @@ export function MySecretsList() {
                                 <span className="text-lg sm:text-xl">🔗</span>
                             </div>
                             <div>
-                                
                                 <p className="text-md sm:text-lg text-gray-500 dark:text-gray-400">
-                                    {visibleSecrets.length} {visibleSecrets.length === 1 ? 'Fun Drop' : 'Fun Drops'}  in the Wild
+                                    {visibleSecrets.length} {visibleSecrets.length === 1 ? 'Fun Drop' : 'Fun Drops'} in the Wild
                                 </p>
                             </div>
                         </div>
@@ -193,7 +192,7 @@ export function MySecretsList() {
                                     onClick={() => !isExpanded && toggleExpanded(secret._id)}
                                 >
                                     {!isExpanded ? (
-                                        // COLLAPSED VIEW - Minimal Info
+                                        // COLLAPSED VIEW - Minimal Info (Removed recipient and teaser message)
                                         <div className="flex items-center justify-between">
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center space-x-3">
@@ -201,7 +200,7 @@ export function MySecretsList() {
                                                     <div className="flex-shrink-0">
                                                         {isExpired ? (
                                                             <div className="w-8 h-8 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
-                                                                <span className="text-red-600 dark:text-red-400 text-xs font-bold">❌</span>
+                                                                <span className="text-red-600 dark:text-red-400 text-xs font-bold">⌛</span>
                                                             </div>
                                                         ) : secret.isRead ? (
                                                             <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
@@ -214,20 +213,25 @@ export function MySecretsList() {
                                                         )}
                                                     </div>
                                                     
-                                                    {/* Main Info */}
+                                                    {/* Main Info - Simplified */}
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-center space-x-2 mb-1">
-                                                            <span className="font-medium text-gray-900 dark:text-white text-sm truncate">
-                                                                To: {secret.recipientName || "Anyone"}
+                                                            <span className="font-medium text-gray-900 dark:text-white text-sm">
+                                                                Fun Drop
                                                             </span>
                                                             {hasAnalytics && (
                                                                 <span className="text-xs text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded-full">
                                                                     Viewed
                                                                 </span>
                                                             )}
+                                                            {isExpired && (
+                                                                <span className="text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-2 py-0.5 rounded-full">
+                                                                    Expired
+                                                                </span>
+                                                            )}
                                                         </div>
-                                                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                                                            {secret.publicNote || "No teaser message"} • {dayjs(secret._creationTime).fromNow()}
+                                                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                                                            Created {dayjs(secret._creationTime).fromNow()}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -249,25 +253,29 @@ export function MySecretsList() {
                                             </div>
                                         </div>
                                     ) : (
-                                        // EXPANDED VIEW - Full Details
+                                        // EXPANDED VIEW - Full Details (Cleaned up layout)
                                         <div className="space-y-4">
                                             {/* Header with collapse button */}
                                             <div className="flex justify-between items-start">
                                                 <div className="flex-1 min-w-0">
-                                                    {/* Recipient */}
-                                                    <div className="flex items-center space-x-2 mb-2">
-                                                        <span className="text-[#FF75A0] text-sm sm:text-base">👤</span>
-                                                        <span className="font-semibold text-gray-900 dark:text-white text-sm sm:text-base">
-                                                            To: {secret.recipientName || "Anyone"}
-                                                        </span>
-                                                    </div>
-                                                    
-                                                    {/* Public Note */}
-                                                    <div className="flex items-start space-x-2 mb-2">
-                                                        <span className="text-[#FFAA70] text-sm sm:text-base flex-shrink-0 mt-0.5">💭</span>
-                                                        <span className="text-sm text-gray-600 dark:text-gray-400 italic break-words">
-                                                            {secret.publicNote || "No teaser message"}
-                                                        </span>
+                                                    {/* Status and Creation Time */}
+                                                    <div className="flex items-center space-x-3 mb-3">
+                                                        <div className="flex items-center space-x-2">
+                                                            <span className="text-[#FF75A0] text-sm sm:text-base">🎯</span>
+                                                            <span className="font-semibold text-gray-900 dark:text-white text-sm sm:text-base">
+                                                                Fun Drop Details
+                                                            </span>
+                                                        </div>
+                                                        {hasAnalytics && (
+                                                            <span className="text-xs text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded-full">
+                                                                Viewed
+                                                            </span>
+                                                        )}
+                                                        {isExpired && (
+                                                            <span className="text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-2 py-0.5 rounded-full">
+                                                                Expired
+                                                            </span>
+                                                        )}
                                                     </div>
                                                     
                                                     {/* Creation Time */}
@@ -352,7 +360,7 @@ export function MySecretsList() {
                                                             copyToClipboard(secret);
                                                         }}
                                                         className="flex items-center justify-center space-x-2 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200 text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600"
-                                                        title={isCopied ? "Copied!" : "Copy message"}
+                                                        title={isCopied ? "Copied!" : "Copy link"}
                                                     >
                                                         {isCopied ? (
                                                             <>

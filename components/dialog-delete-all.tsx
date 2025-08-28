@@ -26,7 +26,7 @@ export function DialogDeleteAll() {
                     className="sm:hidden w-full h-12 text-sm  font-medium rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 border-0 shadow-sm"
                 >
                     <Trash2 className="h-4 w-4 mr-2" />
-                    Delete All Secrets
+                    Delete All
                 </Button>
             </DialogTrigger>
             
