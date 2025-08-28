@@ -32,7 +32,7 @@ export default function HeroSection({ userCount = 2847 }: HeroSectionProps) {
           <div className="text-center space-y-6 sm:space-y-8">
             
             {/* Beta Badge - Social Proof */}
-            <div className="inline-block mb-4">
+            <div className="inline-block mb-4 mt-4 sm:mt-auto">
               <span className="text-[10px] sm:text-xs font-semibold 
                 px-4 py-2 rounded-full
                 bg-gradient-to-r from-emerald-500 to-blue-500
@@ -44,7 +44,7 @@ export default function HeroSection({ userCount = 2847 }: HeroSectionProps) {
 
             {/* Clear, Benefit-Focused Headline */}
             <div className="space-y-4 sm:space-y-6">
-              <h1 className="text-3xl font-bold sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-tight tracking-tight">
+              <h1 className="text-4xl font-bold sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-tight tracking-tight">
                 Turn Your Photos Into <br />
                 <span className="bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] bg-clip-text text-transparent">
                   Fun Games
@@ -58,17 +58,17 @@ export default function HeroSection({ userCount = 2847 }: HeroSectionProps) {
                 
                 {/* Key Benefits - Fun & Game-focused */}
                 <div className="flex flex-wrap justify-center pt-4 sm:pt-6 gap-2">
-                  <div className="flex items-center px-3 py-1 rounded-lg bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-700">
-                    <Sparkles className="w-4 h-4 text-purple-600 mr-2" />
-                    <span className="text-sm font-medium text-purple-700 dark:text-purple-300">Scratch & See</span>
+                  <div className="flex items-center px-2  rounded-lg bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-700">
+                    <Sparkles className="w-3 h-3 text-purple-600 mr-2" />
+                    <span className="text-xs font-medium text-purple-700 dark:text-purple-300">Scratch & See</span>
                   </div>
                   <div className="flex items-center px-3 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-700">
-                    <Zap className="w-4 h-4 text-emerald-600 mr-2" />
-                    <span className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Questio & Answer</span>
+                    <Zap className="w-3 h-3 text-emerald-600 mr-2" />
+                    <span className="text-xs font-medium text-emerald-700 dark:text-emerald-300">Questio & Answer</span>
                   </div>
                   <div className="flex items-center px-3 py-1 rounded-lg bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-700">
-                    <Clock className="w-4 h-4 text-orange-600 mr-2" />
-                    <span className="text-sm font-medium text-orange-700 dark:text-orange-300">Group Games</span>
+                    <Clock className="w-3 h-3 text-orange-600 mr-2" />
+                    <span className="text-xs font-medium text-orange-700 dark:text-orange-300">Group Games</span>
                   </div>
                 </div>
               </div>
