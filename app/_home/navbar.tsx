@@ -6,6 +6,7 @@ import { clerkAppearance } from "@/lib/clerkAppearance";
 import { useTheme } from "next-themes";
 import { useConvexAuth } from "convex/react";
 import { SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import CustomUserButton from '@/components/CustomUserButton';
 import { 
     
     LoaderCircle, 
@@ -169,7 +170,7 @@ export const Navbar = () => {
                                     {/* User Profile Section */}
                                     <div className="flex items-center space-x-3 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-full p-1 border border-purple-200 dark:border-purple-800">
                                         
-                                        <UserButton 
+                                        <CustomUserButton 
                                             afterSignOutUrl="/"
                                             appearance={{
                                                 elements: {
@@ -198,7 +199,7 @@ export const Navbar = () => {
                             {isAuthenticated && !isLoading && (
                                 <div className="flex items-center space-x-2">
                                     
-                                    <UserButton 
+                                    <CustomUserButton
                                         afterSignOutUrl="/"
                                         appearance={{
                                             elements: {
