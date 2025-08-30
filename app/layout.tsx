@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next"
 import "./globals.css";
 
 // --- NEW: Import ClerkProvider ---
@@ -227,6 +228,8 @@ export default function RootLayout({
         </head>
         <body className={`${jakarta.variable} no-scrollbar`}>
           <ConvexClientProvider>
+            <Analytics />
+
             <ThemeProvider
               attribute="class"
               defaultTheme="system"

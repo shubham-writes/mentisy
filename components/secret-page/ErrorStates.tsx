@@ -49,7 +49,7 @@ export function ErrorStates({ type }: ErrorStatesProps) {
         size="lg"
         className="bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-[#FF75A0]/90 hover:to-[#FFAA70]/90 text-white font-medium px-6 py-3 sm:px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 border-0 text-sm sm:text-base"
       >
-        <Link href="/">✨ Create Your Own Fun Link</Link>
+        <Link href="/">✨ Start Your Own Challenge</Link>
       </Button>
     </div>
   );
