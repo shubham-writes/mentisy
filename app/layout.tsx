@@ -217,7 +217,7 @@ export default function RootLayout({
     // Updated ClerkProvider with global appearance configuration
     <ClerkProvider 
       publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY} 
-      afterSignOutUrl="/"
+      afterSignOutUrl="/hello"
       appearance={clerkAppearance}
     >
       <html lang="en" suppressHydrationWarning className="no-scrollbar">
