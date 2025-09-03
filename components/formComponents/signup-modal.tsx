@@ -36,7 +36,7 @@ export function SignupModal({ isVisible, onClose, formData }: SignupModalProps) 
                             You&apos;re almost done!
                         </CardTitle>
                         <CardDescription className="text-base text-gray-600 dark:text-gray-300 leading-relaxed">
-                            Create your account to get 5 free game shares and join thousands turning snaps into fun challenges.
+                            Sign up in seconds to secure your Founder&apos;s Badge and lifetime access. No credit card required.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6 pb-6">
@@ -99,7 +99,7 @@ export function SignupModal({ isVisible, onClose, formData }: SignupModalProps) 
                                         e.stopPropagation();
                                     }}
                                 >
-                                    🚀 Claim My 5 Free Plays
+                                    👑 Unlock Lifetime Access 
                                 </Button>
                             </SignUpButton>
 
