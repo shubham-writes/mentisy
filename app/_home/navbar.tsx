@@ -7,6 +7,7 @@ import { useTheme } from "next-themes";
 import { useConvexAuth } from "convex/react";
 import { SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import CustomUserButton from '@/components/CustomUserButton';
+import { useAutoSetFoundingMember } from "@/hooks/useAutoSetFoundingMember"; // ADD THIS LINE
 import { 
     
     LoaderCircle, 
@@ -82,6 +83,9 @@ export const Navbar = () => {
     const { theme } = useTheme();
     const [mounted, setMounted] = useState(false);
     const router = useRouter();
+
+    // ADD THIS LINE - Initialize founding member detection
+    useAutoSetFoundingMember();
 
     // Handle hydration
     useEffect(() => {

@@ -2,43 +2,87 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
-import { useEffect } from "react";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useEffect, useState, useRef } from "react";
+
+// Configuration - Change this number to increase the founding member limit
+const FOUNDING_MEMBER_LIMIT = 100;
 
 export function useAutoSetFoundingMember() {
-  const { user, isLoaded } = useUser();
+  const { user, isLoaded, isSignedIn } = useUser();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const hasRunRef = useRef(false);
+  
+  // Get total user count from Convex
+  const userCount = useQuery(api.users.getTotalUserCount);
 
   useEffect(() => {
     const setFoundingMember = async () => {
-      if (!isLoaded || !user) return;
+      // Comprehensive checks
+      if (!isLoaded || !isSignedIn || !user || isProcessing || hasRunRef.current) {
+        return;
+      }
       
       // Check if user already has founding member status
-      if (user.publicMetadata?.isFoundingMember === true) return;
+      if (user.publicMetadata?.isFoundingMember === true) {
+        return;
+      }
       
-      // Check if this is a new signup (you can adjust this logic)
-      const isNewUser = user.createdAt && 
-        (Date.now() - new Date(user.createdAt).getTime()) < 60000; // Within 1 minute of creation
+      // Check if we haven't exceeded the founding member limit
+      if (userCount === undefined || userCount >= FOUNDING_MEMBER_LIMIT) {
+        console.log(`Founding member limit reached (${FOUNDING_MEMBER_LIMIT} users)`);
+        return;
+      }
       
-      if (isNewUser) {
-        try {
-          const response = await fetch('/api/set-founding-member', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ userId: user.id }),
-          });
+      hasRunRef.current = true;
+      setIsProcessing(true);
+      
+      try {
+        const response = await fetch('/api/set-founding-member', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ userId: user.id }),
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          console.log('✅ Founding member status set successfully:', result);
           
-          if (response.ok) {
-            console.log('Founding member status set successfully');
-            // Optionally reload the user data
-            window.location.reload();
-          }
-        } catch (error) {
-          console.error('Failed to set founding member status:', error);
+          // Force a user refresh to get updated metadata
+          setTimeout(() => {
+            user.reload();
+          }, 1000);
+        } else {
+          const errorData = await response.json();
+          console.error('❌ Failed to set founding member status:', errorData);
         }
+      } catch (error) {
+        console.error('❌ Error setting founding member status:', error);
+        // Reset hasRunRef so it can try again
+        hasRunRef.current = false;
+      } finally {
+        setIsProcessing(false);
       }
     };
 
-    setFoundingMember();
-  }, [user, isLoaded]);
+    // Only run if we have userCount data
+    if (userCount !== undefined) {
+      const timer = setTimeout(() => {
+        setFoundingMember();
+      }, 2000);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  }, [user, isLoaded, isSignedIn, isProcessing, userCount]);
+
+  return { 
+    isProcessing,
+    userCount,
+    foundingMemberLimit: FOUNDING_MEMBER_LIMIT
+  };
 }

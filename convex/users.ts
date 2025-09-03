@@ -68,23 +68,29 @@ export async function getUser(ctx: QueryCtx, username: string) {
         .unique();
 }
 
-// --- THIS IS THE NEW FUNCTION YOU NEED TO ADD ---
 // Get the current user's identity from their auth token
 export const getMyIdentity = query({
     args: {},
     handler: async (ctx) => {
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) {
-            // Return null if the user is not authenticated
             return null;
         }
 
-        // Find the user document corresponding to the authenticated user
         const user = await ctx.db
             .query("users")
             .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
             .unique();
         
         return user;
+    },
+});
+
+// NEW: Get total user count for founding member limit
+export const getTotalUserCount = query({
+    args: {},
+    handler: async (ctx) => {
+        const users = await ctx.db.query("users").collect();
+        return users.length;
     },
 });

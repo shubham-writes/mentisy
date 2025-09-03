@@ -4,6 +4,7 @@
 import { SignUpButton } from "@clerk/nextjs";
 import { Authenticated, Unauthenticated } from "convex/react";
 
+
 import React, { useState, useEffect } from "react";
 import { Zap, ArrowRight, Users, Sparkles, Clock, Gamepad2, Target } from "lucide-react";
 
@@ -58,13 +59,13 @@ export default function HeroSection({ userCount = 2847 }: HeroSectionProps) {
                 
                 {/* Key Benefits - Fun & Game-focused */}
                 <div className="flex flex-wrap justify-center pt-4 sm:pt-6 gap-2">
-                  <div className="flex items-center px-2  rounded-lg bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-700">
+                  <div className="flex items-center px-2 rounded-lg bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-700">
                     <Sparkles className="w-3 h-3 text-purple-600 mr-2" />
                     <span className="text-xs font-medium text-purple-700 dark:text-purple-300">Scratch & See</span>
                   </div>
                   <div className="flex items-center px-3 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-700">
                     <Zap className="w-3 h-3 text-emerald-600 mr-2" />
-                    <span className="text-xs font-medium text-emerald-700 dark:text-emerald-300">Questio & Answer</span>
+                    <span className="text-xs font-medium text-emerald-700 dark:text-emerald-300">Question & Answer</span>
                   </div>
                   <div className="flex items-center px-3 py-1 rounded-lg bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-700">
                     <Clock className="w-3 h-3 text-orange-600 mr-2" />
@@ -100,8 +101,6 @@ export default function HeroSection({ userCount = 2847 }: HeroSectionProps) {
               </p>
             </div>
 
-            
-
             {/* How it Works - Simple 3-step */}
             <div className="pt-12 sm:pt-16">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl mx-auto">
@@ -130,6 +129,8 @@ export default function HeroSection({ userCount = 2847 }: HeroSectionProps) {
             </div>
           </div>
         </div>
+        
+       
       </div>
     </div>
   );

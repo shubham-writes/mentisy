@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, Suspense } from "react";
 import { useAuth } from "@clerk/nextjs";
 
+
 function HelloPageContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -26,7 +27,6 @@ function HelloPageContent() {
                 
                 if (scrollTo === 'form') {
                     elementId = 'secret-form';
-                    // For form, scroll to center to avoid awkward top positioning
                     scrollOptions.block = 'center';
                 } else if (scrollTo === 'secrets') {
                     elementId = 'my-secrets-list';
@@ -36,7 +36,6 @@ function HelloPageContent() {
                 if (elementId) {
                     const element = document.getElementById(elementId);
                     if (element) {
-                        // Check if element is already in view to avoid unnecessary scrolling
                         const rect = element.getBoundingClientRect();
                         const isInView = rect.top >= 0 && rect.top <= window.innerHeight;
                         
@@ -44,7 +43,6 @@ function HelloPageContent() {
                             element.scrollIntoView(scrollOptions);
                         }
                         
-                        // Clean up the URL after a short delay
                         setTimeout(() => {
                             const newUrl = new URL(window.location.href);
                             newUrl.searchParams.delete('scrollTo');
@@ -52,15 +50,14 @@ function HelloPageContent() {
                         }, 1000);
                     }
                 }
-            }, 800); // Reduced timeout for better UX
+            }, 800);
             
             return () => clearTimeout(timer);
         }
     }, [scrollTo, isSignedIn, router]);
 
-    // Only redirect unauthenticated users after auth has loaded
     useEffect(() => {
-        if (!isLoaded) return; // Wait for auth to load
+        if (!isLoaded) return;
         
         if (!isSignedIn) {
             const timer = setTimeout(() => {
@@ -75,15 +72,15 @@ function HelloPageContent() {
         <div className="flex flex-col items-center justify-start text-center gap-y-8 flex-1">
             <Authenticated>
                 <div data-authenticated="true" className="w-full">
-                    {/* Secret Form Section with better scroll positioning */}
                     <section id="secret-form" data-secret-form className="w-full scroll-mt-24 py-4">
                         <SecretForm useCase={useCase || undefined} />
                     </section>
                     
-                    {/* My Secrets List Section */}
-                    <section id="my-secrets-list" data-secrets-list className="w-full mt-12 scroll-mt-20 py-4 ">
+                    <section id="my-secrets-list" data-secrets-list className="w-full mt-12 scroll-mt-20 py-4">
                         <MySecretsList />
                     </section>
+                    
+                   
                 </div>
             </Authenticated>
             
