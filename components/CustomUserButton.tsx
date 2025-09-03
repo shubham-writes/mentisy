@@ -1,7 +1,7 @@
 // components/CustomUserButton.tsx
 "use client";
 
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 import { type Appearance } from "@clerk/types";
 import FoundingMemberBadge from "./FoundingMemberBadge";
 import { clerkAppearance } from "../lib/clerkAppearance";
@@ -17,11 +17,16 @@ export default function CustomUserButton({
   userProfileUrl = "/user-profile",
   appearance
 }: CustomUserButtonProps) {
+  const { user } = useUser();
+  
+  // Check if user is a founding member
+  const isFoundingMember = user?.publicMetadata?.isFoundingMember === true;
+  
   // Merge the default appearance with any custom appearance passed in
   const finalAppearance = appearance ? { ...clerkAppearance, ...appearance } : clerkAppearance;
 
   return (
-    <div className="flex items-center gap-3 pr-1">
+    <div className={`flex items-center gap-3 ${isFoundingMember ? 'pr-1' : ''}`}>
       <UserButton 
         appearance={finalAppearance}
         afterSignOutUrl={afterSignOutUrl}
