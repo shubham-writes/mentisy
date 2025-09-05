@@ -392,8 +392,8 @@ export function MySecretsList() {
                                                             className="rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 border-0 shadow-sm hover:shadow-md transition-all duration-200 flex-shrink-0 text-xs sm:text-sm px-3 py-2"
                                                         >
                                                             <ShieldX className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" /> 
-                                                            <span className="hidden sm:inline">Expire Now</span>
-                                                            <span className="sm:hidden">Expire</span>
+                                                            <span className="hidden sm:inline">Expire it!</span>
+                                                            <span className="sm:hidden">Expire it!</span>
                                                         </Button>
                                                     )}
                                                 </div>
