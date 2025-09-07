@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { HelpCircle } from "lucide-react";
 
 // --- CHANGE 1: ADD "reveal_rush" TO THE GAMEMODE TYPE ---
-type GameMode = "none" | "scratch_and_see" | "qa_challenge" | "reveal_rush";
+type GameMode = "none" | "scratch_and_see" | "qa_challenge" | "reveal_rush" | "yes_or_no";
 
 // UPDATED INTERFACE - ADD uploadedFile prop and feedback callback
 interface GameModeSelectorProps {
@@ -23,6 +23,7 @@ const gameOptions = [
     { id: "scratch_and_see", icon: "🐾", title: "Scratch & See", description: "Make them work for it" },
     { id: "qa_challenge", icon: "🤔", title: "Q & A", description: "Quiz them to unlock" },
     { id: "reveal_rush", icon: "🏆", title: "Reveal Rush", description: "Group challenge mode" },
+    { id: "yes_or_no", icon: "👍", title: "Yes or No", description: "Two choices, two reveals" },
 ] as const;
 
 // UPDATED FUNCTION SIGNATURE - ADD uploadedFile parameter and feedback callback

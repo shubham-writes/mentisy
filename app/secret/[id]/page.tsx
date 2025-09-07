@@ -44,6 +44,8 @@ export default function SecretPage({ params }: { params: { id: string } }) {
       return <ErrorStates type="expired" />;
     }
 
+    console.log("SECRET DATA:", secret);
+
     const showLoadingIndicator = secret.fileUrl && isMediaLoading;
     const secureFileUrl = secret.fileUrl || "";
 
@@ -54,8 +56,8 @@ export default function SecretPage({ params }: { params: { id: string } }) {
         )}
 
         <div style={{ visibility: showLoadingIndicator ? "hidden" : "visible" }}>
-          {/* Image Content */}
-          {secret.fileType === "image" && secret.fileUrl && (
+          {/* ✅ FIX: Updated condition to include the 'yes_or_no' game mode */}
+          {(secret.fileType === "image" || secret.gameMode === "yes_or_no") && (
             <ImageContent
               secret={secret}
               secureFileUrl={secureFileUrl}

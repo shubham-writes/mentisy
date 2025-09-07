@@ -1,9 +1,8 @@
 import { ShareButton, SocialShareButtons } from "../share-button";
 import { useState } from "react";
 import { Copy, Check } from "lucide-react";
+import { GameMode, MicroQuestType } from "@/lib/types"
 
-type GameMode = "none" | "scratch_and_see" | "qa_challenge" | "reveal_rush";
-type MicroQuestType = "group_qa" | "rate_my";
 
 interface GeneratedLinkDisplayProps {
     generatedLink: string;

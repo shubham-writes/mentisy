@@ -1,9 +1,8 @@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useEffect } from "react";
+import { GameMode } from "@/lib/types"
 
-// Define the GameMode type directly in this file
-type GameMode = "none" | "scratch_and_see" | "qa_challenge" | "reveal_rush";
 
 interface TimerSettingsProps {
     duration: string;

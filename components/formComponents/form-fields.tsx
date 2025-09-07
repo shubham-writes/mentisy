@@ -1,8 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCaseTemplates } from '../use-case-templates';
-
-type GameMode = "none" | "scratch_and_see" | "qa_challenge" | "reveal_rush";
+import { GameMode } from "@/lib/types"
 
 interface FormFieldsProps {
     recipientName: string;

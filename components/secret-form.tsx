@@ -23,13 +23,15 @@ import { GeneratedLinkDisplay } from "./formComponents/generated-link-display";
 import { GameModeSelector } from "./formComponents/game-mode-selector";
 import { QAFormFields } from "./qa-form-fields";
 import { MicroQuestFormFields } from "./reveal-rush-form-fields";
+import { YesNoFormFields } from "./yes-no-form-fields";
+
+import { GameMode, MicroQuestType } from "@/lib/types";
 
 import { useSearchParams, useRouter } from 'next/navigation';
 import { uploadFiles } from "./uploadthing"; // <-- Correct import for uploadFiles
 import { FeedbackModal } from "@/components/feedback/FeedbackModal";
 
-type GameMode = "none" | "scratch_and_see" | "qa_challenge" | "reveal_rush";
-type MicroQuestType = "group_qa" | "rate_my";
+
 
 interface SecretFormProps {
     isLandingPage?: boolean;
@@ -70,6 +72,13 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     const [isMoreSettingsExpanded, setIsMoreSettingsExpanded] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
 
+    // ✅ Define a type for the image file object
+type ImageFile = { url: string; type: "image" };
+
+const [yesNoQuestion, setYesNoQuestion] = useState("");
+const [yesFile, setYesFile] = useState<ImageFile | null>(null); // Changed from yesImageUrl
+const [noFile, setNoFile] = useState<ImageFile | null>(null);   // Changed from noImageUrl
+
     const createSecret = useMutation(api.secrets.create);
     const { signIn } = useSignIn();
     const { signUp } = useSignUp();
@@ -86,6 +95,18 @@ useEffect(() => {
         setIsMoreSettingsExpanded(false);
     }
 }, [uploadedFile]);
+
+useEffect(() => {
+    // When user selects the 'Yes or No' game and the primary file is an image...
+    if (gameMode === 'yes_or_no' && uploadedFile && uploadedFile.type === 'image') {
+        // ...and if the 'Yes' image slot is currently empty...
+        if (!yesFile) {
+            // ...then it's safe to assign the image file to the 'Yes' slot.
+            // ✅ Add "as ImageFile" to explicitly tell TypeScript the type is correct.
+            setYesFile(uploadedFile as ImageFile);
+        }
+    }
+}, [gameMode, uploadedFile, yesFile]);
 
     // --- FIXED: WRAPPED IN useCallback ---
     const clearGeneratedLink = useCallback(() => {
@@ -281,91 +302,116 @@ useEffect(() => {
     };
 
     const handleGenerate = async (e?: React.MouseEvent) => {
-        if (e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
 
-        if (!message && !uploadedFile) {
-            alert("Please provide a message or upload a file.");
+    // --- VALIDATION LOGIC (updated for clarity) ---
+    if (gameMode === 'yes_or_no') {
+        // Use yesFile and noFile for validation
+        if (!yesNoQuestion.trim() || !yesFile || !noFile) {
+            alert("Please provide a question and both a 'Yes' and 'No' image for the game.");
             return;
         }
-
-        if (gameMode === 'qa_challenge' && uploadedFile?.type === 'image') {
-            if (!qaQuestion.trim() || !qaAnswer.trim()) {
-                alert("Please provide both a question and answer for the Q&A challenge.");
-                return;
-            }
-        }
-        
-        if (gameMode === 'reveal_rush' && uploadedFile?.type === 'image') {
-            if (microQuestType === 'group_qa' && (!mqGroupQuestion.trim() || !mqGroupAnswer.trim())) {
-                alert("Please provide a question and answer for the Group Q&A quest.");
-                return;
-            }
-            if (microQuestType === 'rate_my' && (!mqRateCategory.trim() || !mqExpectedRating)) {
-                alert("Please provide a category and select your rating for the Rate My... quest.");
-                return;
-            }
-        }
-
-        if (isLandingPage) {
-            saveFormData();
-            setShowSignupPrompt(true);
+    } else if (gameMode === 'qa_challenge') {
+        if (!uploadedFile || !qaQuestion.trim() || !qaAnswer.trim()) {
+            alert("Please upload an image and provide a question and answer for the Q&A challenge.");
             return;
         }
+    } else if (gameMode === 'reveal_rush') {
+         if (!uploadedFile || (microQuestType === 'group_qa' && (!mqGroupQuestion.trim() || !mqGroupAnswer.trim())) || (microQuestType === 'rate_my' && (!mqRateCategory.trim() || !mqExpectedRating))) {
+            alert("Please upload an image and complete the Reveal Rush challenge fields.");
+            return;
+        }
+    } else if (!message && !uploadedFile) {
+        alert("Please provide a message or upload a file.");
+        return;
+    }
 
-        setIsLoading(true);
-        try {
-            const mutationParams: any = {
-  message: message || undefined,
-  recipientName,
-  publicNote,
-  fileUrl: uploadedFile?.url,  // ✅ always normalized here
-  fileType: uploadedFile?.type,
-  withWatermark: addWatermark,
-  duration: uploadedFile?.type === "video" ? undefined : parseInt(duration),
+    if (isLandingPage) {
+        saveFormData();
+        setShowSignupPrompt(true);
+        return;
+    }
+
+    setIsLoading(true);
+    try {
+        const baseParams = {
+            message: message || undefined,
+            recipientName,
+            publicNote,
+            withWatermark: addWatermark,
+            duration: uploadedFile?.type === "video" ? undefined : parseInt(duration),
+        };
+
+        let mutationParams: any;
+
+        if (gameMode === 'yes_or_no') {
+            mutationParams = {
+                ...baseParams,
+                gameMode: 'yes_or_no',
+                fileType: 'image',
+                yesNoQuestion: yesNoQuestion,
+                yesImageUrl: yesFile?.url, // Use the url from the yesFile object
+                noImageUrl: noFile?.url,   // Use the url from the noFile object
+            };
+        } else {
+            mutationParams = {
+                ...baseParams,
+                fileUrl: uploadedFile?.url,
+                fileType: uploadedFile?.type,
+                gameMode: uploadedFile?.type === 'video' ? 'none' : gameMode,
+            };
+            if (gameMode === 'qa_challenge') {
+                mutationParams.qaQuestion = qaQuestion;
+                mutationParams.qaAnswer = qaAnswer;
+                mutationParams.qaMaxAttempts = qaMaxAttempts;
+                mutationParams.qaCaseSensitive = qaCaseSensitive;
+                mutationParams.qaShowHints = qaShowHints;
+            }
+            if (gameMode === 'reveal_rush') {
+                mutationParams.microQuestType = microQuestType;
+                mutationParams.mqGroupQuestion = mqGroupQuestion;
+                mutationParams.mqGroupAnswer = mqGroupAnswer;
+                mutationParams.mqRateCategory = mqRateCategory;
+                mutationParams.mqExpectedRating = mqExpectedRating;
+                mutationParams.mqSuggestionPrompt = mqSuggestionPrompt;
+            }
+        }
+
+        const publicId = await createSecret(mutationParams);
+
+        if (publicId) {
+            const link = `${window.location.origin}/redirect/${publicId}`;
+            setGeneratedLink(link);
+        }
+
+        setMessage(""); 
+        setUploadedFile(null); 
+        setGameMode("none"); 
+        setMicroQuestType("group_qa");
+        setMqGroupQuestion(""); 
+        setMqGroupAnswer(""); 
+        setMqRateCategory(""); 
+        setMqExpectedRating(0);
+        setMqSuggestionPrompt(""); 
+        setQaQuestion(""); 
+        setQaAnswer(""); 
+        setQaMaxAttempts(3);
+        setQaCaseSensitive(false); 
+        setQaShowHints(true);
+        setYesNoQuestion(""); 
+        setYesFile(null); // Reset yesFile
+        setNoFile(null);  // Reset noFile
+
+    } catch (error) {
+        console.error(error);
+        alert("Failed to create the fun link.");
+    } finally {
+        setIsLoading(false);
+    }
 };
-
-            if (uploadedFile?.type === 'image') {
-                mutationParams.gameMode = gameMode;
-                if (gameMode === 'qa_challenge') {
-                    mutationParams.qaQuestion = qaQuestion;
-                    mutationParams.qaAnswer = qaAnswer;
-                    mutationParams.qaMaxAttempts = qaMaxAttempts;
-                    mutationParams.qaCaseSensitive = qaCaseSensitive;
-                    mutationParams.qaShowHints = qaShowHints;
-                }
-                if (gameMode === 'reveal_rush') {
-                    mutationParams.microQuestType = microQuestType;
-                    mutationParams.mqGroupQuestion = mqGroupQuestion;
-                    mutationParams.mqGroupAnswer = mqGroupAnswer;
-                    mutationParams.mqRateCategory = mqRateCategory;
-                    mutationParams.mqExpectedRating = mqExpectedRating;
-                    mutationParams.mqSuggestionPrompt = mqSuggestionPrompt;
-                }
-            } else {
-                mutationParams.gameMode = "none";
-            }
-
-            const publicId = await createSecret(mutationParams);
-
-            if (publicId) {
-                const link = `${window.location.origin}/redirect/${publicId}`;
-                setGeneratedLink(link);
-            }
-
-            setMessage(""); setUploadedFile(null); setGameMode("none"); setMicroQuestType("group_qa");
-            setMqGroupQuestion(""); setMqGroupAnswer(""); setMqRateCategory(""); setMqExpectedRating(0);
-            setMqSuggestionPrompt(""); setQaQuestion(""); setQaAnswer(""); setQaMaxAttempts(3);
-            setQaCaseSensitive(false); setQaShowHints(true);
-        } catch (error) {
-            console.error(error);
-            alert("Failed to create  message.");
-        } finally {
-            setIsLoading(false);
-        }
-    };
 
     const handleMessageChange = (value: string) => {
         if (value !== message) clearGeneratedLink();
@@ -397,6 +443,8 @@ useEffect(() => {
         } else {
             setDuration("10");
         }
+
+        
 
         if (newMode !== 'qa_challenge') {
             setQaQuestion(""); setQaAnswer(""); setQaMaxAttempts(3);
@@ -439,7 +487,10 @@ useEffect(() => {
     const handleMqSuggestionPromptChange = (value: string) => setMqSuggestionPrompt(value);
 
     const isTimerDisabled = uploadedFile?.type === 'video';
-    const isGameModeDisabled = !uploadedFile || uploadedFile?.type === 'video';
+         const isGameModeDisabled = gameMode !== 'yes_or_no' && (!uploadedFile || uploadedFile.type === 'video');
+
+        const disableGameModes = gameMode === 'yes_or_no' ? false : !uploadedFile || uploadedFile.type === 'video';
+
 
     const formData = {
         recipientName, publicNote, message, uploadedFile, duration, addWatermark, gameMode,
@@ -471,6 +522,10 @@ useEffect(() => {
                         
                         {/* LEFT COLUMN - Content & Media Flow */}
                         <div className="space-y-4 sm:space-y-6 order-1">
+
+                            {gameMode !== 'yes_or_no' && (
+                                <>
+
                             
                             {/* 1. File Upload/Preview - Primary Visual Content */}
                             {uploadedFile ? (
@@ -506,8 +561,8 @@ useEffect(() => {
                                     onVideoUploadError={handleUploadError}
                                 />
                             )}
-
-                            
+                        </>
+                         )}   
                         </div>
 
                         {/* RIGHT COLUMN - Game Features & Settings (Better organized hierarchy) */}
@@ -693,6 +748,25 @@ useEffect(() => {
 </div>
 
                             {/* 3. Game-Specific Forms (Conditional - After instructions) */}
+                            {gameMode === 'yes_or_no' && (
+    <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
+        <YesNoFormFields
+            question={yesNoQuestion}
+            onQuestionChange={setYesNoQuestion}
+            
+            yesFile={yesFile}
+            noFile={noFile}
+
+            onYesImageUpload={(url) => setYesFile({ url, type: 'image' })}
+            onNoImageUpload={(url) => setNoFile({ url, type: 'image' })}
+
+            onYesImageRemove={() => setYesFile(null)}
+            onNoImageRemove={() => setNoFile(null)}
+        />
+    </div>
+)}
+
+
                             {gameMode === 'qa_challenge' && uploadedFile?.type === 'image' && (
                                 <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
                                     <QAFormFields

@@ -7,6 +7,7 @@ import { ScratchGame } from "@/components/scratch-game";
 import { QAGame } from "@/components/qa-game";
 import { MicroQuestGame } from "@/components/reveal-rush-game";
 import { MessageDisplay } from "@/components/secret-page/MessageDisplay";
+import { YesNoGame } from "@/components/yes-no-game";
 
 interface ImageContentProps {
   secret: Doc<"secrets">;
@@ -112,6 +113,29 @@ export function ImageContent({
           />
         ) : null}
       />
+    );
+  }
+
+  // ✅ FIX: Safely pass image URLs and the timer component to the game
+   if (secret.gameMode === 'yes_or_no') {
+    return (
+       <div className="relative w-full max-w-full sm:max-w-lg mx-auto mb-4 p-2 sm:p-4">
+        <YesNoGame
+            question={secret.yesNoQuestion || "Yes or No?"}
+            yesImageUrl={secret.yesImageUrl ?? ''}
+            noImageUrl={secret.noImageUrl ?? ''}
+            onImageReady={onMediaLoad}
+            recipientName={secret.recipientName}
+            receiverIp={receiverIp ?? undefined} 
+            withWatermark={secret.withWatermark}
+            timerComponent={!isMediaLoading ? (
+              <CountdownTimer 
+                initialSeconds={secret.duration || 10} 
+                onComplete={onTimerComplete} 
+              />
+            ) : null}
+        />
+       </div>
     );
   }
 

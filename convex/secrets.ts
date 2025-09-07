@@ -24,7 +24,8 @@ export const create = mutation({
       v.literal("qa_challenge"),
       v.literal("mystery_reveal"),
       v.literal("emoji_curtain"),
-      v.literal("reveal_rush")
+      v.literal("reveal_rush"),
+      v.literal("yes_or_no")
     )),
 
     // Q&A fields
@@ -45,6 +46,10 @@ export const create = mutation({
     mqRateCategory: v.optional(v.string()),
     mqExpectedRating: v.optional(v.number()),
     mqSuggestionPrompt: v.optional(v.string()),
+
+    yesNoQuestion: v.optional(v.string()),
+    yesImageUrl: v.optional(v.string()),
+    noImageUrl: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -83,6 +88,11 @@ export const create = mutation({
       mqRateCategory: args.mqRateCategory,
       mqExpectedRating: args.mqExpectedRating,
       mqSuggestionPrompt: args.mqSuggestionPrompt,
+
+      // Yes or No
+      yesNoQuestion: args.yesNoQuestion,
+      yesImageUrl: args.yesImageUrl,
+      noImageUrl: args.noImageUrl,
 
       mqIsCompleted: false,
       mqParticipants: [],

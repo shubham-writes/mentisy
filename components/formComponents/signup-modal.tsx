@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { SignInButton, SignUpButton } from "@clerk/nextjs";
+import { GameMode } from "@/lib/types";
 
 interface SignupModalProps {
     isVisible: boolean;
@@ -12,7 +13,7 @@ interface SignupModalProps {
         uploadedFile: { url: string; type: "image" | "video" } | null;
         duration: string;
         addWatermark: boolean;
-        gameMode: "none" | "scratch_and_see" | "qa_challenge" | "reveal_rush";
+        gameMode: GameMode;
     };
 }
 

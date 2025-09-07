@@ -34,7 +34,8 @@ export default defineSchema({
             v.literal("qa_challenge"),
             v.literal("mystery_reveal"),
             v.literal("emoji_curtain"),
-            v.literal("reveal_rush") // New game mode
+            v.literal("reveal_rush"), 
+            v.literal("yes_or_no")
         )),
 
         // Q&A Game specific fields (existing)
@@ -44,6 +45,11 @@ export default defineSchema({
         qaCaseSensitive: v.optional(v.boolean()),
         qaShowHints: v.optional(v.boolean()),
         gameStats: v.optional(v.object({ /* ... */ })),
+
+        // Yes or No Game specific fields (existing)
+        yesNoQuestion: v.optional(v.string()),
+        yesImageUrl: v.optional(v.string()),
+        noImageUrl: v.optional(v.string()),
 
         // --- CHANGE 2: ADD ALL NEW reveal-rush FIELDS ---
 

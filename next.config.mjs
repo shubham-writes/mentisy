@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     images: {
-        domains: ["xiymxowfqd.ufs.sh"], // Allow UploadThing CDN images
+        // ✅ We are adding the new hostname to the existing list
+        domains: ["xiymxowfqd.ufs.sh", "utfs.io"], 
     },
 };
 

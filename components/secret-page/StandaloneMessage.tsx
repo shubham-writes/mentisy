@@ -18,7 +18,7 @@ export function StandaloneMessage({
   onTimerComplete,
   onToggleMessage
 }: StandaloneMessageProps) {
-  if (!secret.message || secret.fileUrl) {
+  if (!secret.message || secret.fileUrl || secret.yesImageUrl || secret.noImageUrl) {
     return null;
   }
 
