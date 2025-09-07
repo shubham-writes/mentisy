@@ -539,12 +539,13 @@ useEffect(() => {
                                             showWatermark={addWatermark}
                                         />
                                     </div>
-                                    
-                                    {/* Compact Watermark Settings - Right next to file preview */}
+
                                     <WatermarkSettings
-                                        addWatermark={addWatermark}
-                                        onWatermarkChange={setAddWatermark}
-                                    />
+    addWatermark={addWatermark}
+    onWatermarkChange={setAddWatermark}
+/>
+                                    
+                                    
                                 </div>
                             ) : (
                                 <FileUploadArea
@@ -577,6 +578,8 @@ useEffect(() => {
                                     uploadedFile={uploadedFile}
                                     onFeedbackClick={handleGameFeedbackClick}
                                 />
+
+                               
                             </div>
 
                             {/* 2. Dynamic Instructions Panel - Visual Guide (Right after game selection) */}
@@ -762,6 +765,17 @@ useEffect(() => {
 
             onYesImageRemove={() => setYesFile(null)}
             onNoImageRemove={() => setNoFile(null)}
+
+             watermarkSettingsComponent={
+                <div className="pt-4"> {/* Adds spacing above the settings */}
+                    <WatermarkSettings
+                        addWatermark={addWatermark}
+                        onWatermarkChange={setAddWatermark}
+                        
+                    />
+                </div>
+            }
+            addWatermark={addWatermark}
         />
     </div>
 )}

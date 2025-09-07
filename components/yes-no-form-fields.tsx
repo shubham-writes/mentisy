@@ -1,13 +1,13 @@
 // components/yes-no-form-fields.tsx
 "use client";
 
+import { ReactNode } from "react"; // ✅ Import ReactNode
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { UploadButton } from "@/components/uploadthing";
 import { Image as ImageIcon } from "lucide-react";
-import { FilePreview } from "./file-preview"; // ✅ Using your actual component
+import { FilePreview } from "./file-preview";
 
-// ✅ Define a type for the file object to match your FilePreview component
 type ImageFile = {
   url: string;
   type: "image";
@@ -16,12 +16,14 @@ type ImageFile = {
 interface YesNoFormFieldsProps {
   question: string;
   onQuestionChange: (value: string) => void;
-  yesFile: ImageFile | null; // ✅ Changed from yesImageUrl to yesFile
+  yesFile: ImageFile | null;
   onYesImageUpload: (url: string) => void;
-  noFile: ImageFile | null; // ✅ Changed from noImageUrl to noFile
+  noFile: ImageFile | null;
   onNoImageUpload: (url: string) => void;
   onYesImageRemove: () => void;
   onNoImageRemove: () => void;
+  watermarkSettingsComponent: ReactNode; // ✅ Add prop to receive the component
+  addWatermark: boolean;
 }
 
 export function YesNoFormFields({
@@ -33,10 +35,12 @@ export function YesNoFormFields({
   onNoImageUpload,
   onYesImageRemove,
   onNoImageRemove,
+  watermarkSettingsComponent,
+  addWatermark, 
 }: YesNoFormFieldsProps) {
   return (
     <div className="space-y-4">
-      {/* Header */}
+      {/* ... (Header and Question Input remain the same) ... */}
       <div className="flex items-center space-x-3 p-3 bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20 rounded-lg border border-teal-200/50 dark:border-teal-700/50">
         <span className="text-lg">👍👎</span>
         <div>
@@ -44,8 +48,6 @@ export function YesNoFormFields({
           <p className="text-xs text-teal-600 dark:text-teal-300">Let them choose their reveal.</p>
         </div>
       </div>
-
-      {/* Question Input */}
       <div>
         <Label htmlFor="yes-no-question" className="text-sm font-medium mb-2 block text-gray-800 dark:text-gray-200">
           The Question <span className="text-red-500">*</span>
@@ -59,7 +61,6 @@ export function YesNoFormFields({
         />
       </div>
 
-      {/* ✅ Image Uploads - Now stacked vertically for better previewing */}
       <div className="space-y-6 pt-4">
         {/* YES Image Section */}
         <div className="space-y-2">
@@ -67,7 +68,7 @@ export function YesNoFormFields({
             Yes Image <span className="text-red-500">*</span>
           </Label>
           {yesFile ? (
-             <FilePreview file={yesFile} onRemove={onYesImageRemove} />
+             <FilePreview file={yesFile} onRemove={onYesImageRemove} showWatermark={addWatermark} />
           ) : (
             <UploadButton
                 endpoint="imageUploader"
@@ -87,7 +88,7 @@ export function YesNoFormFields({
             No Image <span className="text-red-500">*</span>
           </Label>
           {noFile ? (
-             <FilePreview file={noFile} onRemove={onNoImageRemove} />
+             <FilePreview file={noFile} onRemove={onNoImageRemove} showWatermark={addWatermark}/>
           ) : (
             <UploadButton
                 endpoint="imageUploader"
@@ -100,6 +101,10 @@ export function YesNoFormFields({
             />
           )}
         </div>
+
+        {/* ✅ Render the watermark settings component here */}
+        {watermarkSettingsComponent}
+
       </div>
     </div>
   );
