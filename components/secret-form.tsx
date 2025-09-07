@@ -78,6 +78,7 @@ type ImageFile = { url: string; type: "image" };
 const [yesNoQuestion, setYesNoQuestion] = useState("");
 const [yesFile, setYesFile] = useState<ImageFile | null>(null); // Changed from yesImageUrl
 const [noFile, setNoFile] = useState<ImageFile | null>(null);   // Changed from noImageUrl
+const [hasUserClearedYesFile, setHasUserClearedYesFile] = useState(false);
 
     const createSecret = useMutation(api.secrets.create);
     const { signIn } = useSignIn();
@@ -99,14 +100,13 @@ useEffect(() => {
 useEffect(() => {
     // When user selects the 'Yes or No' game and the primary file is an image...
     if (gameMode === 'yes_or_no' && uploadedFile && uploadedFile.type === 'image') {
-        // ...and if the 'Yes' image slot is currently empty...
-        if (!yesFile) {
+        // ...and if the 'Yes' slot is empty AND the user hasn't manually cleared it...
+        if (!yesFile && !hasUserClearedYesFile) { // ✅ UPDATE THIS LINE
             // ...then it's safe to assign the image file to the 'Yes' slot.
-            // ✅ Add "as ImageFile" to explicitly tell TypeScript the type is correct.
             setYesFile(uploadedFile as ImageFile);
         }
     }
-}, [gameMode, uploadedFile, yesFile]);
+}, [gameMode, uploadedFile, yesFile, hasUserClearedYesFile]); 
 
     // --- FIXED: WRAPPED IN useCallback ---
     const clearGeneratedLink = useCallback(() => {
@@ -120,6 +120,7 @@ useEffect(() => {
     const handleFileUpload = useCallback((file: { url: string; type: "image" | "video" }) => {
         clearGeneratedLink();
         setUploadedFile(file);
+        setHasUserClearedYesFile(false);
         setIsUploading(false);
         if (file.type === 'video') {
             setGameMode('none');
@@ -437,6 +438,7 @@ useEffect(() => {
     const handleGameModeChange = (newMode: GameMode) => {
         clearGeneratedLink();
         setGameMode(newMode);
+        setHasUserClearedYesFile(false);
         
         if (newMode === 'qa_challenge' || newMode === 'reveal_rush') {
             setDuration("60");
@@ -763,7 +765,7 @@ useEffect(() => {
             onYesImageUpload={(url) => setYesFile({ url, type: 'image' })}
             onNoImageUpload={(url) => setNoFile({ url, type: 'image' })}
 
-            onYesImageRemove={() => setYesFile(null)}
+            onYesImageRemove={() => { setYesFile(null); setHasUserClearedYesFile(true); }}
             onNoImageRemove={() => setNoFile(null)}
 
              watermarkSettingsComponent={
