@@ -15,7 +15,10 @@ interface YesNoGameProps {
   recipientName?: string;
   receiverIp?: string;
   withWatermark?: boolean;
-  timerComponent?: ReactNode; // ✅ ADD: Prop for the timer
+  timerComponent?: ReactNode;
+  // ✅ ADD the new caption props
+  yesCaption?: string;
+  noCaption?: string;
 }
 
 export function YesNoGame({
@@ -26,7 +29,10 @@ export function YesNoGame({
   recipientName,
   receiverIp,
   withWatermark,
-  timerComponent, // ✅ ADD: Get the timer prop
+  timerComponent,
+  // ✅ GET the new caption props
+  yesCaption,
+  noCaption,
 }: YesNoGameProps) {
   const [revealed, setRevealed] = useState<'yes' | 'no' | null>(null);
 
@@ -63,8 +69,16 @@ export function YesNoGame({
              {withWatermark && (
                 <Watermark name={recipientName} ip={receiverIp || undefined} mode="image" />
              )}
-             {/* ✅ ADD: Display the timer once an image is revealed */}
              {timerComponent}
+
+            {/* ✅ ADD THIS BLOCK to display the correct caption */}
+            {((revealed === 'yes' && yesCaption) || (revealed === 'no' && noCaption)) && (
+              <div className="absolute bottom-0 left-0 right-0 bg-black/50 backdrop-blur-sm p-3 text-white text-center text-sm animate-in fade-in duration-500">
+                <p>
+                  {revealed === 'yes' ? yesCaption : noCaption}
+                </p>
+              </div>
+            )}
           </>
         )}
         

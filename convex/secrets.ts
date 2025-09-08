@@ -50,6 +50,8 @@ export const create = mutation({
     yesNoQuestion: v.optional(v.string()),
     yesImageUrl: v.optional(v.string()),
     noImageUrl: v.optional(v.string()),
+    yesCaption: v.optional(v.string()),
+    noCaption: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -93,6 +95,9 @@ export const create = mutation({
       yesNoQuestion: args.yesNoQuestion,
       yesImageUrl: args.yesImageUrl,
       noImageUrl: args.noImageUrl,
+      yesCaption: args.yesCaption,
+      noCaption: args.noCaption,
+
 
       mqIsCompleted: false,
       mqParticipants: [],

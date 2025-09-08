@@ -80,6 +80,9 @@ const [yesFile, setYesFile] = useState<ImageFile | null>(null); // Changed from 
 const [noFile, setNoFile] = useState<ImageFile | null>(null);   // Changed from noImageUrl
 const [hasUserClearedYesFile, setHasUserClearedYesFile] = useState(false);
 
+const [yesCaption, setYesCaption] = useState("");
+const [noCaption, setNoCaption] = useState("");
+
     const createSecret = useMutation(api.secrets.create);
     const { signIn } = useSignIn();
     const { signUp } = useSignUp();
@@ -872,6 +875,10 @@ useEffect(() => {
                     useCase={useCase}
                     gameMode={gameMode}
                     uploadedFile={uploadedFile}
+                    yesCaption={yesCaption}
+                    onYesCaptionChange={setYesCaption}
+                    noCaption={noCaption}
+                    onNoCaptionChange={setNoCaption}
                 />
                 
                 {/* Timer Settings */}

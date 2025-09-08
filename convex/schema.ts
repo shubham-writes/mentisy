@@ -26,6 +26,7 @@ export default defineSchema({
         duration: v.optional(v.number()),
         expired: v.optional(v.boolean()),
         viewedAt: v.optional(v.number()),
+        
 
         // --- CHANGE 1: ADD "reveal_rush" TO THE GAMEMODE UNION ---
         gameMode: v.optional(v.union(
@@ -50,6 +51,8 @@ export default defineSchema({
         yesNoQuestion: v.optional(v.string()),
         yesImageUrl: v.optional(v.string()),
         noImageUrl: v.optional(v.string()),
+        yesCaption: v.optional(v.string()),
+        noCaption: v.optional(v.string()),
 
         // --- CHANGE 2: ADD ALL NEW reveal-rush FIELDS ---
 

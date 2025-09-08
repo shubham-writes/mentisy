@@ -30,7 +30,7 @@ export function ImageContent({
   onTimerComplete,
   onToggleMessage
 }: ImageContentProps) {
-  // Scratch Game Mode
+  // ... (Other game modes like 'scratch_and_see', 'qa_challenge', etc. are unchanged)
   if (secret.gameMode === 'scratch_and_see') {
     return (
       <>
@@ -67,7 +67,6 @@ export function ImageContent({
     );
   }
 
-  // Q&A Game Mode
   if (secret.gameMode === 'qa_challenge') {
     return (
       <div className="relative w-full max-w-full sm:max-w-lg mx-auto mb-4 rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 p-2 sm:p-4">
@@ -99,7 +98,6 @@ export function ImageContent({
     );
   }
 
-  // Reveal Rush Game Mode
   if (secret.gameMode === 'reveal_rush') {
     return (
       <MicroQuestGame
@@ -116,7 +114,7 @@ export function ImageContent({
     );
   }
 
-  // ✅ FIX: Safely pass image URLs and the timer component to the game
+  // ✅ THIS IS THE SECTION TO UPDATE
    if (secret.gameMode === 'yes_or_no') {
     return (
        <div className="relative w-full max-w-full sm:max-w-lg mx-auto mb-4 p-2 sm:p-4">
@@ -128,6 +126,11 @@ export function ImageContent({
             recipientName={secret.recipientName}
             receiverIp={receiverIp ?? undefined} 
             withWatermark={secret.withWatermark}
+            
+            // ✅ PASS the caption props from the secret object down to the game
+            yesCaption={secret.yesCaption}
+            noCaption={secret.noCaption}
+
             timerComponent={!isMediaLoading ? (
               <CountdownTimer 
                 initialSeconds={secret.duration || 10} 
@@ -151,7 +154,6 @@ export function ImageContent({
           onLoad={onMediaLoad}
           onError={() => {
             console.error("Failed to load image");
-            // Handle error - you might want to pass this as a prop
           }}
           priority
           className="rounded-xl"
