@@ -1,6 +1,6 @@
 // sw.js
 
-const CACHE_NAME = "mentisy-cache-v22"; // bump version
+const CACHE_NAME = "mentisy-cache-v23"; // bump version
 const DB_NAME = "MentisyShareDB";
 const STORE_NAME = "shared-files";
 

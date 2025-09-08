@@ -23,13 +23,15 @@ import { GeneratedLinkDisplay } from "./formComponents/generated-link-display";
 import { GameModeSelector } from "./formComponents/game-mode-selector";
 import { QAFormFields } from "./qa-form-fields";
 import { MicroQuestFormFields } from "./reveal-rush-form-fields";
-import { YesNoFormFields } from "./yes-no-form-fields";
+
 
 import { GameMode, MicroQuestType } from "@/lib/types";
 
 import { useSearchParams, useRouter } from 'next/navigation';
 import { uploadFiles } from "./uploadthing"; // <-- Correct import for uploadFiles
 import { FeedbackModal } from "@/components/feedback/FeedbackModal";
+import { YesNoImageUploaders } from "./formComponents/yes-no-image-uploaders"; // ✅ Import new component
+import { YesNoSettings } from "./formComponents/yes-no-settings";  
 
 
 
@@ -359,6 +361,8 @@ useEffect(() => {
                 yesNoQuestion: yesNoQuestion,
                 yesImageUrl: yesFile?.url, // Use the url from the yesFile object
                 noImageUrl: noFile?.url,   // Use the url from the noFile object
+                yesCaption: yesCaption,  
+                noCaption: noCaption, 
             };
         } else {
             mutationParams = {
@@ -527,49 +531,39 @@ useEffect(() => {
                         
                         {/* LEFT COLUMN - Content & Media Flow */}
                         <div className="space-y-4 sm:space-y-6 order-1">
-
-                            {gameMode !== 'yes_or_no' && (
+                            {gameMode !== 'yes_or_no' ? (
                                 <>
-
-                            
-                            {/* 1. File Upload/Preview - Primary Visual Content */}
-                            {uploadedFile ? (
-                                <div className="space-y-3">
-                                    {/* File Preview */}
-                                    <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-[#FF75A0]/20 dark:border-[#FF75A0]/30 shadow-lg">
-                                        <FilePreview 
-                                            file={uploadedFile} 
-                                            onRemove={handleFileRemove}
-                                            recipientName={recipientName}
-                                            showWatermark={addWatermark}
-                                        />
-                                    </div>
-
-                                    <WatermarkSettings
-    addWatermark={addWatermark}
-    onWatermarkChange={setAddWatermark}
-/>
-                                    
-                                    
-                                </div>
+                                    {uploadedFile ? (
+                                        <div className="space-y-3">
+                                            <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-[#FF75A0]/20 dark:border-[#FF75A0]/30 shadow-lg">
+                                                <FilePreview file={uploadedFile} onRemove={handleFileRemove} recipientName={recipientName} showWatermark={addWatermark} />
+                                            </div>
+                                            <WatermarkSettings addWatermark={addWatermark} onWatermarkChange={setAddWatermark} />
+                                        </div>
+                                    ) : (
+                                        <FileUploadArea isLandingPage={isLandingPage} isUploading={isUploading} uploadProgress={uploadProgress} onSaveFormData={saveFormData} onShowSignupPrompt={() => setShowSignupPrompt(true)} onImageUploadBegin={() => setIsUploading(true)} onImageUploadComplete={handleImageUploadComplete} onImageUploadError={handleUploadError} onVideoUploadBegin={() => setIsUploading(true)} onVideoUploadComplete={handleVideoUploadComplete} onVideoUploadError={handleUploadError} />
+                                    )}
+                                </>
                             ) : (
-                                <FileUploadArea
-                                    isLandingPage={isLandingPage}
-                                    isUploading={isUploading}
-                                    uploadProgress={uploadProgress}
-                                    onSaveFormData={saveFormData}
-                                    onShowSignupPrompt={() => setShowSignupPrompt(true)}
-                                    onImageUploadBegin={() => setIsUploading(true)}
-                                    onImageUploadComplete={handleImageUploadComplete}
-                                    onImageUploadError={handleUploadError}
-                                    onVideoUploadBegin={() => setIsUploading(true)}
-                                    onVideoUploadComplete={handleVideoUploadComplete}
-                                    onVideoUploadError={handleUploadError}
+                                // ✅ RENDER the new image uploaders in the left column
+                                <>
+                                <YesNoImageUploaders
+                                    yesFile={yesFile}
+                                    noFile={noFile}
+                                    onYesImageUpload={(url) => setYesFile({ url, type: 'image' })}
+                                    onNoImageUpload={(url) => setNoFile({ url, type: 'image' })}
+                                    onYesImageRemove={() => { setYesFile(null); setHasUserClearedYesFile(true); }}
+                                    onNoImageRemove={() => setNoFile(null)}
+                                    addWatermark={addWatermark}
                                 />
+
+                                <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
+                                        <WatermarkSettings addWatermark={addWatermark} onWatermarkChange={setAddWatermark} />
+                                    </div>
+                                    </>
                             )}
-                        </>
-                         )}   
                         </div>
+
 
                         {/* RIGHT COLUMN - Game Features & Settings (Better organized hierarchy) */}
                         <div className="space-y-4 sm:space-y-6 order-2">
@@ -593,6 +587,7 @@ useEffect(() => {
     gameMode === 'none' ? 'bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200/50 dark:border-blue-700/50' :
     gameMode === 'scratch_and_see' ? 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200/50 dark:border-green-700/50' :
     gameMode === 'qa_challenge' ? 'bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 border-purple-200/50 dark:border-purple-700/50' :
+    gameMode === 'yes_or_no' ? 'bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20 border-teal-200/50 dark:border-teal-700/50' :
     'bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-orange-200/50 dark:border-orange-700/50'
 }`}>
     {/* Compact Header - Always Visible */}
@@ -608,6 +603,7 @@ useEffect(() => {
                     {gameMode === 'scratch_and_see' && '🐾'}
                     {gameMode === 'qa_challenge' && '🤔'}
                     {gameMode === 'reveal_rush' && '🏆'}
+                    {gameMode === 'yes_or_no' && '👍'}
                 </span>
             </div>
             
@@ -617,23 +613,27 @@ useEffect(() => {
                     gameMode === 'none' ? 'text-blue-800 dark:text-blue-200' :
                     gameMode === 'scratch_and_see' ? 'text-green-800 dark:text-green-200' :
                     gameMode === 'qa_challenge' ? 'text-purple-800 dark:text-purple-200' :
+                    gameMode === 'yes_or_no' ? 'text-teal-800 dark:text-teal-200' :
                     'text-orange-800 dark:text-orange-200'
                 }`}>
                     {gameMode === 'none' && 'Add Some Fun?'}
                     {gameMode === 'scratch_and_see' && 'Scratch & Reveal Magic'}
                     {gameMode === 'qa_challenge' && 'Brain Teaser Mode'}
                     {gameMode === 'reveal_rush' && 'Competition Mode'}
+                    {gameMode === 'yes_or_no' && 'Two Choices, One Secret'}
                 </h3>
                 <p className={`text-xs opacity-70 truncate ${
                     gameMode === 'none' ? 'text-blue-600 dark:text-blue-300' :
                     gameMode === 'scratch_and_see' ? 'text-green-600 dark:text-green-300' :
                     gameMode === 'qa_challenge' ? 'text-purple-600 dark:text-purple-300' :
+                    gameMode === 'yes_or_no' ? 'text-teal-600 dark:text-teal-300' :
                     'text-orange-600 dark:text-orange-300'
                 }`}>
                     {gameMode === 'none' && 'Upload an image to unlock interactive modes'}
                     {gameMode === 'scratch_and_see' && 'Interactive scratching experience'}
                     {gameMode === 'qa_challenge' && 'Answer correctly to unlock content'}
                     {gameMode === 'reveal_rush' && 'Multi-player competition mode'}
+                    {gameMode === 'yes_or_no' && 'Two choices, two different reveals'}
                 </p>
             </div>
         </div>
@@ -659,12 +659,14 @@ useEffect(() => {
                     gameMode === 'none' ? 'text-blue-600 dark:text-blue-300' :
                     gameMode === 'scratch_and_see' ? 'text-green-600 dark:text-green-300' :
                     gameMode === 'qa_challenge' ? 'text-purple-600 dark:text-purple-300' :
+                    gameMode === 'yes_or_no' ? 'text-teal-600 dark:text-teal-300' :
                     'text-orange-600 dark:text-orange-300'
                 }`}>
                     {gameMode === 'none' && 'Upload an image to unlock interactive game modes and challenges that make your moments more engaging!'}
                     {gameMode === 'scratch_and_see' && 'Recipients will see a blurred version first, then scratch to gradually reveal your image with smooth interactive animations.'}
                     {gameMode === 'qa_challenge' && 'Recipients must answer your custom question correctly to unlock the moment. Perfect for personal security or fun challenges.'}
                     {gameMode === 'reveal_rush' && 'Multiple people compete to solve your challenge! The first correct answer wins access to your moment.'}
+                    {gameMode === 'yes_or_no' && 'Pose a question and provide two different visual outcomes. The recipient’s choice of “Yes” or “No” determines which image they get to see.'}
                 </p>
 
                 {/* Feature List */}
@@ -685,7 +687,6 @@ useEffect(() => {
                             </div>
                         </>
                     )}
-
                     {gameMode === 'scratch_and_see' && (
                         <>
                             <div className="flex items-center space-x-2 text-xs text-green-500 dark:text-green-400">
@@ -702,7 +703,6 @@ useEffect(() => {
                             </div>
                         </>
                     )}
-
                     {gameMode === 'qa_challenge' && (
                         <>
                             <div className="flex items-center space-x-2 text-xs text-purple-500 dark:text-purple-400">
@@ -719,7 +719,6 @@ useEffect(() => {
                             </div>
                         </>
                     )}
-
                     {gameMode === 'reveal_rush' && (
                         <>
                             <div className="flex items-center space-x-2 text-xs text-orange-500 dark:text-orange-400">
@@ -736,6 +735,22 @@ useEffect(() => {
                             </div>
                         </>
                     )}
+                    {gameMode === 'yes_or_no' && (
+                        <>
+                            <div className="flex items-center space-x-2 text-xs text-teal-500 dark:text-teal-400">
+                                <span>❓</span>
+                                <span>Pose any question</span>
+                            </div>
+                            <div className="flex items-center space-x-2 text-xs text-teal-500 dark:text-teal-400">
+                                <span>🖼️</span>
+                                <span>Two unique image reveals</span>
+                            </div>
+                            <div className="flex items-center space-x-2 text-xs text-teal-500 dark:text-teal-400">
+                                <span>🎁</span>
+                                <span>Perfect for surprises & announcements</span>
+                            </div>
+                        </>
+                    )}
                 </div>
 
                 {/* Pro Tip */}
@@ -747,6 +762,7 @@ useEffect(() => {
                             {gameMode === 'scratch_and_see' && "Pro tip: Works best with photos, artwork, or visual surprises that benefit from gradual reveal."}
                             {gameMode === 'qa_challenge' && "Pro tip: Use inside jokes or personal questions for better security and more fun interactions."}
                             {gameMode === 'reveal_rush' && "Pro tip: Perfect for friend groups, teams, or family challenges. Great conversation starter!"}
+                            {gameMode === 'yes_or_no' && "Pro tip: Great for gender reveals, asking someone out, or any scenario where you want to give the recipient a fun choice."}
                         </p>
                     </div>
                 </div>
@@ -758,29 +774,11 @@ useEffect(() => {
                             {/* 3. Game-Specific Forms (Conditional - After instructions) */}
                             {gameMode === 'yes_or_no' && (
     <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
-        <YesNoFormFields
+        <YesNoSettings
             question={yesNoQuestion}
             onQuestionChange={setYesNoQuestion}
+             
             
-            yesFile={yesFile}
-            noFile={noFile}
-
-            onYesImageUpload={(url) => setYesFile({ url, type: 'image' })}
-            onNoImageUpload={(url) => setNoFile({ url, type: 'image' })}
-
-            onYesImageRemove={() => { setYesFile(null); setHasUserClearedYesFile(true); }}
-            onNoImageRemove={() => setNoFile(null)}
-
-             watermarkSettingsComponent={
-                <div className="pt-4"> {/* Adds spacing above the settings */}
-                    <WatermarkSettings
-                        addWatermark={addWatermark}
-                        onWatermarkChange={setAddWatermark}
-                        
-                    />
-                </div>
-            }
-            addWatermark={addWatermark}
         />
     </div>
 )}
