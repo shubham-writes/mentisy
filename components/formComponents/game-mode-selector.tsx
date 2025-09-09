@@ -22,8 +22,9 @@ const gameOptions = [
     { id: "none", icon: "✨", title: "Classic", description: "The original one-time view" },
     { id: "scratch_and_see", icon: "🐾", title: "Scratch & See", description: "Make them work for it" },
     { id: "qa_challenge", icon: "🤔", title: "Q & A", description: "Quiz them to unlock" },
+    { id: "yes_or_no", icon: "🎭", title: "Yes or No", description: "Two choices, two reveals" },
     { id: "reveal_rush", icon: "🏆", title: "Reveal Rush", description: "Group challenge mode" },
-    { id: "yes_or_no", icon: "👍", title: "Yes or No", description: "Two choices, two reveals" },
+    
 ] as const;
 
 // UPDATED FUNCTION SIGNATURE - ADD uploadedFile parameter and feedback callback
