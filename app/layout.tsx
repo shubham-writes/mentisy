@@ -121,7 +121,7 @@ const clerkAppearance = {
 // Your metadata and viewport exports with enhanced favicon configuration
 export const metadata: Metadata = {
   title: "Mentisy - Fun Sharing Platform",
-  description: "Share fun links, play with friends, and spark joy âœ¨",
+  description: "Share fun links, play with friends, and spark joy",
   metadataBase: new URL(process.env.NEXT_PUBLIC_URL!),
   manifest: "/manifest.json",
   applicationName: "Mentisy",
@@ -143,8 +143,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Mentisy - Fun Sharing Platform ðŸŽ‰",
-    description: "Share fun links, play with friends, and spark joy âœ¨",
+    title: "Mentisy - Fun Sharing Platform",
+    description: "Share fun links, play with friends, and spark joy",
     images: ["/og-image.png"],
   },
   appleWebApp: {
@@ -188,10 +188,11 @@ export const metadata: Metadata = {
     ],
     // Apple touch icons
     apple: [
-      { url: "/icon-152x152.png", sizes: "152x152", type: "image/png" },
-      { url: "/favicon-192x192.png", sizes: "180x180", type: "image/png" },
-      { url: "/icon-180x180.png", sizes: "180x180", type: "image/png" },
-    ],
+  { url: "/icon-152x152.png", sizes: "152x152", type: "image/png" },
+  { url: "/icon-180x180.png", sizes: "180x180", type: "image/png" },
+  { url: "/icon-192x192.png", sizes: "192x192", type: "image/png" }
+],
+
   },
   other: {
     "mobile-web-app-capable": "yes",
