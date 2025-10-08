@@ -25,7 +25,7 @@ export default function Home() {
 
   useEffect(() => {
     const originalScrollBehavior = document.documentElement.style.scrollBehavior;
-    
+
     const timer = setTimeout(() => {
       document.documentElement.style.scrollBehavior = originalScrollBehavior || 'smooth';
     }, 100);
@@ -39,9 +39,9 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-white">
       <Unauthenticated>
-        
+
         <HeroSection userCount={userCount} />
-        
+
         {/* Streamlined Form Section */}
         <div className="pt-12 sm:pt-16 md:pt-20 pb-16">
           <div className="max-w-7xl mx-auto">
@@ -52,28 +52,28 @@ export default function Home() {
                 </p>
                 <div className="mt-2 h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent" />
               </div>
-              <SecretForm isLandingPage={true} />
+              <SecretForm isLandingPage={false} />
             </div>
           </div>
         </div>
-       
 
-        
+
+
         <FeaturesComparison />
         <TestimonialsSection />
-        
-        
-       
+
+
+
         <FaqSection />
-        
+
         <FinalCta userCount={userCount} />
         <Footer />
       </Unauthenticated>
 
       <Authenticated>
-        
+
         <AuthenticatedDashboard />
-        
+
       </Authenticated>
     </div>
   );

@@ -6,97 +6,65 @@ import { Authenticated, Unauthenticated } from "convex/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, Suspense } from "react";
 import { useAuth } from "@clerk/nextjs";
-
+import { SignInButton } from "@clerk/nextjs";
+import { Button } from "@/components/ui/button";
 
 function HelloPageContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const useCase = searchParams.get('useCase');
     const scrollTo = searchParams.get('scrollTo');
-    const { isSignedIn, isLoaded } = useAuth();
+    const { isSignedIn } = useAuth();
 
-    // Handle scrolling based on URL parameter
+    // Handle scrolling for signed-in users
     useEffect(() => {
         if (scrollTo && isSignedIn) {
             const timer = setTimeout(() => {
-                let elementId = '';
-                let scrollOptions = {
-                    behavior: 'smooth' as ScrollBehavior,
-                    block: 'start' as ScrollLogicalPosition
-                };
-                
-                if (scrollTo === 'form') {
-                    elementId = 'secret-form';
-                    scrollOptions.block = 'center';
-                } else if (scrollTo === 'secrets') {
-                    elementId = 'my-secrets-list';
-                    scrollOptions.block = 'start';
-                }
-                
-                if (elementId) {
-                    const element = document.getElementById(elementId);
-                    if (element) {
-                        const rect = element.getBoundingClientRect();
-                        const isInView = rect.top >= 0 && rect.top <= window.innerHeight;
-                        
-                        if (!isInView || scrollTo === 'form') {
-                            element.scrollIntoView(scrollOptions);
-                        }
-                        
-                        setTimeout(() => {
-                            const newUrl = new URL(window.location.href);
-                            newUrl.searchParams.delete('scrollTo');
-                            router.replace(newUrl.pathname + newUrl.search);
-                        }, 1000);
-                    }
+                const element = document.getElementById('my-secrets-list');
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    const newUrl = new URL(window.location.href);
+                    newUrl.searchParams.delete('scrollTo');
+                    router.replace(newUrl.pathname + newUrl.search);
                 }
             }, 800);
-            
+
             return () => clearTimeout(timer);
         }
     }, [scrollTo, isSignedIn, router]);
 
-    useEffect(() => {
-        if (!isLoaded) return;
-        
-        if (!isSignedIn) {
-            const timer = setTimeout(() => {
-                router.push('/');
-            }, 2000);
-            
-            return () => clearTimeout(timer);
-        }
-    }, [router, isSignedIn, isLoaded]);
-
     return (
         <div className="flex flex-col items-center justify-start text-center gap-y-8 flex-1">
+
+            {/* The SecretForm is now visible to EVERYONE */}
+            <section id="secret-form" className="w-full scroll-mt-24 py-4">
+                <SecretForm useCase={useCase || undefined} />
+            </section>
+
+            {/* Authenticated users see their list of secrets */}
             <Authenticated>
-                <div data-authenticated="true" className="w-full">
-                    <section id="secret-form" data-secret-form className="w-full scroll-mt-24 py-4">
-                        <SecretForm useCase={useCase || undefined} />
-                    </section>
-                    
-                    <section id="my-secrets-list" data-secrets-list className="w-full mt-12 scroll-mt-20 py-4">
-                        <MySecretsList />
-                    </section>
-                    
-                   
-                </div>
+                <section id="my-secrets-list" className="w-full mt-12 scroll-mt-20 py-4">
+                    <MySecretsList />
+                </section>
             </Authenticated>
-            
+
+            {/* Unauthenticated users see a prompt to sign up */}
             <Unauthenticated>
-                <div className="flex flex-col items-center justify-center gap-y-4 mb-8">
-                    <div className="animate-spin mt-20 rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                    <h2 className="text-xl font-semibold">Authentication Required</h2>
-                    <p className="text-muted-foreground">
-                        Redirecting you to sign in...
+                <div className="w-full max-w-2xl text-center my-12 p-8 bg-white/50 dark:bg-gray-900/50 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-lg">
+                    <h3 className="text-2xl font-bold text-gray-800 dark:text-white">Unlock More Features!</h3>
+                    <p className="mt-2 text-gray-600 dark:text-gray-400">
+                        Create a free account to track your shared moments, see view status, and expire links at any time.
                     </p>
-                    <button 
-                        onClick={() => router.push('/')}
-                        className="mt-4 px-4 py-2 text-blue-600 hover:text-blue-800 underline"
-                    >
-                        Go to Home Page Now
-                    </button>
+                    <div className="mt-6">
+                        <SignInButton mode="modal">
+                            <Button
+                                size="lg"
+                                className="font-semibold bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-[#e65a85] hover:to-[#e6955a] transition-transform transform hover:scale-105"
+                            >
+                                ✨ Sign Up for Free
+                            </Button>
+                        </SignInButton>
+                    </div>
                 </div>
             </Unauthenticated>
         </div>

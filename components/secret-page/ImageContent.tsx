@@ -45,14 +45,14 @@ export function ImageContent({
               withWatermark={secret.withWatermark}
             />
             {!isMediaLoading && (
-              <CountdownTimer 
-                initialSeconds={secret.duration || 10} 
-                onComplete={onTimerComplete} 
+              <CountdownTimer
+                initialSeconds={secret.duration || 10}
+                onComplete={onTimerComplete}
               />
             )}
           </div>
         </div>
-        
+
         {secret.message && (
           <div className="max-w-full sm:max-w-lg mx-auto mb-6 sm:mb-8 p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl border border-blue-200/50 dark:border-blue-700/50 shadow-lg">
             <MessageDisplay
@@ -88,9 +88,9 @@ export function ImageContent({
           caseSensitive={secret.qaCaseSensitive || false}
           showHints={secret.qaShowHints ?? true}
           timerComponent={!isMediaLoading ? (
-            <CountdownTimer 
-              initialSeconds={secret.duration || 10} 
-              onComplete={onTimerComplete} 
+            <CountdownTimer
+              initialSeconds={secret.duration || 10}
+              onComplete={onTimerComplete}
             />
           ) : null}
         />
@@ -105,9 +105,9 @@ export function ImageContent({
         onImageReady={onMediaLoad}
         receiverIp={receiverIp}
         timerComponent={!isMediaLoading ? (
-          <CountdownTimer 
-            initialSeconds={secret.duration || 10} 
-            onComplete={onTimerComplete} 
+          <CountdownTimer
+            initialSeconds={secret.duration || 10}
+            onComplete={onTimerComplete}
           />
         ) : null}
       />
@@ -115,30 +115,30 @@ export function ImageContent({
   }
 
   // ✅ THIS IS THE SECTION TO UPDATE
-   if (secret.gameMode === 'yes_or_no') {
+  if (secret.gameMode === 'yes_or_no') {
     return (
-       <div className="relative w-full max-w-full sm:max-w-lg mx-auto mb-4 p-2 sm:p-4">
+      <div className="relative w-full max-w-full sm:max-w-lg mx-auto mb-4 p-2 sm:p-4">
         <YesNoGame
-            question={secret.yesNoQuestion || "Yes or No?"}
-            yesImageUrl={secret.yesImageUrl ?? ''}
-            noImageUrl={secret.noImageUrl ?? ''}
-            onImageReady={onMediaLoad}
-            recipientName={secret.recipientName}
-            receiverIp={receiverIp ?? undefined} 
-            withWatermark={secret.withWatermark}
-            
-            // ✅ PASS the caption props from the secret object down to the game
-            yesCaption={secret.yesCaption}
-            noCaption={secret.noCaption}
+          question={secret.yesNoQuestion || "Yes or No?"}
+          yesImageUrl={secret.yesImageUrl ?? ''}
+          noImageUrl={secret.noImageUrl ?? ''}
+          onImageReady={onMediaLoad}
+          recipientName={secret.recipientName}
+          receiverIp={receiverIp ?? undefined}
+          withWatermark={secret.withWatermark}
 
-            timerComponent={!isMediaLoading ? (
-              <CountdownTimer 
-                initialSeconds={secret.duration || 10} 
-                onComplete={onTimerComplete} 
-              />
-            ) : null}
+          // ✅ PASS the caption props from the secret object down to the game
+          yesCaption={secret.yesCaption}
+          noCaption={secret.noCaption}
+
+          timerComponent={!isMediaLoading ? (
+            <CountdownTimer
+              initialSeconds={secret.duration || 10}
+              onComplete={onTimerComplete}
+            />
+          ) : null}
         />
-       </div>
+      </div>
     );
   }
 
@@ -151,6 +151,7 @@ export function ImageContent({
           alt="Secret Image"
           fill
           style={{ objectFit: "contain" }}
+          sizes="(max-width: 768px) 100vw, 50vw"
           onLoad={onMediaLoad}
           onError={() => {
             console.error("Failed to load image");
@@ -158,15 +159,15 @@ export function ImageContent({
           priority
           className="rounded-xl"
         />
-        
+
         {secret.withWatermark && (
           <Watermark name={secret.recipientName} ip={receiverIp ?? undefined} />
         )}
 
         {!isMediaLoading && (
-          <CountdownTimer 
-            initialSeconds={secret.duration || 10} 
-            onComplete={onTimerComplete} 
+          <CountdownTimer
+            initialSeconds={secret.duration || 10}
+            onComplete={onTimerComplete}
           />
         )}
 

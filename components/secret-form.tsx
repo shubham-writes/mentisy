@@ -31,7 +31,10 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { uploadFiles } from "./uploadthing"; // <-- Correct import for uploadFiles
 import { FeedbackModal } from "@/components/feedback/FeedbackModal";
 import { YesNoImageUploaders } from "./formComponents/yes-no-image-uploaders"; // ✅ Import new component
-import { YesNoSettings } from "./formComponents/yes-no-settings";  
+import { YesNoSettings } from "./formComponents/yes-no-settings";
+
+import { track } from '@vercel/analytics/react';
+import { useAuth } from "@clerk/nextjs";
 
 
 
@@ -75,19 +78,20 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     const [uploadProgress, setUploadProgress] = useState(0);
 
     // ✅ Define a type for the image file object
-type ImageFile = { url: string; type: "image" };
+    type ImageFile = { url: string; type: "image" };
 
-const [yesNoQuestion, setYesNoQuestion] = useState("");
-const [yesFile, setYesFile] = useState<ImageFile | null>(null); // Changed from yesImageUrl
-const [noFile, setNoFile] = useState<ImageFile | null>(null);   // Changed from noImageUrl
-const [hasUserClearedYesFile, setHasUserClearedYesFile] = useState(false);
+    const [yesNoQuestion, setYesNoQuestion] = useState("");
+    const [yesFile, setYesFile] = useState<ImageFile | null>(null); // Changed from yesImageUrl
+    const [noFile, setNoFile] = useState<ImageFile | null>(null);   // Changed from noImageUrl
+    const [hasUserClearedYesFile, setHasUserClearedYesFile] = useState(false);
 
-const [yesCaption, setYesCaption] = useState("");
-const [noCaption, setNoCaption] = useState("");
+    const [yesCaption, setYesCaption] = useState("");
+    const [noCaption, setNoCaption] = useState("");
 
     const createSecret = useMutation(api.secrets.create);
     const { signIn } = useSignIn();
     const { signUp } = useSignUp();
+    const { isSignedIn } = useAuth();
     const searchParams = useSearchParams();
     const router = useRouter();
 
@@ -96,22 +100,22 @@ const [noCaption, setNoCaption] = useState("");
     }, []);
 
     // Auto-collapse More Settings when file is uploaded
-useEffect(() => {
-    if (uploadedFile) {
-        setIsMoreSettingsExpanded(false);
-    }
-}, [uploadedFile]);
-
-useEffect(() => {
-    // When user selects the 'Yes or No' game and the primary file is an image...
-    if (gameMode === 'yes_or_no' && uploadedFile && uploadedFile.type === 'image') {
-        // ...and if the 'Yes' slot is empty AND the user hasn't manually cleared it...
-        if (!yesFile && !hasUserClearedYesFile) { // ✅ UPDATE THIS LINE
-            // ...then it's safe to assign the image file to the 'Yes' slot.
-            setYesFile(uploadedFile as ImageFile);
+    useEffect(() => {
+        if (uploadedFile) {
+            setIsMoreSettingsExpanded(false);
         }
-    }
-}, [gameMode, uploadedFile, yesFile, hasUserClearedYesFile]); 
+    }, [uploadedFile]);
+
+    useEffect(() => {
+        // When user selects the 'Yes or No' game and the primary file is an image...
+        if (gameMode === 'yes_or_no' && uploadedFile && uploadedFile.type === 'image') {
+            // ...and if the 'Yes' slot is empty AND the user hasn't manually cleared it...
+            if (!yesFile && !hasUserClearedYesFile) { // ✅ UPDATE THIS LINE
+                // ...then it's safe to assign the image file to the 'Yes' slot.
+                setYesFile(uploadedFile as ImageFile);
+            }
+        }
+    }, [gameMode, uploadedFile, yesFile, hasUserClearedYesFile]);
 
     // --- FIXED: WRAPPED IN useCallback ---
     const clearGeneratedLink = useCallback(() => {
@@ -120,7 +124,7 @@ useEffect(() => {
         }
     }, [generatedLink]);
 
-    
+
 
     const handleFileUpload = useCallback((file: { url: string; type: "image" | "video" }) => {
         clearGeneratedLink();
@@ -133,121 +137,121 @@ useEffect(() => {
     }, [clearGeneratedLink]);
 
     // --- FIXED: THE useEffect HOOK WITH UPLOAD LOGIC ---
-  useEffect(() => {
-    const handleSharedFile = async () => {
-        if (searchParams.get("shared") === "true") {
-            console.log("📂 Page loaded from share, handling file...");
+    useEffect(() => {
+        const handleSharedFile = async () => {
+            if (searchParams.get("shared") === "true") {
+                console.log("📂 Page loaded from share, handling file...");
 
-            // 🔒 Immediately clean the URL to prevent loops
-            const newUrl = new URL(window.location.href);
-            newUrl.searchParams.delete("shared");
-            router.replace(newUrl.pathname + newUrl.search, { scroll: false });
+                // 🔒 Immediately clean the URL to prevent loops
+                const newUrl = new URL(window.location.href);
+                newUrl.searchParams.delete("shared");
+                router.replace(newUrl.pathname + newUrl.search, { scroll: false });
 
-            const DB_NAME = "MentisyShareDB";
-            const STORE_NAME = "shared-files";
-            const request = indexedDB.open(DB_NAME, 1);
+                const DB_NAME = "MentisyShareDB";
+                const STORE_NAME = "shared-files";
+                const request = indexedDB.open(DB_NAME, 1);
 
-            request.onsuccess = (event) => {
-                const db = (event.target as IDBOpenDBRequest).result;
-                if (!db.objectStoreNames.contains(STORE_NAME)) return;
+                request.onsuccess = (event) => {
+                    const db = (event.target as IDBOpenDBRequest).result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) return;
 
-                const tx = db.transaction(STORE_NAME, "readonly");
-                const store = tx.objectStore(STORE_NAME);
-                const getRequest = store.get("shared-file");
+                    const tx = db.transaction(STORE_NAME, "readonly");
+                    const store = tx.objectStore(STORE_NAME);
+                    const getRequest = store.get("shared-file");
 
-                getRequest.onsuccess = async () => {
-                    const sharedItem = getRequest.result;
-                    if (sharedItem && sharedItem.file) {
-                        setIsUploading(true);
-                        
-                        let fileForUpload: File;
-                        let fileSizeBytes = 0;
+                    getRequest.onsuccess = async () => {
+                        const sharedItem = getRequest.result;
+                        if (sharedItem && sharedItem.file) {
+                            setIsUploading(true);
 
-                        // Prepare file and get size
-                        if (sharedItem.file.data) {
-                            const blob = new Blob([sharedItem.file.data], { type: sharedItem.file.type });
-                            fileForUpload = new File([blob], sharedItem.file.name || "shared", {
-                                type: sharedItem.file.type,
-                            });
-                            fileSizeBytes = blob.size;
-                        } else if (sharedItem.file instanceof Blob) {
-                            const blob = sharedItem.file;
-                            fileForUpload = new File([blob], sharedItem.file.name || "shared", { type: blob.type });
-                            fileSizeBytes = blob.size;
-                        } else {
-                            throw new Error("No file bytes found in IndexedDB");
-                        }
+                            let fileForUpload: File;
+                            let fileSizeBytes = 0;
 
-                        // 🆕 Updated Size-aware progress simulation
-                        const simulateProgressBasedOnFileSize = (sizeBytes: number, fileType: string) => {
-                            let estimatedUploadTimeMs;
-                            let maxProgress;
-                            
-                            // Check if it's an image type
-                            if (fileType === "image") {
-                                estimatedUploadTimeMs = 8000; // Fixed 6 seconds for images
-                                maxProgress = 99; // Reach 99% for images
+                            // Prepare file and get size
+                            if (sharedItem.file.data) {
+                                const blob = new Blob([sharedItem.file.data], { type: sharedItem.file.type });
+                                fileForUpload = new File([blob], sharedItem.file.name || "shared", {
+                                    type: sharedItem.file.type,
+                                });
+                                fileSizeBytes = blob.size;
+                            } else if (sharedItem.file instanceof Blob) {
+                                const blob = sharedItem.file;
+                                fileForUpload = new File([blob], sharedItem.file.name || "shared", { type: blob.type });
+                                fileSizeBytes = blob.size;
                             } else {
-                                // For videos or other files, use 7 seconds
-                                estimatedUploadTimeMs = 12000; // Fixed 7 seconds for other files
-                                maxProgress = 98; // Keep 90% for other files
+                                throw new Error("No file bytes found in IndexedDB");
                             }
-                            
-                            const updateIntervalMs = Math.min(300, estimatedUploadTimeMs / 30);
-                            const totalUpdates = Math.floor(estimatedUploadTimeMs / updateIntervalMs);
-                            const incrementPerUpdate = maxProgress / totalUpdates;
-                            
-                            console.log(`📊 File size: ${(sizeBytes / (1024 * 1024)).toFixed(1)}MB`);
-                            console.log(`📁 File type: ${fileType}`);
-                            console.log(`⏱️ Estimated upload: ${(estimatedUploadTimeMs / 1000).toFixed(1)}s`);
-                            console.log(`🎯 Target progress: ${maxProgress}%`);
-                            
-                            let progress = 0;
-                            const interval = setInterval(() => {
-                                progress += incrementPerUpdate + (Math.random() * 2 - 1); // ±1% variation
-                                progress = Math.max(0, Math.min(maxProgress, progress)); // Keep between 0-maxProgress%
-                                setUploadProgress(Math.round(progress));
-                            }, updateIntervalMs);
-                            
-                            return interval;
-                        };
 
-                        const progressInterval = simulateProgressBasedOnFileSize(fileSizeBytes, sharedItem.type);
+                            // 🆕 Updated Size-aware progress simulation
+                            const simulateProgressBasedOnFileSize = (sizeBytes: number, fileType: string) => {
+                                let estimatedUploadTimeMs;
+                                let maxProgress;
 
-                        try {
-                            const endpoint = sharedItem.type === "image" ? "imageUploader" : "videoUploader";
-                            const res = await uploadFiles(endpoint, { files: [fileForUpload] });
+                                // Check if it's an image type
+                                if (fileType === "image") {
+                                    estimatedUploadTimeMs = 8000; // Fixed 6 seconds for images
+                                    maxProgress = 99; // Reach 99% for images
+                                } else {
+                                    // For videos or other files, use 7 seconds
+                                    estimatedUploadTimeMs = 12000; // Fixed 7 seconds for other files
+                                    maxProgress = 98; // Keep 90% for other files
+                                }
 
-                            // Complete progress animation
-                            clearInterval(progressInterval);
-                            setUploadProgress(100);
-                            
-                            setTimeout(() => {
+                                const updateIntervalMs = Math.min(300, estimatedUploadTimeMs / 30);
+                                const totalUpdates = Math.floor(estimatedUploadTimeMs / updateIntervalMs);
+                                const incrementPerUpdate = maxProgress / totalUpdates;
+
+                                console.log(`📊 File size: ${(sizeBytes / (1024 * 1024)).toFixed(1)}MB`);
+                                console.log(`📁 File type: ${fileType}`);
+                                console.log(`⏱️ Estimated upload: ${(estimatedUploadTimeMs / 1000).toFixed(1)}s`);
+                                console.log(`🎯 Target progress: ${maxProgress}%`);
+
+                                let progress = 0;
+                                const interval = setInterval(() => {
+                                    progress += incrementPerUpdate + (Math.random() * 2 - 1); // ±1% variation
+                                    progress = Math.max(0, Math.min(maxProgress, progress)); // Keep between 0-maxProgress%
+                                    setUploadProgress(Math.round(progress));
+                                }, updateIntervalMs);
+
+                                return interval;
+                            };
+
+                            const progressInterval = simulateProgressBasedOnFileSize(fileSizeBytes, sharedItem.type);
+
+                            try {
+                                const endpoint = sharedItem.type === "image" ? "imageUploader" : "videoUploader";
+                                const res = await uploadFiles(endpoint, { files: [fileForUpload] });
+
+                                // Complete progress animation
+                                clearInterval(progressInterval);
+                                setUploadProgress(100);
+
+                                setTimeout(() => {
+                                    setUploadProgress(0);
+                                }, 1000);
+
+                                if (res && res.length > 0) {
+                                    const uploaded = res[0];
+                                    const fileUrl = (uploaded as any).ufsUrl || uploaded.url;
+                                    handleFileUpload({ url: fileUrl, type: sharedItem.type });
+                                } else {
+                                    throw new Error("Upload failed to return a valid response.");
+                                }
+                            } catch (error) {
+                                console.error("❌ Upload failed:", error);
+                                clearInterval(progressInterval);
                                 setUploadProgress(0);
-                            }, 1000);
-
-                            if (res && res.length > 0) {
-                                const uploaded = res[0];
-                                const fileUrl = (uploaded as any).ufsUrl || uploaded.url;
-                                handleFileUpload({ url: fileUrl, type: sharedItem.type });
-                            } else {
-                                throw new Error("Upload failed to return a valid response.");
+                                alert(`ERROR! ${(error as Error).message}`);
+                            } finally {
+                                setIsUploading(false);
                             }
-                        } catch (error) {
-                            console.error("❌ Upload failed:", error);
-                            clearInterval(progressInterval);
-                            setUploadProgress(0);
-                            alert(`ERROR! ${(error as Error).message}`);
-                        } finally {
-                            setIsUploading(false);
                         }
-                    }
+                    };
                 };
-            };
-        }
-    };
-    handleSharedFile();
-}, [searchParams, router, handleFileUpload]);
+            }
+        };
+        handleSharedFile();
+    }, [searchParams, router, handleFileUpload]);
 
 
     // ... (The rest of your file is fine, no changes needed below this line)
@@ -272,7 +276,7 @@ useEffect(() => {
         }
     }, [useCase, templateApplied, clearGeneratedLink]);
 
-     useEffect(() => {
+    useEffect(() => {
         // Only run this logic if the component has been hydrated on the client
         if (isHydrated && !isLandingPage && !useCase && !templateApplied) {
             const savedData = localStorage.getItem('secretFormData');
@@ -308,118 +312,122 @@ useEffect(() => {
     };
 
     const handleGenerate = async (e?: React.MouseEvent) => {
-    if (e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
-
-    // --- VALIDATION LOGIC (updated for clarity) ---
-    if (gameMode === 'yes_or_no') {
-        // Use yesFile and noFile for validation
-        if (!yesNoQuestion.trim() || !yesFile || !noFile) {
-            alert("Please provide a question and both a 'Yes' and 'No' image for the game.");
-            return;
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
         }
-    } else if (gameMode === 'qa_challenge') {
-        if (!uploadedFile || !qaQuestion.trim() || !qaAnswer.trim()) {
-            alert("Please upload an image and provide a question and answer for the Q&A challenge.");
-            return;
-        }
-    } else if (gameMode === 'reveal_rush') {
-         if (!uploadedFile || (microQuestType === 'group_qa' && (!mqGroupQuestion.trim() || !mqGroupAnswer.trim())) || (microQuestType === 'rate_my' && (!mqRateCategory.trim() || !mqExpectedRating))) {
-            alert("Please upload an image and complete the Reveal Rush challenge fields.");
-            return;
-        }
-    } else if (!message && !uploadedFile) {
-        alert("Please provide a message or upload a file.");
-        return;
-    }
 
-    if (isLandingPage) {
-        saveFormData();
-        setShowSignupPrompt(true);
-        return;
-    }
-
-    setIsLoading(true);
-    try {
-        const baseParams = {
-            message: message || undefined,
-            recipientName,
-            publicNote,
-            withWatermark: addWatermark,
-            duration: uploadedFile?.type === "video" ? undefined : parseInt(duration),
-        };
-
-        let mutationParams: any;
-
+        // --- VALIDATION LOGIC (updated for clarity) ---
         if (gameMode === 'yes_or_no') {
-            mutationParams = {
-                ...baseParams,
-                gameMode: 'yes_or_no',
-                fileType: 'image',
-                yesNoQuestion: yesNoQuestion,
-                yesImageUrl: yesFile?.url, // Use the url from the yesFile object
-                noImageUrl: noFile?.url,   // Use the url from the noFile object
-                yesCaption: yesCaption,  
-                noCaption: noCaption, 
-            };
-        } else {
-            mutationParams = {
-                ...baseParams,
-                fileUrl: uploadedFile?.url,
-                fileType: uploadedFile?.type,
-                gameMode: uploadedFile?.type === 'video' ? 'none' : gameMode,
-            };
-            if (gameMode === 'qa_challenge') {
-                mutationParams.qaQuestion = qaQuestion;
-                mutationParams.qaAnswer = qaAnswer;
-                mutationParams.qaMaxAttempts = qaMaxAttempts;
-                mutationParams.qaCaseSensitive = qaCaseSensitive;
-                mutationParams.qaShowHints = qaShowHints;
+            // Use yesFile and noFile for validation
+            if (!yesNoQuestion.trim() || !yesFile || !noFile) {
+                alert("Please provide a question and both a 'Yes' and 'No' image for the game.");
+                return;
             }
-            if (gameMode === 'reveal_rush') {
-                mutationParams.microQuestType = microQuestType;
-                mutationParams.mqGroupQuestion = mqGroupQuestion;
-                mutationParams.mqGroupAnswer = mqGroupAnswer;
-                mutationParams.mqRateCategory = mqRateCategory;
-                mutationParams.mqExpectedRating = mqExpectedRating;
-                mutationParams.mqSuggestionPrompt = mqSuggestionPrompt;
+        } else if (gameMode === 'qa_challenge') {
+            if (!uploadedFile || !qaQuestion.trim() || !qaAnswer.trim()) {
+                alert("Please upload an image and provide a question and answer for the Q&A challenge.");
+                return;
             }
+        } else if (gameMode === 'reveal_rush') {
+            if (!uploadedFile || (microQuestType === 'group_qa' && (!mqGroupQuestion.trim() || !mqGroupAnswer.trim())) || (microQuestType === 'rate_my' && (!mqRateCategory.trim() || !mqExpectedRating))) {
+                alert("Please upload an image and complete the Reveal Rush challenge fields.");
+                return;
+            }
+        } else if (!message && !uploadedFile) {
+            alert("Please provide a message or upload a file.");
+            return;
         }
 
-        const publicId = await createSecret(mutationParams);
+        // The isLandingPage block that forced sign-up has been removed.
 
-        if (publicId) {
-            const link = `${window.location.origin}/redirect/${publicId}`;
-            setGeneratedLink(link);
+        setIsLoading(true);
+        try {
+            const baseParams = {
+                message: message || undefined,
+                recipientName,
+                publicNote,
+                withWatermark: addWatermark,
+                duration: uploadedFile?.type === "video" ? undefined : parseInt(duration),
+            };
+
+            let mutationParams: any;
+
+            if (gameMode === 'yes_or_no') {
+                mutationParams = {
+                    ...baseParams,
+                    gameMode: 'yes_or_no',
+                    fileType: 'image',
+                    yesNoQuestion: yesNoQuestion,
+                    yesImageUrl: yesFile?.url, // Use the url from the yesFile object
+                    noImageUrl: noFile?.url,   // Use the url from the noFile object
+                    yesCaption: yesCaption,
+                    noCaption: noCaption,
+                };
+            } else {
+                mutationParams = {
+                    ...baseParams,
+                    fileUrl: uploadedFile?.url,
+                    fileType: uploadedFile?.type,
+                    gameMode: uploadedFile?.type === 'video' ? 'none' : gameMode,
+                };
+                if (gameMode === 'qa_challenge') {
+                    mutationParams.qaQuestion = qaQuestion;
+                    mutationParams.qaAnswer = qaAnswer;
+                    mutationParams.qaMaxAttempts = qaMaxAttempts;
+                    mutationParams.qaCaseSensitive = qaCaseSensitive;
+                    mutationParams.qaShowHints = qaShowHints;
+                }
+                if (gameMode === 'reveal_rush') {
+                    mutationParams.microQuestType = microQuestType;
+                    mutationParams.mqGroupQuestion = mqGroupQuestion;
+                    mutationParams.mqGroupAnswer = mqGroupAnswer;
+                    mutationParams.mqRateCategory = mqRateCategory;
+                    mutationParams.mqExpectedRating = mqExpectedRating;
+                    mutationParams.mqSuggestionPrompt = mqSuggestionPrompt;
+                }
+            }
+
+            const publicId = await createSecret(mutationParams);
+
+            if (publicId) {
+                // NEW: Fire the Vercel Analytics custom event
+                track('Create Fun Link', {
+                    gameMode: gameMode,
+                    fileType: uploadedFile?.type ?? 'none',
+                    isGuest: !isSignedIn
+                });
+
+                const link = `${window.location.origin}/redirect/${publicId}`;
+                setGeneratedLink(link);
+            }
+
+            // Reset all form fields after successful creation
+            setMessage("");
+            setUploadedFile(null);
+            setGameMode("none");
+            setMicroQuestType("group_qa");
+            setMqGroupQuestion("");
+            setMqGroupAnswer("");
+            setMqRateCategory("");
+            setMqExpectedRating(0);
+            setMqSuggestionPrompt("");
+            setQaQuestion("");
+            setQaAnswer("");
+            setQaMaxAttempts(3);
+            setQaCaseSensitive(false);
+            setQaShowHints(true);
+            setYesNoQuestion("");
+            setYesFile(null);
+            setNoFile(null);
+
+        } catch (error) {
+            console.error(error);
+            alert("Failed to create the fun link.");
+        } finally {
+            setIsLoading(false);
         }
-
-        setMessage(""); 
-        setUploadedFile(null); 
-        setGameMode("none"); 
-        setMicroQuestType("group_qa");
-        setMqGroupQuestion(""); 
-        setMqGroupAnswer(""); 
-        setMqRateCategory(""); 
-        setMqExpectedRating(0);
-        setMqSuggestionPrompt(""); 
-        setQaQuestion(""); 
-        setQaAnswer(""); 
-        setQaMaxAttempts(3);
-        setQaCaseSensitive(false); 
-        setQaShowHints(true);
-        setYesNoQuestion(""); 
-        setYesFile(null); // Reset yesFile
-        setNoFile(null);  // Reset noFile
-
-    } catch (error) {
-        console.error(error);
-        alert("Failed to create the fun link.");
-    } finally {
-        setIsLoading(false);
-    }
-};
+    };
 
     const handleMessageChange = (value: string) => {
         if (value !== message) clearGeneratedLink();
@@ -441,19 +449,19 @@ useEffect(() => {
         setUploadedFile(null);
         setGameMode('none');
     };
-    
+
     const handleGameModeChange = (newMode: GameMode) => {
         clearGeneratedLink();
         setGameMode(newMode);
         setHasUserClearedYesFile(false);
-        
+
         if (newMode === 'qa_challenge' || newMode === 'reveal_rush') {
             setDuration("60");
         } else {
             setDuration("10");
         }
 
-        
+
 
         if (newMode !== 'qa_challenge') {
             setQaQuestion(""); setQaAnswer(""); setQaMaxAttempts(3);
@@ -467,21 +475,21 @@ useEffect(() => {
     const handleQaCaseSensitiveChange = (value: boolean) => { clearGeneratedLink(); setQaCaseSensitive(value); };
     const handleQaShowHintsChange = (value: boolean) => { clearGeneratedLink(); setQaShowHints(value); };
 
-   const handleImageUploadComplete = (res: any) => {
-  if (res && res.length > 0) {
-    const uploaded = res[0];
-    const fileUrl = (uploaded as any).ufsUrl || uploaded.url;
-    handleFileUpload({ url: fileUrl, type: "image" });
-  }
-};
+    const handleImageUploadComplete = (res: any) => {
+        if (res && res.length > 0) {
+            const uploaded = res[0];
+            const fileUrl = (uploaded as any).ufsUrl || uploaded.url;
+            handleFileUpload({ url: fileUrl, type: "image" });
+        }
+    };
 
     const handleVideoUploadComplete = (res: any) => {
-  if (res && res.length > 0) {
-    const uploaded = res[0];
-    const fileUrl = (uploaded as any).ufsUrl || uploaded.url;
-    handleFileUpload({ url: fileUrl, type: "video" });
-  }
-};
+        if (res && res.length > 0) {
+            const uploaded = res[0];
+            const fileUrl = (uploaded as any).ufsUrl || uploaded.url;
+            handleFileUpload({ url: fileUrl, type: "video" });
+        }
+    };
 
     const handleUploadError = (error: Error) => {
         alert(`ERROR! ${error.message}`);
@@ -496,9 +504,9 @@ useEffect(() => {
     const handleMqSuggestionPromptChange = (value: string) => setMqSuggestionPrompt(value);
 
     const isTimerDisabled = uploadedFile?.type === 'video';
-         const isGameModeDisabled = gameMode !== 'yes_or_no' && (!uploadedFile || uploadedFile.type === 'video');
+    const isGameModeDisabled = gameMode !== 'yes_or_no' && (!uploadedFile || uploadedFile.type === 'video');
 
-        const disableGameModes = gameMode === 'yes_or_no' ? false : !uploadedFile || uploadedFile.type === 'video';
+    const disableGameModes = gameMode === 'yes_or_no' ? false : !uploadedFile || uploadedFile.type === 'video';
 
 
     const formData = {
@@ -510,10 +518,10 @@ useEffect(() => {
         <div className="w-full max-w-7xl mx-auto px-2 sm:px-2 md:px-6 lg:px-8">
             {/* The rest of your JSX return statement is correct and does not need changes */}
             {/* ... */}
-             <PersonalizedHeader useCase={useCase} isLandingPage={isLandingPage} />
+            <PersonalizedHeader useCase={useCase} isLandingPage={isLandingPage} />
 
             {/* Use Case Tips - Mobile Optimized */}
-            <UseCaseTips 
+            <UseCaseTips
                 useCase={useCase}
                 isVisible={showTips}
                 onClose={() => setShowTips(false)}
@@ -522,13 +530,13 @@ useEffect(() => {
             {/* Main Form Container - Mobile First Responsive */}
             <div className="bg-white/80 dark:bg-gray-900/50 dark:border mb-20 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-xl sm:shadow-2xl border border-white/20 dark:border-gray-800 overflow-hidden">
                 <div className="p-2 sm:p-2 md:p-8 lg:p-10">
-                    
+
                     {/* Landing Page Notice */}
                     {isLandingPage && <LandingPageNotice />}
 
                     {/* Mobile: Single Column, Desktop: Balanced Two Columns */}
                     <div className="space-y-6 sm:space-y-8 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-8 xl:gap-12">
-                        
+
                         {/* LEFT COLUMN - Content & Media Flow */}
                         <div className="space-y-4 sm:space-y-6 order-1">
                             {gameMode !== 'yes_or_no' ? (
@@ -547,27 +555,27 @@ useEffect(() => {
                             ) : (
                                 // ✅ RENDER the new image uploaders in the left column
                                 <>
-                                <YesNoImageUploaders
-                                    yesFile={yesFile}
-                                    noFile={noFile}
-                                    onYesImageUpload={(url) => setYesFile({ url, type: 'image' })}
-                                    onNoImageUpload={(url) => setNoFile({ url, type: 'image' })}
-                                    onYesImageRemove={() => { setYesFile(null); setHasUserClearedYesFile(true); }}
-                                    onNoImageRemove={() => setNoFile(null)}
-                                    addWatermark={addWatermark}
-                                />
+                                    <YesNoImageUploaders
+                                        yesFile={yesFile}
+                                        noFile={noFile}
+                                        onYesImageUpload={(url) => setYesFile({ url, type: 'image' })}
+                                        onNoImageUpload={(url) => setNoFile({ url, type: 'image' })}
+                                        onYesImageRemove={() => { setYesFile(null); setHasUserClearedYesFile(true); }}
+                                        onNoImageRemove={() => setNoFile(null)}
+                                        addWatermark={addWatermark}
+                                    />
 
-                                <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
+                                    <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
                                         <WatermarkSettings addWatermark={addWatermark} onWatermarkChange={setAddWatermark} />
                                     </div>
-                                    </>
+                                </>
                             )}
                         </div>
 
 
                         {/* RIGHT COLUMN - Game Features & Settings (Better organized hierarchy) */}
                         <div className="space-y-4 sm:space-y-6 order-2">
-                            
+
                             {/* 1. Game Mode Selector - Top Priority (Interactive Features) */}
                             <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
                                 <GameModeSelector
@@ -578,210 +586,204 @@ useEffect(() => {
                                     onFeedbackClick={handleGameFeedbackClick}
                                 />
 
-                               
+
                             </div>
 
                             {/* 2. Dynamic Instructions Panel - Visual Guide (Right after game selection) */}
                             {/* 2. Elegant Game Mode Instructions - Collapsible */}
-<div className={`rounded-xl sm:rounded-2xl border shadow-lg transition-all duration-150 ${
-    gameMode === 'none' ? 'bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200/50 dark:border-blue-700/50' :
-    gameMode === 'scratch_and_see' ? 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200/50 dark:border-green-700/50' :
-    gameMode === 'qa_challenge' ? 'bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 border-purple-200/50 dark:border-purple-700/50' :
-    gameMode === 'yes_or_no' ? 'bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20 border-teal-200/50 dark:border-teal-700/50' :
-    'bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-orange-200/50 dark:border-orange-700/50'
-}`}>
-    {/* Compact Header - Always Visible */}
-    <div 
-        className="p-4 sm:p-5 cursor-pointer flex items-center justify-between hover:bg-white/30 dark:hover:bg-black/10 transition-colors duration-100"
-        onClick={() => setIsInstructionsExpanded(!isInstructionsExpanded)}
-    >
-        <div className="flex items-center space-x-3">
-            {/* Mode Icon */}
-            <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-white/50 dark:bg-black/20">
-                <span className="text-lg">
-                    {gameMode === 'none' && 'ⓘ'}
-                    {gameMode === 'scratch_and_see' && '🐾'}
-                    {gameMode === 'qa_challenge' && '🤔'}
-                    {gameMode === 'reveal_rush' && '🏆'}
-                    {gameMode === 'yes_or_no' && '👍'}
-                </span>
-            </div>
-            
-            {/* Mode Title & Quick Description */}
-            <div className="flex-1 min-w-0">
-                <h3 className={`font-semibold text-sm sm:text-base ${
-                    gameMode === 'none' ? 'text-blue-800 dark:text-blue-200' :
-                    gameMode === 'scratch_and_see' ? 'text-green-800 dark:text-green-200' :
-                    gameMode === 'qa_challenge' ? 'text-purple-800 dark:text-purple-200' :
-                    gameMode === 'yes_or_no' ? 'text-teal-800 dark:text-teal-200' :
-                    'text-orange-800 dark:text-orange-200'
-                }`}>
-                    {gameMode === 'none' && 'Add Some Fun?'}
-                    {gameMode === 'scratch_and_see' && 'Scratch & Reveal Magic'}
-                    {gameMode === 'qa_challenge' && 'Brain Teaser Mode'}
-                    {gameMode === 'reveal_rush' && 'Competition Mode'}
-                    {gameMode === 'yes_or_no' && 'Two Choices, One Secret'}
-                </h3>
-                <p className={`text-xs opacity-70 truncate ${
-                    gameMode === 'none' ? 'text-blue-600 dark:text-blue-300' :
-                    gameMode === 'scratch_and_see' ? 'text-green-600 dark:text-green-300' :
-                    gameMode === 'qa_challenge' ? 'text-purple-600 dark:text-purple-300' :
-                    gameMode === 'yes_or_no' ? 'text-teal-600 dark:text-teal-300' :
-                    'text-orange-600 dark:text-orange-300'
-                }`}>
-                    {gameMode === 'none' && 'Upload an image to unlock interactive modes'}
-                    {gameMode === 'scratch_and_see' && 'Interactive scratching experience'}
-                    {gameMode === 'qa_challenge' && 'Answer correctly to unlock content'}
-                    {gameMode === 'reveal_rush' && 'Multi-player competition mode'}
-                    {gameMode === 'yes_or_no' && 'Two choices, two different reveals'}
-                </p>
-            </div>
-        </div>
+                            <div className={`rounded-xl sm:rounded-2xl border shadow-lg transition-all duration-150 ${gameMode === 'none' ? 'bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200/50 dark:border-blue-700/50' :
+                                gameMode === 'scratch_and_see' ? 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200/50 dark:border-green-700/50' :
+                                    gameMode === 'qa_challenge' ? 'bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 border-purple-200/50 dark:border-purple-700/50' :
+                                        gameMode === 'yes_or_no' ? 'bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20 border-teal-200/50 dark:border-teal-700/50' :
+                                            'bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-orange-200/50 dark:border-orange-700/50'
+                                }`}>
+                                {/* Compact Header - Always Visible */}
+                                <div
+                                    className="p-4 sm:p-5 cursor-pointer flex items-center justify-between hover:bg-white/30 dark:hover:bg-black/10 transition-colors duration-100"
+                                    onClick={() => setIsInstructionsExpanded(!isInstructionsExpanded)}
+                                >
+                                    <div className="flex items-center space-x-3">
+                                        {/* Mode Icon */}
+                                        <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-white/50 dark:bg-black/20">
+                                            <span className="text-lg">
+                                                {gameMode === 'none' && 'ⓘ'}
+                                                {gameMode === 'scratch_and_see' && '🐾'}
+                                                {gameMode === 'qa_challenge' && '🤔'}
+                                                {gameMode === 'reveal_rush' && '🏆'}
+                                                {gameMode === 'yes_or_no' && '👍'}
+                                            </span>
+                                        </div>
 
-        {/* Expand/Collapse Icon */}
-        <div className={`flex-shrink-0 w-6 h-6 flex items-center justify-center transition-transform duration-150 ${
-            isInstructionsExpanded ? 'rotate-180' : 'rotate-0'
-        }`}>
-            <svg className="w-4 h-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-        </div>
-    </div>
+                                        {/* Mode Title & Quick Description */}
+                                        <div className="flex-1 min-w-0">
+                                            <h3 className={`font-semibold text-sm sm:text-base ${gameMode === 'none' ? 'text-blue-800 dark:text-blue-200' :
+                                                gameMode === 'scratch_and_see' ? 'text-green-800 dark:text-green-200' :
+                                                    gameMode === 'qa_challenge' ? 'text-purple-800 dark:text-purple-200' :
+                                                        gameMode === 'yes_or_no' ? 'text-teal-800 dark:text-teal-200' :
+                                                            'text-orange-800 dark:text-orange-200'
+                                                }`}>
+                                                {gameMode === 'none' && 'Add Some Fun?'}
+                                                {gameMode === 'scratch_and_see' && 'Scratch & Reveal Magic'}
+                                                {gameMode === 'qa_challenge' && 'Brain Teaser Mode'}
+                                                {gameMode === 'reveal_rush' && 'Competition Mode'}
+                                                {gameMode === 'yes_or_no' && 'Two Choices, One Secret'}
+                                            </h3>
+                                            <p className={`text-xs opacity-70 truncate ${gameMode === 'none' ? 'text-blue-600 dark:text-blue-300' :
+                                                gameMode === 'scratch_and_see' ? 'text-green-600 dark:text-green-300' :
+                                                    gameMode === 'qa_challenge' ? 'text-purple-600 dark:text-purple-300' :
+                                                        gameMode === 'yes_or_no' ? 'text-teal-600 dark:text-teal-300' :
+                                                            'text-orange-600 dark:text-orange-300'
+                                                }`}>
+                                                {gameMode === 'none' && 'Upload an image to unlock interactive modes'}
+                                                {gameMode === 'scratch_and_see' && 'Interactive scratching experience'}
+                                                {gameMode === 'qa_challenge' && 'Answer correctly to unlock content'}
+                                                {gameMode === 'reveal_rush' && 'Multi-player competition mode'}
+                                                {gameMode === 'yes_or_no' && 'Two choices, two different reveals'}
+                                            </p>
+                                        </div>
+                                    </div>
 
-    {/* Expandable Content */}
-    <div className={`overflow-hidden transition-all duration-150 ease-in-out ${
-        isInstructionsExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-    }`}>
-        <div className="px-4 sm:px-5 pb-4 sm:pb-5 border-t border-current/10">
-            <div className="pt-4">
-                {/* Detailed Description */}
-                <p className={`text-sm mb-4 ${
-                    gameMode === 'none' ? 'text-blue-600 dark:text-blue-300' :
-                    gameMode === 'scratch_and_see' ? 'text-green-600 dark:text-green-300' :
-                    gameMode === 'qa_challenge' ? 'text-purple-600 dark:text-purple-300' :
-                    gameMode === 'yes_or_no' ? 'text-teal-600 dark:text-teal-300' :
-                    'text-orange-600 dark:text-orange-300'
-                }`}>
-                    {gameMode === 'none' && 'Upload an image to unlock interactive game modes and challenges that make your moments more engaging!'}
-                    {gameMode === 'scratch_and_see' && 'Recipients will see a blurred version first, then scratch to gradually reveal your image with smooth interactive animations.'}
-                    {gameMode === 'qa_challenge' && 'Recipients must answer your custom question correctly to unlock the moment. Perfect for personal security or fun challenges.'}
-                    {gameMode === 'reveal_rush' && 'Multiple people compete to solve your challenge! The first correct answer wins access to your moment.'}
-                    {gameMode === 'yes_or_no' && 'Pose a question and provide two different visual outcomes. The recipient’s choice of “Yes” or “No” determines which image they get to see.'}
-                </p>
+                                    {/* Expand/Collapse Icon */}
+                                    <div className={`flex-shrink-0 w-6 h-6 flex items-center justify-center transition-transform duration-150 ${isInstructionsExpanded ? 'rotate-180' : 'rotate-0'
+                                        }`}>
+                                        <svg className="w-4 h-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </div>
+                                </div>
 
-                {/* Feature List */}
-                <div className="space-y-2 mb-4">
-                    {gameMode === 'none' && (
-                        <>
-                            <div className="flex items-center space-x-2 text-xs text-blue-500 dark:text-blue-400">
-                                <span>🤔</span>
-                                <span>Q&A Challenges</span>
-                            </div>
-                            <div className="flex items-center space-x-2 text-xs text-blue-500 dark:text-blue-400">
-                                <span>🏆</span>
-                                <span>Group Competitions</span>
-                            </div>
-                            <div className="flex items-center space-x-2 text-xs text-blue-500 dark:text-blue-400">
-                                <span>🐾</span>
-                                <span>Scratch & Reveal</span>
-                            </div>
-                        </>
-                    )}
-                    {gameMode === 'scratch_and_see' && (
-                        <>
-                            <div className="flex items-center space-x-2 text-xs text-green-500 dark:text-green-400">
-                                <span>👆</span>
-                                <span>Interactive scratching experience</span>
-                            </div>
-                            <div className="flex items-center space-x-2 text-xs text-green-500 dark:text-green-400">
-                                <span>🎨</span>
-                                <span>Gradual image reveal</span>
-                            </div>
-                            <div className="flex items-center space-x-2 text-xs text-green-500 dark:text-green-400">
-                                <span>📱</span>
-                                <span>Perfect for mobile & desktop</span>
-                            </div>
-                        </>
-                    )}
-                    {gameMode === 'qa_challenge' && (
-                        <>
-                            <div className="flex items-center space-x-2 text-xs text-purple-500 dark:text-purple-400">
-                                <span>❓</span>
-                                <span>Custom question & answer</span>
-                            </div>
-                            <div className="flex items-center space-x-2 text-xs text-purple-500 dark:text-purple-400">
-                                <span>🎯</span>
-                                <span>Multiple attempts allowed</span>
-                            </div>
-                            <div className="flex items-center space-x-2 text-xs text-purple-500 dark:text-purple-400">
-                                <span>💡</span>
-                                <span>Optional hints system</span>
-                            </div>
-                        </>
-                    )}
-                    {gameMode === 'reveal_rush' && (
-                        <>
-                            <div className="flex items-center space-x-2 text-xs text-orange-500 dark:text-orange-400">
-                                <span>👥</span>
-                                <span>Multi-player competition</span>
-                            </div>
-                            <div className="flex items-center space-x-2 text-xs text-orange-500 dark:text-orange-400">
-                                <span>⚡</span>
-                                <span>First correct answer wins</span>
-                            </div>
-                            <div className="flex items-center space-x-2 text-xs text-orange-500 dark:text-orange-400">
-                                <span>🎉</span>
-                                <span>Great for group chats</span>
-                            </div>
-                        </>
-                    )}
-                    {gameMode === 'yes_or_no' && (
-                        <>
-                            <div className="flex items-center space-x-2 text-xs text-teal-500 dark:text-teal-400">
-                                <span>❓</span>
-                                <span>Pose any question</span>
-                            </div>
-                            <div className="flex items-center space-x-2 text-xs text-teal-500 dark:text-teal-400">
-                                <span>🖼️</span>
-                                <span>Two unique image reveals</span>
-                            </div>
-                            <div className="flex items-center space-x-2 text-xs text-teal-500 dark:text-teal-400">
-                                <span>🎁</span>
-                                <span>Perfect for surprises & announcements</span>
-                            </div>
-                        </>
-                    )}
-                </div>
+                                {/* Expandable Content */}
+                                <div className={`overflow-hidden transition-all duration-150 ease-in-out ${isInstructionsExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                                    }`}>
+                                    <div className="px-4 sm:px-5 pb-4 sm:pb-5 border-t border-current/10">
+                                        <div className="pt-4">
+                                            {/* Detailed Description */}
+                                            <p className={`text-sm mb-4 ${gameMode === 'none' ? 'text-blue-600 dark:text-blue-300' :
+                                                gameMode === 'scratch_and_see' ? 'text-green-600 dark:text-green-300' :
+                                                    gameMode === 'qa_challenge' ? 'text-purple-600 dark:text-purple-300' :
+                                                        gameMode === 'yes_or_no' ? 'text-teal-600 dark:text-teal-300' :
+                                                            'text-orange-600 dark:text-orange-300'
+                                                }`}>
+                                                {gameMode === 'none' && 'Upload an image to unlock interactive game modes and challenges that make your moments more engaging!'}
+                                                {gameMode === 'scratch_and_see' && 'Recipients will see a blurred version first, then scratch to gradually reveal your image with smooth interactive animations.'}
+                                                {gameMode === 'qa_challenge' && 'Recipients must answer your custom question correctly to unlock the moment. Perfect for personal security or fun challenges.'}
+                                                {gameMode === 'reveal_rush' && 'Multiple people compete to solve your challenge! The first correct answer wins access to your moment.'}
+                                                {gameMode === 'yes_or_no' && 'Pose a question and provide two different visual outcomes. The recipient’s choice of “Yes” or “No” determines which image they get to see.'}
+                                            </p>
 
-                {/* Pro Tip */}
-                <div className="pt-3 border-t border-current/10">
-                    <div className="flex items-start space-x-2">
-                        <span className="text-sm flex-shrink-0">💡</span>
-                        <p className="text-xs opacity-80 leading-relaxed">
-                            {gameMode === 'none' && "Pro tip: Games make your moments more engaging and memorable! Perfect for special occasions."}
-                            {gameMode === 'scratch_and_see' && "Pro tip: Works best with photos, artwork, or visual surprises that benefit from gradual reveal."}
-                            {gameMode === 'qa_challenge' && "Pro tip: Use inside jokes or personal questions for better security and more fun interactions."}
-                            {gameMode === 'reveal_rush' && "Pro tip: Perfect for friend groups, teams, or family challenges. Great conversation starter!"}
-                            {gameMode === 'yes_or_no' && "Pro tip: Great for gender reveals, asking someone out, or any scenario where you want to give the recipient a fun choice."}
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                                            {/* Feature List */}
+                                            <div className="space-y-2 mb-4">
+                                                {gameMode === 'none' && (
+                                                    <>
+                                                        <div className="flex items-center space-x-2 text-xs text-blue-500 dark:text-blue-400">
+                                                            <span>🤔</span>
+                                                            <span>Q&A Challenges</span>
+                                                        </div>
+                                                        <div className="flex items-center space-x-2 text-xs text-blue-500 dark:text-blue-400">
+                                                            <span>🏆</span>
+                                                            <span>Group Competitions</span>
+                                                        </div>
+                                                        <div className="flex items-center space-x-2 text-xs text-blue-500 dark:text-blue-400">
+                                                            <span>🐾</span>
+                                                            <span>Scratch & Reveal</span>
+                                                        </div>
+                                                    </>
+                                                )}
+                                                {gameMode === 'scratch_and_see' && (
+                                                    <>
+                                                        <div className="flex items-center space-x-2 text-xs text-green-500 dark:text-green-400">
+                                                            <span>👆</span>
+                                                            <span>Interactive scratching experience</span>
+                                                        </div>
+                                                        <div className="flex items-center space-x-2 text-xs text-green-500 dark:text-green-400">
+                                                            <span>🎨</span>
+                                                            <span>Gradual image reveal</span>
+                                                        </div>
+                                                        <div className="flex items-center space-x-2 text-xs text-green-500 dark:text-green-400">
+                                                            <span>📱</span>
+                                                            <span>Perfect for mobile & desktop</span>
+                                                        </div>
+                                                    </>
+                                                )}
+                                                {gameMode === 'qa_challenge' && (
+                                                    <>
+                                                        <div className="flex items-center space-x-2 text-xs text-purple-500 dark:text-purple-400">
+                                                            <span>❓</span>
+                                                            <span>Custom question & answer</span>
+                                                        </div>
+                                                        <div className="flex items-center space-x-2 text-xs text-purple-500 dark:text-purple-400">
+                                                            <span>🎯</span>
+                                                            <span>Multiple attempts allowed</span>
+                                                        </div>
+                                                        <div className="flex items-center space-x-2 text-xs text-purple-500 dark:text-purple-400">
+                                                            <span>💡</span>
+                                                            <span>Optional hints system</span>
+                                                        </div>
+                                                    </>
+                                                )}
+                                                {gameMode === 'reveal_rush' && (
+                                                    <>
+                                                        <div className="flex items-center space-x-2 text-xs text-orange-500 dark:text-orange-400">
+                                                            <span>👥</span>
+                                                            <span>Multi-player competition</span>
+                                                        </div>
+                                                        <div className="flex items-center space-x-2 text-xs text-orange-500 dark:text-orange-400">
+                                                            <span>⚡</span>
+                                                            <span>First correct answer wins</span>
+                                                        </div>
+                                                        <div className="flex items-center space-x-2 text-xs text-orange-500 dark:text-orange-400">
+                                                            <span>🎉</span>
+                                                            <span>Great for group chats</span>
+                                                        </div>
+                                                    </>
+                                                )}
+                                                {gameMode === 'yes_or_no' && (
+                                                    <>
+                                                        <div className="flex items-center space-x-2 text-xs text-teal-500 dark:text-teal-400">
+                                                            <span>❓</span>
+                                                            <span>Pose any question</span>
+                                                        </div>
+                                                        <div className="flex items-center space-x-2 text-xs text-teal-500 dark:text-teal-400">
+                                                            <span>🖼️</span>
+                                                            <span>Two unique image reveals</span>
+                                                        </div>
+                                                        <div className="flex items-center space-x-2 text-xs text-teal-500 dark:text-teal-400">
+                                                            <span>🎁</span>
+                                                            <span>Perfect for surprises & announcements</span>
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </div>
+
+                                            {/* Pro Tip */}
+                                            <div className="pt-3 border-t border-current/10">
+                                                <div className="flex items-start space-x-2">
+                                                    <span className="text-sm flex-shrink-0">💡</span>
+                                                    <p className="text-xs opacity-80 leading-relaxed">
+                                                        {gameMode === 'none' && "Pro tip: Games make your moments more engaging and memorable! Perfect for special occasions."}
+                                                        {gameMode === 'scratch_and_see' && "Pro tip: Works best with photos, artwork, or visual surprises that benefit from gradual reveal."}
+                                                        {gameMode === 'qa_challenge' && "Pro tip: Use inside jokes or personal questions for better security and more fun interactions."}
+                                                        {gameMode === 'reveal_rush' && "Pro tip: Perfect for friend groups, teams, or family challenges. Great conversation starter!"}
+                                                        {gameMode === 'yes_or_no' && "Pro tip: Great for gender reveals, asking someone out, or any scenario where you want to give the recipient a fun choice."}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                             {/* 3. Game-Specific Forms (Conditional - After instructions) */}
                             {gameMode === 'yes_or_no' && (
-    <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
-        <YesNoSettings
-            question={yesNoQuestion}
-            onQuestionChange={setYesNoQuestion}
-             
-            
-        />
-    </div>
-)}
+                                <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
+                                    <YesNoSettings
+                                        question={yesNoQuestion}
+                                        onQuestionChange={setYesNoQuestion}
+
+
+                                    />
+                                </div>
+                            )}
 
 
                             {gameMode === 'qa_challenge' && uploadedFile?.type === 'image' && (
@@ -821,90 +823,87 @@ useEffect(() => {
                             )}
 
                             {/* More Settings Panel - Collapsible Caption + Timer */}
-<div className={`rounded-xl sm:rounded-2xl border shadow-lg transition-all duration-150 mt-6 sm:mt-8 ${
-    'bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border-gray-200/50 dark:border-gray-700/50'
-}`}>
-    {/* Header - Always Visible */}
-    <div 
-        className="p-4 sm:p-5 cursor-pointer flex items-center justify-between hover:bg-white/30 dark:hover:bg-black/10 transition-colors duration-100"
-        onClick={() => setIsMoreSettingsExpanded(!isMoreSettingsExpanded)}
-    >
-        <div className="flex items-center space-x-3">
-            {/* Settings Icon */}
-            <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-white/50 dark:bg-black/20">
-                <span className="text-lg">⚙️</span>
-            </div>
-            
-            {/* Title & Description */}
-            <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-sm sm:text-base text-gray-800 dark:text-gray-200">
-                    More Settings
-                </h3>
-                <p className="text-xs opacity-70 truncate text-gray-600 dark:text-gray-300">
-                    {uploadedFile ? 'Caption & timer settings' : 'Message & timer settings'}
-                </p>
-            </div>
-        </div>
+                            <div className={`rounded-xl sm:rounded-2xl border shadow-lg transition-all duration-150 mt-6 sm:mt-8 ${'bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border-gray-200/50 dark:border-gray-700/50'
+                                }`}>
+                                {/* Header - Always Visible */}
+                                <div
+                                    className="p-4 sm:p-5 cursor-pointer flex items-center justify-between hover:bg-white/30 dark:hover:bg-black/10 transition-colors duration-100"
+                                    onClick={() => setIsMoreSettingsExpanded(!isMoreSettingsExpanded)}
+                                >
+                                    <div className="flex items-center space-x-3">
+                                        {/* Settings Icon */}
+                                        <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-white/50 dark:bg-black/20">
+                                            <span className="text-lg">⚙️</span>
+                                        </div>
 
-        {/* Expand/Collapse Icon */}
-        <div className={`flex-shrink-0 w-6 h-6 flex items-center justify-center transition-transform duration-150 ${
-            isMoreSettingsExpanded ? 'rotate-180' : 'rotate-0'
-        }`}>
-            <svg className="w-4 h-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-        </div>
-    </div>
+                                        {/* Title & Description */}
+                                        <div className="flex-1 min-w-0">
+                                            <h3 className="font-semibold text-sm sm:text-base text-gray-800 dark:text-gray-200">
+                                                More Settings
+                                            </h3>
+                                            <p className="text-xs opacity-70 truncate text-gray-600 dark:text-gray-300">
+                                                {uploadedFile ? 'Caption & timer settings' : 'Message & timer settings'}
+                                            </p>
+                                        </div>
+                                    </div>
 
-    {/* Expandable Content */}
-    <div className={`overflow-hidden transition-all duration-150 ease-in-out ${
-        isMoreSettingsExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-    }`}>
-        <div className="px-4 sm:px-5 pb-4 sm:pb-5 border-t border-gray-200/30 dark:border-gray-700/30">
-            <div className="pt-4 space-y-6">
-                {/* Caption/Message Fields */}
-                <FormFields
-                    recipientName={recipientName}
-                    publicNote={publicNote}
-                    message={message}
-                    onRecipientNameChange={handleRecipientNameChange}
-                    onPublicNoteChange={handlePublicNoteChange}
-                    onMessageChange={handleMessageChange}
-                    useCase={useCase}
-                    gameMode={gameMode}
-                    uploadedFile={uploadedFile}
-                    yesCaption={yesCaption}
-                    onYesCaptionChange={setYesCaption}
-                    noCaption={noCaption}
-                    onNoCaptionChange={setNoCaption}
-                />
-                
-                {/* Timer Settings */}
-                <TimerSettings
-                    duration={duration}
-                    onDurationChange={setDuration}
-                    isTimerDisabled={isTimerDisabled}
-                    gameMode={gameMode}
-                />
-            </div>
-        </div>
-    </div>
-</div>
+                                    {/* Expand/Collapse Icon */}
+                                    <div className={`flex-shrink-0 w-6 h-6 flex items-center justify-center transition-transform duration-150 ${isMoreSettingsExpanded ? 'rotate-180' : 'rotate-0'
+                                        }`}>
+                                        <svg className="w-4 h-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </div>
+                                </div>
 
-                            
+                                {/* Expandable Content */}
+                                <div className={`overflow-hidden transition-all duration-150 ease-in-out ${isMoreSettingsExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                                    }`}>
+                                    <div className="px-4 sm:px-5 pb-4 sm:pb-5 border-t border-gray-200/30 dark:border-gray-700/30">
+                                        <div className="pt-4 space-y-6">
+                                            {/* Caption/Message Fields */}
+                                            <FormFields
+                                                recipientName={recipientName}
+                                                publicNote={publicNote}
+                                                message={message}
+                                                onRecipientNameChange={handleRecipientNameChange}
+                                                onPublicNoteChange={handlePublicNoteChange}
+                                                onMessageChange={handleMessageChange}
+                                                useCase={useCase}
+                                                gameMode={gameMode}
+                                                uploadedFile={uploadedFile}
+                                                yesCaption={yesCaption}
+                                                onYesCaptionChange={setYesCaption}
+                                                noCaption={noCaption}
+                                                onNoCaptionChange={setNoCaption}
+                                            />
+
+                                            {/* Timer Settings */}
+                                            <TimerSettings
+                                                duration={duration}
+                                                onDurationChange={setDuration}
+                                                isTimerDisabled={isTimerDisabled}
+                                                gameMode={gameMode}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
                         </div>
                     </div>
 
-                    
-                   
+
+
 
                     {/* Generate Button - Centered, Full Width */}
                     <div className="mt-6 sm:mt-8 lg:mt-12">
                         {/* Mobile: Full width bottom button */}
                         <div className="sm:hidden">
-                            <Button 
-                                onClick={handleGenerate} 
-                                disabled={isLoading || isUploading} 
+                            <Button
+                                onClick={handleGenerate}
+                                disabled={isLoading || isUploading}
                                 className="w-full h-14 text-base font-bold rounded-xl bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-[#e65a85] hover:to-[#e6955a] border-0 shadow-xl transform active:scale-98 transition-all duration-150"
                                 size="lg"
                                 type="button"
@@ -926,12 +925,12 @@ useEffect(() => {
                                 )}
                             </Button>
                         </div>
-                        
+
                         {/* Desktop: Centered button */}
                         <div className="hidden sm:flex sm:justify-center">
-                            <Button 
-                                onClick={handleGenerate} 
-                                disabled={isLoading || isUploading} 
+                            <Button
+                                onClick={handleGenerate}
+                                disabled={isLoading || isUploading}
                                 className="w-full max-w-md h-14 sm:h-16 text-base sm:text-lg font-bold rounded-xl sm:rounded-2xl bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-[#e65a85] hover:to-[#e6955a] border-0 shadow-xl sm:shadow-2xl transform hover:scale-105 active:scale-98 transition-all duration-200"
                                 size="lg"
                                 type="button"
@@ -963,7 +962,7 @@ useEffect(() => {
                     <GeneratedLinkDisplay
                         generatedLink={generatedLink}
                         publicNote={publicNote}
-                        gameMode={gameMode}       
+                        gameMode={gameMode}
                         selectedType={microQuestType}
                     />
                 </div>
@@ -975,8 +974,8 @@ useEffect(() => {
                 onClose={() => setShowSignupPrompt(false)}
                 formData={formData}
             />
-             <FeedbackModal 
-                isOpen={isFeedbackModalOpen} 
+            <FeedbackModal
+                isOpen={isFeedbackModalOpen}
                 onClose={() => setIsFeedbackModalOpen(false)}
                 defaultTab="game" // This will open with game suggestion tab
             />

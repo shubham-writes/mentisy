@@ -4,11 +4,8 @@ import { auth } from "@clerk/nextjs/server";
 
 const f = createUploadthing();
 
-// 1. Make the handleAuth function 'async'
 const handleAuth = async () => {
-  // 2. Add 'await' before the auth() call
   const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
   return { userId };
 }
 

@@ -13,7 +13,7 @@ export default defineSchema({
     }).index("by_token", ["tokenIdentifier"]).index("username", ["username"]),
 
     secrets: defineTable({
-        authorId: v.id("users"),
+        authorId: v.optional(v.id("users")),
         publicId: v.string(),
         message: v.optional(v.string()),
         recipientName: v.optional(v.string()),
@@ -26,7 +26,7 @@ export default defineSchema({
         duration: v.optional(v.number()),
         expired: v.optional(v.boolean()),
         viewedAt: v.optional(v.number()),
-        
+
 
         // --- CHANGE 1: ADD "reveal_rush" TO THE GAMEMODE UNION ---
         gameMode: v.optional(v.union(
@@ -35,7 +35,7 @@ export default defineSchema({
             v.literal("qa_challenge"),
             v.literal("mystery_reveal"),
             v.literal("emoji_curtain"),
-            v.literal("reveal_rush"), 
+            v.literal("reveal_rush"),
             v.literal("yes_or_no")
         )),
 
@@ -73,7 +73,7 @@ export default defineSchema({
 
         // Field for the "Game Suggestion" sub-game
         mqSuggestionPrompt: v.optional(v.string()),
-        
+
         // --- CHANGE 3: ADD FIELDS TO TRACK QUEST STATE ---
 
         // Stores an array of participants who have tried the quest
@@ -87,7 +87,7 @@ export default defineSchema({
         // Stores the ID of the winning user
         mqWinnerId: v.optional(v.id("users")),
         mqWinnerName: v.optional(v.string()),   // ✅ New
-        mqWinnerAt: v.optional(v.number()),  
+        mqWinnerAt: v.optional(v.number()),
 
         // A flag to lock the quest once someone has won
         mqIsCompleted: v.optional(v.boolean()),
@@ -101,8 +101,8 @@ export default defineSchema({
         userId: v.optional(v.id("users")), // Optional for anonymous feedback
         userEmail: v.optional(v.string()), // For anonymous users who want to be contacted
         type: v.union(
-            v.literal("game_suggestion"), 
-            v.literal("bug_report"), 
+            v.literal("game_suggestion"),
+            v.literal("bug_report"),
             v.literal("general_feedback"),
             v.literal("feature_request")
         ),
@@ -112,8 +112,8 @@ export default defineSchema({
         gameIdea: v.optional(v.string()), // Specific field for game suggestions
         priority: v.optional(v.union(v.literal("low"), v.literal("medium"), v.literal("high"))),
         status: v.union(
-            v.literal("pending"), 
-            v.literal("reviewing"), 
+            v.literal("pending"),
+            v.literal("reviewing"),
             v.literal("in_progress"),
             v.literal("completed"),
             v.literal("rejected")

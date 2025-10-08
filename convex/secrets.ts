@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import { mutation, internalMutation, internalAction, query, internalQuery, action } from "./_generated/server";
 import { api, internal } from "./_generated/api";
 import { paginationOptsValidator } from "convex/server";
+import { Id } from "./_generated/dataModel";
 
 function generatePublicId(length = 8) {
   return Math.random().toString(36).substring(2, 2 + length);
@@ -10,6 +11,7 @@ function generatePublicId(length = 8) {
 
 export const create = mutation({
   args: {
+    // ... (args are unchanged)
     message: v.optional(v.string()),
     recipientName: v.optional(v.string()),
     publicNote: v.optional(v.string()),
@@ -17,36 +19,24 @@ export const create = mutation({
     fileType: v.optional(v.union(v.literal("image"), v.literal("video"))),
     withWatermark: v.optional(v.boolean()),
     duration: v.optional(v.number()),
-
     gameMode: v.optional(v.union(
-      v.literal("none"),
-      v.literal("scratch_and_see"),
-      v.literal("qa_challenge"),
-      v.literal("mystery_reveal"),
-      v.literal("emoji_curtain"),
-      v.literal("reveal_rush"),
+      v.literal("none"), v.literal("scratch_and_see"), v.literal("qa_challenge"),
+      v.literal("mystery_reveal"), v.literal("emoji_curtain"), v.literal("reveal_rush"),
       v.literal("yes_or_no")
     )),
-
-    // Q&A fields
     qaQuestion: v.optional(v.string()),
     qaAnswer: v.optional(v.string()),
     qaMaxAttempts: v.optional(v.number()),
     qaCaseSensitive: v.optional(v.boolean()),
     qaShowHints: v.optional(v.boolean()),
-
-    // reveal-rush fields
     microQuestType: v.optional(v.union(
-      v.literal("group_qa"),
-      v.literal("rate_my"),
-      v.literal("game_suggestion")
+      v.literal("group_qa"), v.literal("rate_my"), v.literal("game_suggestion")
     )),
     mqGroupQuestion: v.optional(v.string()),
     mqGroupAnswer: v.optional(v.string()),
     mqRateCategory: v.optional(v.string()),
     mqExpectedRating: v.optional(v.number()),
     mqSuggestionPrompt: v.optional(v.string()),
-
     yesNoQuestion: v.optional(v.string()),
     yesImageUrl: v.optional(v.string()),
     noImageUrl: v.optional(v.string()),
@@ -55,15 +45,23 @@ export const create = mutation({
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthorized");
 
-    const user = await ctx.db.query("users")
-      .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
-      .unique();
-    if (!user) throw new Error("User not found.");
+    let authorId: Id<"users"> | undefined = undefined;
 
+    // If an identity exists, find the corresponding user in our database
+    if (identity) {
+      const user = await ctx.db.query("users")
+        .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
+        .unique();
+
+      if (user) {
+        authorId = user._id;
+      }
+    }
+
+    // Now, insert the secret. `authorId` will be the user's ID or undefined for guests.
     const secretId = await ctx.db.insert("secrets", {
-      authorId: user._id,
+      authorId: authorId, // <-- This is the key change
       publicId: generatePublicId(),
       message: args.message,
       recipientName: args.recipientName,
@@ -75,30 +73,22 @@ export const create = mutation({
       hiddenForSender: false,
       duration: args.duration,
       gameMode: args.gameMode,
-
-      // Q&A
       qaQuestion: args.qaQuestion,
       qaAnswer: args.qaAnswer,
       qaMaxAttempts: args.qaMaxAttempts,
       qaCaseSensitive: args.qaCaseSensitive,
       qaShowHints: args.qaShowHints,
-
-      // reveal-rush
       microQuestType: args.microQuestType,
       mqGroupQuestion: args.mqGroupQuestion,
       mqGroupAnswer: args.mqGroupAnswer,
       mqRateCategory: args.mqRateCategory,
       mqExpectedRating: args.mqExpectedRating,
       mqSuggestionPrompt: args.mqSuggestionPrompt,
-
-      // Yes or No
       yesNoQuestion: args.yesNoQuestion,
       yesImageUrl: args.yesImageUrl,
       noImageUrl: args.noImageUrl,
       yesCaption: args.yesCaption,
       noCaption: args.noCaption,
-
-
       mqIsCompleted: false,
       mqParticipants: [],
       mqWinnerId: undefined,
@@ -219,13 +209,13 @@ export const readAndReveal = mutation({
       if (secret.mqIsCompleted) {
         // Allow the winner to view, even if anonymous
         if (user && user._id === secret.mqWinnerId) {
-            const elapsed = Date.now() - (secret.mqWinnerAt || 0);
-            const allowedDuration = (secret.duration || 10) * 1000;
+          const elapsed = Date.now() - (secret.mqWinnerAt || 0);
+          const allowedDuration = (secret.duration || 10) * 1000;
 
-            if (elapsed > allowedDuration) {
-                return { ...secret, expired: true, message: "Your viewing time has expired." };
-            }
-            return secret;
+          if (elapsed > allowedDuration) {
+            return { ...secret, expired: true, message: "Your viewing time has expired." };
+          }
+          return secret;
         } else {
           // Generic message for everyone else
           return { ...secret, expired: true, message: "Game Over — Someone has won!" };
@@ -293,115 +283,115 @@ export const getMySecrets = query({
 });
 
 export const hideSecretForSender = mutation({
-    args: { secretId: v.id("secrets") },
-    handler: async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) throw new Error("Unauthorized");
-        
-        const secret = await ctx.db.get(args.secretId);
-        const user = await ctx.db.query("users").withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier)).unique();
+  args: { secretId: v.id("secrets") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
 
-        if (secret && user && secret.authorId === user._id) {
-            await ctx.db.patch(args.secretId, { hiddenForSender: true });
-        } else {
-            throw new Error("You can only hide your own secrets.");
-        }
-    },
+    const secret = await ctx.db.get(args.secretId);
+    const user = await ctx.db.query("users").withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier)).unique();
+
+    if (secret && user && secret.authorId === user._id) {
+      await ctx.db.patch(args.secretId, { hiddenForSender: true });
+    } else {
+      throw new Error("You can only hide your own secrets.");
+    }
+  },
 });
 
 export const expireSecretNow = action({
-    args: { secretId: v.id("secrets") },
-    handler: async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) throw new Error("Unauthorized");
+  args: { secretId: v.id("secrets") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
 
-        const secret = await ctx.runQuery(internal.secrets.getSecretForDeletion, { secretId: args.secretId });
-        const user = await ctx.runQuery(internal.secrets.getUser, { tokenIdentifier: identity.tokenIdentifier });
+    const secret = await ctx.runQuery(internal.secrets.getSecretForDeletion, { secretId: args.secretId });
+    const user = await ctx.runQuery(internal.secrets.getUser, { tokenIdentifier: identity.tokenIdentifier });
 
-        if (secret && user && secret.authorId === user._id) {
-            if (secret.fileUrl) {
-                const fileKey = secret.fileUrl.substring(secret.fileUrl.lastIndexOf("/") + 1);
-                const vercelUrl = process.env.NEXT_PUBLIC_URL;
-                const internalSecret = process.env.INTERNAL_API_SECRET;
-                if (vercelUrl && internalSecret) {
-                    await fetch(`${vercelUrl}/api/deleteFile`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json", "x-internal-secret": internalSecret },
-                        body: JSON.stringify({ fileKey }),
-                    });
-                }
-            }
-            await ctx.runMutation(internal.secrets.clearSecretContent, { secretId: args.secretId });
-        } else {
-            throw new Error("You can only expire your own secrets.");
+    if (secret && user && secret.authorId === user._id) {
+      if (secret.fileUrl) {
+        const fileKey = secret.fileUrl.substring(secret.fileUrl.lastIndexOf("/") + 1);
+        const vercelUrl = process.env.NEXT_PUBLIC_URL;
+        const internalSecret = process.env.INTERNAL_API_SECRET;
+        if (vercelUrl && internalSecret) {
+          await fetch(`${vercelUrl}/api/deleteFile`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "x-internal-secret": internalSecret },
+            body: JSON.stringify({ fileKey }),
+          });
         }
-    },
+      }
+      await ctx.runMutation(internal.secrets.clearSecretContent, { secretId: args.secretId });
+    } else {
+      throw new Error("You can only expire your own secrets.");
+    }
+  },
 });
 
 export const deleteAllMySecrets = mutation({
-    handler: async (ctx) => {
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) throw new Error("Unauthorized");
-        
-        const user = await ctx.db.query("users").withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier)).unique();
-        if (!user) return;
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
 
-        const secrets = await ctx.db.query("secrets").withIndex("by_author", (q) => q.eq("authorId", user._id)).collect();
-        
-        for (const secret of secrets) {
-            await ctx.db.delete(secret._id);
-        }
-    },
+    const user = await ctx.db.query("users").withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier)).unique();
+    if (!user) return;
+
+    const secrets = await ctx.db.query("secrets").withIndex("by_author", (q) => q.eq("authorId", user._id)).collect();
+
+    for (const secret of secrets) {
+      await ctx.db.delete(secret._id);
+    }
+  },
 });
 
-export const getSecretIdFromPublicId = query({ 
-    args: { publicId: v.string() }, 
-    handler: async (ctx, args) => { 
-        const secret = await ctx.db.query("secrets").withIndex("by_publicId", (q) => q.eq("publicId", args.publicId)).unique(); 
-        return secret?._id; 
-    }, 
+export const getSecretIdFromPublicId = query({
+  args: { publicId: v.string() },
+  handler: async (ctx, args) => {
+    const secret = await ctx.db.query("secrets").withIndex("by_publicId", (q) => q.eq("publicId", args.publicId)).unique();
+    return secret?._id;
+  },
 });
 
 
 
-export const destroy = internalAction({ 
-    args: { secretId: v.id("secrets") }, 
-    handler: async (ctx, args) => { 
-        const secret = await ctx.runQuery(internal.secrets.getSecretForDeletion, { secretId: args.secretId }); 
-        if (secret?.fileUrl) { 
-            const fileKey = secret.fileUrl.substring(secret.fileUrl.lastIndexOf("/") + 1); 
-            const vercelUrl = process.env.NEXT_PUBLIC_URL; 
-            const internalSecret = process.env.INTERNAL_API_SECRET; 
-            if (vercelUrl && internalSecret) { 
-                await fetch(`${vercelUrl}/api/deleteFile`, { 
-                    method: "POST", 
-                    headers: { "Content-Type": "application/json", "x-internal-secret": internalSecret }, 
-                    body: JSON.stringify({ fileKey }), 
-                }); 
-            } 
-        } 
-        await ctx.runMutation(internal.secrets.clearSecretContent, { secretId: args.secretId }); 
-    }, 
+export const destroy = internalAction({
+  args: { secretId: v.id("secrets") },
+  handler: async (ctx, args) => {
+    const secret = await ctx.runQuery(internal.secrets.getSecretForDeletion, { secretId: args.secretId });
+    if (secret?.fileUrl) {
+      const fileKey = secret.fileUrl.substring(secret.fileUrl.lastIndexOf("/") + 1);
+      const vercelUrl = process.env.NEXT_PUBLIC_URL;
+      const internalSecret = process.env.INTERNAL_API_SECRET;
+      if (vercelUrl && internalSecret) {
+        await fetch(`${vercelUrl}/api/deleteFile`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-internal-secret": internalSecret },
+          body: JSON.stringify({ fileKey }),
+        });
+      }
+    }
+    await ctx.runMutation(internal.secrets.clearSecretContent, { secretId: args.secretId });
+  },
 });
 
-export const getSecretForDeletion = internalQuery({ 
-    args: { secretId: v.id("secrets") }, 
-    handler: async (ctx, args) => { 
-        return await ctx.db.get(args.secretId); 
-    }, 
+export const getSecretForDeletion = internalQuery({
+  args: { secretId: v.id("secrets") },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.secretId);
+  },
 });
 
-export const clearSecretContent = internalMutation({ 
-    args: { secretId: v.id("secrets") }, 
-    handler: async (ctx, args) => { 
-        await ctx.db.patch(args.secretId, { 
-            message: undefined, 
-            fileUrl: undefined, 
-            fileType: undefined,
-            isRead: true,
-            expired: true,
-        }); 
-    }, 
+export const clearSecretContent = internalMutation({
+  args: { secretId: v.id("secrets") },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.secretId, {
+      message: undefined,
+      fileUrl: undefined,
+      fileType: undefined,
+      isRead: true,
+      expired: true,
+    });
+  },
 });
 
 export const expireSecret = mutation({
@@ -413,18 +403,18 @@ export const expireSecret = mutation({
   },
 });
 
-export const getUser = internalQuery({ 
-    args: { tokenIdentifier: v.string() }, 
-    handler: async (ctx, args) => { 
-        return await ctx.db.query("users").withIndex("by_token", (q) => q.eq("tokenIdentifier", args.tokenIdentifier)).unique(); 
-    }, 
+export const getUser = internalQuery({
+  args: { tokenIdentifier: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db.query("users").withIndex("by_token", (q) => q.eq("tokenIdentifier", args.tokenIdentifier)).unique();
+  },
 });
 
-export const deleteSecretRecord = internalMutation({ 
-    args: { secretId: v.id("secrets") }, 
-    handler: async (ctx, args) => { 
-        await ctx.db.delete(args.secretId); 
-    }, 
+export const deleteSecretRecord = internalMutation({
+  args: { secretId: v.id("secrets") },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.secretId);
+  },
 });
 
 export const getLiveSecret = query({
