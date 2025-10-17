@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css";
 
@@ -11,10 +11,11 @@ import { ConvexClientProvider } from "@/components/convex-provider";
 import { ServiceWorkerProvider } from "@/components/service-worker-provider";
 import { Navbar } from "./_home/navbar";
 
-const inter = Inter({ subsets: ["latin"] });
+
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: '--font-jakarta'
+  variable: '--font-jakarta',
+  display: "swap",
 });
 
 // Global Clerk Appearance Configuration

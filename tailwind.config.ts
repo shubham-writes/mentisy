@@ -70,7 +70,7 @@ const config = {
       },
 
       fontFamily: {
-        jakarta: ["var(--font-jakarta)"],
+        jakarta: ["var(--font-jakarta)", "sans-serif"],
         dancing: ['"Dancing Script"', 'cursive'],
         lobster: ['"Lobster"', 'cursive'],
       },
