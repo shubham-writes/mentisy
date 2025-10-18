@@ -224,10 +224,18 @@ export default function RootLayout({
     >
       <html lang="en" suppressHydrationWarning className="no-scrollbar">
         <head>
+          {/* PWA / mobile settings */}
           <meta name="apple-mobile-web-app-capable" content="yes" />
           <meta name="apple-mobile-web-app-status-bar-style" content="default" />
           <meta name="mobile-web-app-capable" content="yes" />
+
+          {/* ✅ Explicit favicon links for all browsers */}
+          <link rel="icon" href="/favicon.ico" sizes="any" />
+          <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+          <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+          <link rel="apple-touch-icon" href="/icon-180x180.png" />
         </head>
+
         <body className={`${jakarta.variable} font-jakarta no-scrollbar`}>
           <ConvexClientProvider>
             <Analytics />

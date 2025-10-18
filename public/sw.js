@@ -1,6 +1,6 @@
 // sw.js
 
-const CACHE_NAME = "mentisy-cache-v29"; // bump version
+const CACHE_NAME = "mentisy-cache-v30"; // bump version
 const DB_NAME = "MentisyShareDB";
 const STORE_NAME = "shared-files";
 
@@ -59,7 +59,7 @@ self.addEventListener("fetch", (event) => {
     );
   } catch (err) {
     console.error("SW fetch handler failed:", err, event.request);
-  } b
+  }
 });
 
 // ---- IndexedDB helpers ---- //
