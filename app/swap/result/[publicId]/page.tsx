@@ -119,7 +119,7 @@ export default function SwapResultPage() {
                             <div className="flex items-center justify-center space-x-2">
                                 <CheckCircle className="w-8 h-8 text-green-500" />
                                 <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-                                    It's a Swap!
+                                    It&apos;s a Swap!
                                 </h1>
                             </div>
                         </div>
@@ -203,8 +203,8 @@ export default function SwapResultPage() {
                         </div>
 
                         <p className="text-xs text-gray-500 dark:text-gray-500">
-                            Don't worry, we saved this link in your browser.
-                            You can find it again from the "My Swaps"
+                            Don&apos;t worry, we saved this link in your browser.
+                            You can find it again from the &quot;My Swaps&quot;
                             button on the navbar if you refresh the page.
                         </p>
                     </div>
