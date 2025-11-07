@@ -7,14 +7,12 @@ import { useTheme } from "next-themes";
 import { useConvexAuth } from "convex/react";
 import { SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import CustomUserButton from '@/components/CustomUserButton';
-import { useAutoSetFoundingMember } from "@/hooks/useAutoSetFoundingMember"; // ADD THIS LINE
-import { 
-    
-    LoaderCircle, 
-    SquareMenu ,
-    WandSparkles, 
-    Sparkles, 
-    NotepadText, 
+import { useAutoSetFoundingMember } from "@/hooks/useAutoSetFoundingMember";
+import {
+    LoaderCircle,
+    WandSparkles,
+    Sparkles,
+    NotepadText,
     LogIn,
     Menu,
     X,
@@ -56,7 +54,7 @@ const EnhancedModeToggle = () => {
     }
 
     const currentTheme = theme || "system";
-    
+
     return (
         <div className="relative">
             <button
@@ -83,6 +81,16 @@ export const Navbar = () => {
     const { theme } = useTheme();
     const [mounted, setMounted] = useState(false);
     const router = useRouter();
+
+    const [guestHistory, setGuestHistory] = useState<any[]>([]);
+
+    useEffect(() => {
+        // Only run this on the client and for guests
+        if (typeof window !== "undefined" && !isLoading && !isAuthenticated) {
+            const history = JSON.parse(localStorage.getItem('mentisyGuestHistory') || '[]');
+            setGuestHistory(history);
+        }
+    }, [isLoading, isAuthenticated]);
 
     // ADD THIS LINE - Initialize founding member detection
     useAutoSetFoundingMember();
@@ -138,9 +146,20 @@ export const Navbar = () => {
                             {/* Unauthenticated State */}
                             {!isAuthenticated && !isLoading && (
                                 <div className="flex items-center space-x-3">
+                                    {guestHistory.length > 0 && (
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="rounded-full border border-[#FF75A0]/50 text-[#FF75A0] hover:bg-[#FF75A0]/10 hover:text-[#FF75A0] dark:border-[#FF75A0]/60 dark:text-[#FF75A0]/90 dark:hover:bg-[#FF75A0]/20 dark:hover:text-[#FF75A0] transition-all duration-200 px-6"
+                                            onClick={() => router.push(`/swap/result/${guestHistory[guestHistory.length - 1].publicId}`)}
+                                        >
+                                            <NotepadText className="w-4 h-4 mr-2" />
+                                            My Swaps
+                                        </Button>
+                                    )}
                                     <SignInButton mode="modal" fallbackRedirectUrl="/hello" forceRedirectUrl="/hello">
-                                        <Button 
-                                            variant="ghost" 
+                                        <Button
+                                            variant="ghost"
                                             size="sm"
                                             className="rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 px-6"
                                         >
@@ -148,21 +167,21 @@ export const Navbar = () => {
                                             Sign In
                                         </Button>
                                     </SignInButton>
-                                    
-                                   <SignUpButton
-  mode="modal"
-  appearance={clerkAppearance}
-  fallbackRedirectUrl="/hello"
-  forceRedirectUrl="/hello"
->
-  <Button
-    size="sm"
-    className="rounded-full bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-purple-600 hover:to-pink-600 border-0 shadow-lg transform hover:scale-105 transition-all duration-200 px-6"
-  >
-    <Sparkles className="w-4 h-4 mr-2" />
-    Get Started
-  </Button>
-</SignUpButton>
+
+                                    <SignUpButton
+                                        mode="modal"
+                                        appearance={clerkAppearance}
+                                        fallbackRedirectUrl="/hello"
+                                        forceRedirectUrl="/hello"
+                                    >
+                                        <Button
+                                            size="sm"
+                                            className="rounded-full bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-purple-600 hover:to-pink-600 border-0 shadow-lg transform hover:scale-105 transition-all duration-200 px-6"
+                                        >
+                                            <Sparkles className="w-4 h-4 mr-2" />
+                                            Get Started
+                                        </Button>
+                                    </SignUpButton>
 
 
                                 </div>
@@ -173,8 +192,8 @@ export const Navbar = () => {
                                 <div className="flex items-center space-x-4">
                                     {/* User Profile Section */}
                                     <div className="flex items-center space-x-3 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-full p-1 border border-purple-200 dark:border-purple-800">
-                                        
-                                        <CustomUserButton 
+
+                                        <CustomUserButton
                                             afterSignOutUrl="/"
                                             appearance={{
                                                 elements: {
@@ -202,7 +221,7 @@ export const Navbar = () => {
                             {/* Authenticated State Mobile - Compact */}
                             {isAuthenticated && !isLoading && (
                                 <div className="flex items-center space-x-2">
-                                    
+
                                     <CustomUserButton
                                         afterSignOutUrl="/"
                                         appearance={{
@@ -233,8 +252,8 @@ export const Navbar = () => {
 
             {/* Mobile Menu Overlay */}
             {isMobileMenuOpen && (
-                <div className="md:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" 
-                     onClick={() => setIsMobileMenuOpen(false)} />
+                <div className="md:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+                    onClick={() => setIsMobileMenuOpen(false)} />
             )}
 
             {/* Mobile Menu Slide-out */}
@@ -256,7 +275,7 @@ export const Navbar = () => {
                                     className="rounded-full"
                                     priority
                                 />
-                                
+
                             </div>
                             <span className="font-medium text-base">Menu</span>
                         </div>
@@ -277,9 +296,22 @@ export const Navbar = () => {
                                     Account
                                 </h3>
                                 <div className="space-y-2">
+                                    {guestHistory.length > 0 && (
+                                        <Button
+                                            variant="ghost"
+                                            className="w-full justify-start rounded-lg border border-[#FF75A0]/30 bg-gradient-to-r from-[#FF75A0]/5 to-white dark:from-[#FF75A0]/10 dark:to-gray-900 hover:bg-[#FF75A0]/10 dark:hover:bg-[#FF75A0]/20 h-10 text-sm text-[#FF75A0]"
+                                            onClick={() => {
+                                                setIsMobileMenuOpen(false);
+                                                router.push(`/swap/result/${guestHistory[guestHistory.length - 1].publicId}`);
+                                            }}
+                                        >
+                                            <NotepadText className="w-4 h-4 mr-2" />
+                                            My Guest Swaps
+                                        </Button>
+                                    )}
                                     <SignInButton mode="modal" fallbackRedirectUrl="/hello" forceRedirectUrl="/hello">
-                                        <Button 
-                                            variant="ghost" 
+                                        <Button
+                                            variant="ghost"
                                             className="w-full justify-start rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 h-10 text-sm"
                                             onClick={() => setIsMobileMenuOpen(false)}
                                         >
@@ -287,21 +319,21 @@ export const Navbar = () => {
                                             Sign In
                                         </Button>
                                     </SignInButton>
-                                    
+
                                     <SignUpButton
-  mode="modal"
-  appearance={clerkAppearance}
-  fallbackRedirectUrl="/hello"
-  forceRedirectUrl="/hello"
->
-  <Button
-    className="w-full justify-start rounded-lg bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-purple-600 hover:to-pink-600 border-0 shadow-md h-10 text-sm"
-    onClick={() => setIsMobileMenuOpen(false)}
-  >
-    <Sparkles className="w-4 h-4 mr-2" />
-    Get Started
-  </Button>
-</SignUpButton>
+                                        mode="modal"
+                                        appearance={clerkAppearance}
+                                        fallbackRedirectUrl="/hello"
+                                        forceRedirectUrl="/hello"
+                                    >
+                                        <Button
+                                            className="w-full justify-start rounded-lg bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-purple-600 hover:to-pink-600 border-0 shadow-md h-10 text-sm"
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                        >
+                                            <Sparkles className="w-4 h-4 mr-2" />
+                                            Get Started
+                                        </Button>
+                                    </SignUpButton>
 
                                 </div>
                             </div>
@@ -340,8 +372,8 @@ export const Navbar = () => {
                                     Quick Actions
                                 </h3>
                                 <div className="space-y-1.5">
-                                    <Button 
-                                        variant="ghost" 
+                                    <Button
+                                        variant="ghost"
                                         className="w-full justify-start rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 h-10 text-sm"
                                         onClick={() => {
                                             setIsMobileMenuOpen(false);
@@ -355,11 +387,11 @@ export const Navbar = () => {
                                             }, 500);
                                         }}
                                     >
-                                        <WandSparkles  className="w-4 h-4 mr-2 text-[#FF75A0]" />
+                                        <WandSparkles className="w-4 h-4 mr-2 text-[#FF75A0]" />
                                         Create a Moment
                                     </Button>
-                                    <Button 
-                                        variant="ghost" 
+                                    <Button
+                                        variant="ghost"
                                         className="w-full justify-start rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 h-10 text-sm"
                                         onClick={() => {
                                             setIsMobileMenuOpen(false);

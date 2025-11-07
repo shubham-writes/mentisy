@@ -10,7 +10,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "./ui/button";
 import { Id } from "@/convex/_generated/dataModel";
 import { DialogDeleteAll } from "./dialog-delete-all";
-import { 
+import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
@@ -22,12 +22,14 @@ import {
     CollapsibleTrigger,
 } from "./ui/collapsible";
 
+import Image from "next/image";
+
 dayjs.extend(relativeTime);
 
 export function MySecretsList() {
     const { results, status, loadMore } = usePaginatedQuery(
-        api.secrets.getMySecrets, 
-        {}, 
+        api.secrets.getMySecrets,
+        {},
         { initialNumItems: 10 }
     );
     const hideSecret = useMutation(api.secrets.hideSecretForSender);
@@ -36,7 +38,7 @@ export function MySecretsList() {
     const [copiedSecrets, setCopiedSecrets] = useState<Set<string>>(new Set());
 
     const scrollContainerRef = useRef<HTMLDivElement>(null);
-    
+
     const visibleSecrets = useMemo(() => {
         return results.filter(secret => !secret.hiddenForSender);
     }, [results]);
@@ -84,19 +86,19 @@ export function MySecretsList() {
 
     const formatUserAgent = (userAgent?: string) => {
         if (!userAgent) return "Unknown Device";
-        
+
         // Basic parsing for common browsers and devices
         if (userAgent.includes("Mobile") || userAgent.includes("Android")) {
             if (userAgent.includes("Chrome")) return "📱 Mobile Chrome";
             if (userAgent.includes("Safari")) return "📱 Mobile Safari";
             return "📱 Mobile Device";
         }
-        
+
         if (userAgent.includes("Chrome")) return "💻 Desktop Chrome";
         if (userAgent.includes("Firefox")) return "🦊 Firefox";
         if (userAgent.includes("Safari")) return "🌍 Safari";
         if (userAgent.includes("Edge")) return "🔷 Edge";
-        
+
         return "💻 Desktop Browser";
     };
 
@@ -127,7 +129,7 @@ export function MySecretsList() {
                                 </p>
                             </div>
                         </div>
-                        
+
                         {/* Desktop delete all button */}
                         {visibleSecrets.length > 0 && (
                             <div className="hidden sm:block">
@@ -135,7 +137,7 @@ export function MySecretsList() {
                             </div>
                         )}
                     </div>
-                    
+
                     {/* Mobile delete all button - full width below header */}
                     {visibleSecrets.length > 0 && (
                         <div className="sm:hidden px-2">
@@ -153,7 +155,7 @@ export function MySecretsList() {
                         <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400">Loading your moments...</p>
                     </div>
                 )}
-                
+
                 {/* Scrollable Secrets List */}
                 <div ref={scrollContainerRef} className="space-y-3 max-h-96 overflow-y-auto">
                     {/* Empty State */}
@@ -182,7 +184,7 @@ export function MySecretsList() {
                         return (
                             <div key={secret._id} className="group">
                                 {/* Collapsed State - Clean and Minimal */}
-                                <div 
+                                <div
                                     className={`
                                         bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 
                                         rounded-lg p-4 hover:border-[#FF75A0]/30 dark:hover:border-[#FF75A0]/30 
@@ -198,7 +200,11 @@ export function MySecretsList() {
                                                 <div className="flex items-center space-x-3">
                                                     {/* Status Icon */}
                                                     <div className="flex-shrink-0">
-                                                        {isExpired ? (
+                                                        {(secret.gameMode === "pic_swap" && secret.swapFileUrl) ? (
+                                                            <div className="w-8 h-8 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center">
+                                                                <span className="text-lg">🔄</span>
+                                                            </div>
+                                                        ) : isExpired ? (
                                                             <div className="w-8 h-8 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
                                                                 <span className="text-red-600 dark:text-red-400 text-xs font-bold">⌛</span>
                                                             </div>
@@ -212,7 +218,7 @@ export function MySecretsList() {
                                                             </div>
                                                         )}
                                                     </div>
-                                                    
+
                                                     {/* Main Info - Simplified */}
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-center space-x-2 mb-1">
@@ -236,11 +242,11 @@ export function MySecretsList() {
                                                     </div>
                                                 </div>
                                             </div>
-                                            
+
                                             {/* Expand Button */}
                                             <div className="flex items-center space-x-2 flex-shrink-0">
-                                                <Button 
-                                                    variant="ghost" 
+                                                <Button
+                                                    variant="ghost"
                                                     size="sm"
                                                     className="h-8 w-8 p-0 rounded-full hover:bg-[#FF75A0]/10"
                                                     onClick={(e) => {
@@ -277,7 +283,7 @@ export function MySecretsList() {
                                                             </span>
                                                         )}
                                                     </div>
-                                                    
+
                                                     {/* Creation Time */}
                                                     <div className="flex items-center space-x-2">
                                                         <span className="text-gray-400 text-sm">📅</span>
@@ -286,7 +292,7 @@ export function MySecretsList() {
                                                         </span>
                                                     </div>
                                                 </div>
-                                                
+
                                                 {/* Status and Actions */}
                                                 <div className="flex items-center space-x-2 flex-shrink-0">
                                                     {!isExpired && (
@@ -300,10 +306,10 @@ export function MySecretsList() {
                                                             </div>
                                                         )
                                                     )}
-                                                    
-                                                    <Button 
-                                                        variant="ghost" 
-                                                        size="icon" 
+
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
                                                         className="h-8 w-8 sm:h-9 sm:w-9 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
@@ -312,11 +318,11 @@ export function MySecretsList() {
                                                     >
                                                         <EyeOff className="h-4 w-4 text-gray-500" />
                                                     </Button>
-                                                    
-                                                    <Button 
-                                                        variant="ghost" 
-                                                        size="icon" 
-                                                        className="h-8 w-8 sm:h-9 sm:w-9 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-200 dark:hover:border-red-800" 
+
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8 sm:h-9 sm:w-9 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-200 dark:hover:border-red-800"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             hideSecret({ secretId: secret._id as Id<"secrets"> });
@@ -326,7 +332,7 @@ export function MySecretsList() {
                                                     </Button>
                                                 </div>
                                             </div>
-                                            
+
                                             {/* Analytics Preview */}
                                             {hasAnalytics && (
                                                 <div className="flex items-center space-x-2">
@@ -347,7 +353,24 @@ export function MySecretsList() {
                                                     </TooltipProvider>
                                                 </div>
                                             )}
-                                            
+
+                                            {secret.gameMode === "pic_swap" && secret.swapFileUrl && (
+                                                <div className="pt-4 space-y-2">
+                                                    <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                                        Photo Swapped!
+                                                    </h4>
+                                                    <div className="relative w-full aspect-square rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-md">
+                                                        <Image
+                                                            src={secret.swapFileUrl}
+                                                            alt="Swapped Photo from receiver"
+                                                            fill
+                                                            sizes="(max-width: 768px) 100vw, 50vw"
+                                                            className="object-cover"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )}
+
                                             {/* Action Buttons */}
                                             {!isExpired && (
                                                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
@@ -372,26 +395,26 @@ export function MySecretsList() {
                                                             </>
                                                         )}
                                                     </button>
-                                                    
+
                                                     <div className="flex-1" onClick={(e) => e.stopPropagation()}>
-                                                        <ShareButton 
-                                                            title="A Secret Message" 
-                                                            text={`${secret.publicNote || ""} ${link}`} 
-                                                            url={link} 
+                                                        <ShareButton
+                                                            title="A Secret Message"
+                                                            text={`${secret.publicNote || ""} ${link}`}
+                                                            url={link}
                                                         />
                                                     </div>
-                                                    
+
                                                     {!secret.isRead && (
-                                                        <Button 
-                                                            variant="destructive" 
-                                                            size="sm" 
+                                                        <Button
+                                                            variant="destructive"
+                                                            size="sm"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 expireSecret({ secretId: secret._id as Id<"secrets"> });
                                                             }}
                                                             className="rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 border-0 shadow-sm hover:shadow-md transition-all duration-200 flex-shrink-0 text-xs sm:text-sm px-3 py-2"
                                                         >
-                                                            <ShieldX className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" /> 
+                                                            <ShieldX className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                                                             <span className="hidden sm:inline">Expire it!</span>
                                                             <span className="sm:hidden">Expire it!</span>
                                                         </Button>

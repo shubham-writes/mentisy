@@ -119,24 +119,34 @@ const clerkAppearance = {
   }
 };
 
-// Your metadata and viewport exports with enhanced favicon configuration
+/// Your metadata and viewport exports with enhanced favicon configuration
 export const metadata: Metadata = {
-  title: "Mentisy - Fun Sharing Platform",
-  description: "Share fun links, play with friends, and spark joy",
+  // MODIFIED: Title is now focused on the "PicSwap" value prop
+  title: "Mentisy - The Fair Photo Swap App",
+
+  // MODIFIED: Description explains the core problem and solution
+  description: "Tired of not getting a photo back? Mentisy's PicSwap is the fun, fair way to trade photos. You only see their pic after you send yours.",
+
   metadataBase: new URL(process.env.NEXT_PUBLIC_URL!),
   manifest: "/manifest.json",
   applicationName: "Mentisy",
   openGraph: {
-    title: "Mentisy - Fun Sharing Platform",
-    description: "Share fun links, play with friends, and spark joy",
+    // MODIFIED: Title
+    title: "Mentisy - The Fair Photo Swap App",
+
+    // MODIFIED: Description
+    description: "Tired of not getting a photo back? Mentisy's PicSwap is the fun, fair way to trade photos. You only see their pic after you send yours.",
+
     url: process.env.NEXT_PUBLIC_URL,
     siteName: "Mentisy",
     images: [
       {
-        url: "/og-image.png",
+        url: "/og-image.png", // You should update this image to reflect the PicSwap feature!
         width: 1200,
         height: 630,
-        alt: "Mentisy - Fun Sharing Preview",
+
+        // MODIFIED: Alt text
+        alt: "Mentisy - The Fair Photo Swap App Preview",
       },
     ],
     locale: "en_US",
@@ -144,9 +154,14 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Mentisy - Fun Sharing Platform",
-    description: "Share fun links, play with friends, and spark joy",
-    images: ["/og-image.png"],
+
+    // MODIFIED: Title
+    title: "Mentisy - The Fair Photo Swap App",
+
+    // MODIFIED: Description
+    description: "Tired of not getting a photo back? Mentisy's PicSwap is the fun, fair way to trade photos. You only see their pic after you send yours.",
+
+    images: ["/og-image.png"], // This image should also be updated
   },
   appleWebApp: {
     capable: true,

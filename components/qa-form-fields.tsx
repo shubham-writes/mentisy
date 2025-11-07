@@ -59,7 +59,7 @@ export function QAFormFields({
                 <span className="text-lg">🤔</span>
                 <div className="flex-1">
                     <h4 className="font-semibold text-purple-800 dark:text-purple-200 text-sm">Q&A Challenge</h4>
-                    <p className="text-xs text-purple-600 dark:text-purple-300">Answer correctly to reveal the secret</p>
+                    <p className="text-xs text-purple-600 dark:text-purple-300">Answer correctly to reveal the image</p>
                 </div>
             </div>
 
@@ -135,11 +135,10 @@ export function QAFormFields({
                                         key={num}
                                         type="button"
                                         onClick={() => onMaxAttemptsChange(num)}
-                                        className={`w-8 h-8 rounded-md text-xs font-medium transition-all ${
-                                            qaMaxAttempts === num
+                                        className={`w-8 h-8 rounded-md text-xs font-medium transition-all ${qaMaxAttempts === num
                                                 ? 'bg-[#FF75A0] text-white'
                                                 : 'bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-[#FF75A0]/50'
-                                        }`}
+                                            }`}
                                     >
                                         {num}
                                     </button>
@@ -152,15 +151,13 @@ export function QAFormFields({
                             <label className="flex items-center justify-between cursor-pointer">
                                 <span className="text-sm text-gray-700 dark:text-gray-300">Case sensitive</span>
                                 <div
-                                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                                        qaCaseSensitive ? 'bg-[#FF75A0]' : 'bg-gray-200 dark:bg-gray-600'
-                                    }`}
+                                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${qaCaseSensitive ? 'bg-[#FF75A0]' : 'bg-gray-200 dark:bg-gray-600'
+                                        }`}
                                     onClick={() => onCaseSensitiveChange(!qaCaseSensitive)}
                                 >
                                     <span
-                                        className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-                                            qaCaseSensitive ? 'translate-x-5' : 'translate-x-1'
-                                        }`}
+                                        className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${qaCaseSensitive ? 'translate-x-5' : 'translate-x-1'
+                                            }`}
                                     />
                                 </div>
                             </label>
@@ -168,15 +165,13 @@ export function QAFormFields({
                             <label className="flex items-center justify-between cursor-pointer">
                                 <span className="text-sm text-gray-700 dark:text-gray-300">Show hints</span>
                                 <div
-                                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                                        qaShowHints ? 'bg-[#FF75A0]' : 'bg-gray-200 dark:bg-gray-600'
-                                    }`}
+                                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${qaShowHints ? 'bg-[#FF75A0]' : 'bg-gray-200 dark:bg-gray-600'
+                                        }`}
                                     onClick={() => onShowHintsChange(!qaShowHints)}
                                 >
                                     <span
-                                        className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-                                            qaShowHints ? 'translate-x-5' : 'translate-x-1'
-                                        }`}
+                                        className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${qaShowHints ? 'translate-x-5' : 'translate-x-1'
+                                            }`}
                                     />
                                 </div>
                             </label>

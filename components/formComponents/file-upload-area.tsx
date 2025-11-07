@@ -6,32 +6,26 @@ import { useState } from "react";
 interface FileUploadAreaProps {
     isLandingPage: boolean;
     isUploading: boolean;
-    uploadProgress?: number; 
+    uploadProgress?: number;
     onSaveFormData: () => void;
     onShowSignupPrompt: () => void;
     onImageUploadBegin: () => void;
     onImageUploadComplete: (res: any) => void;
     onImageUploadError: (error: Error) => void;
-    onVideoUploadBegin: () => void;
-    onVideoUploadComplete: (res: any) => void;
-    onVideoUploadError: (error: Error) => void;
 }
 
-export function FileUploadArea({ 
-    isLandingPage, 
-    isUploading, 
+export function FileUploadArea({
+    isLandingPage,
+    isUploading,
     uploadProgress = 0, // 🆕 Accept external progress with default 0
-    onSaveFormData, 
+    onSaveFormData,
     onShowSignupPrompt,
     onImageUploadBegin,
     onImageUploadComplete,
-    onImageUploadError,
-    onVideoUploadBegin,
-    onVideoUploadComplete,
-    onVideoUploadError
+    onImageUploadError
 }: FileUploadAreaProps) {
     const [internalProgress, setInternalProgress] = useState(0);
-    
+
     // 🆕 Use external progress if it's > 0 (from share uploads), otherwise use internal progress (from button uploads)
     const displayProgress = uploadProgress > 0 ? uploadProgress : internalProgress;
 
@@ -47,10 +41,7 @@ export function FileUploadArea({
         onImageUploadBegin();
     };
 
-    const handleVideoUploadBegin = () => {
-        setInternalProgress(0);
-        onVideoUploadBegin();
-    };
+
 
     const handleImageUploadComplete = (res: any) => {
         setInternalProgress(100);
@@ -58,11 +49,7 @@ export function FileUploadArea({
         onImageUploadComplete(res);
     };
 
-    const handleVideoUploadComplete = (res: any) => {
-        setInternalProgress(100);
-        setTimeout(() => setInternalProgress(0), 1000);
-        onVideoUploadComplete(res);
-    };
+
 
     return (
         <div className="border-2 border-dashed border-[#FF75A0]/40 dark:border-[#FFAA70]/50 rounded-xl sm:rounded-xl p-4 sm:p-8 md:p-12 lg:p-16 text-center bg-gradient-to-br from-[#FF75A0]/5 to-[#FFAA70]/5 dark:from-[#FF75A0]/10 dark:to-[#FFAA70]/10 hover:border-[#FF75A0]/60 dark:hover:border-[#FFAA70]/70 transition-all duration-300 min-h-[280px] sm:min-h-[320px] lg:min-h-[400px] flex items-center justify-center">
@@ -75,37 +62,30 @@ export function FileUploadArea({
                         </svg>
                     </div>
                     <h4 className="text-lg sm:text-xl lg:text-2xl font-bold mb-2 sm:mb-3 text-gray-800 dark:text-gray-200">
-                        Drop Your Moment Here
+                        Start the Swap
                     </h4>
                     <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-sm sm:text-base lg:text-lg px-2 sm:px-4">
-                        {isLandingPage 
-                            ? "Upload anything — we'll turn it into laughs with scratch, guess, or rate." 
-                            : "Make every share a game — scratch it, guess it, race it, or rate it with friends."
+                        {isLandingPage
+                            ? "Your photo will stay hidden until your friend sends one back. It's the ultimate fair trade."
+                            : "Your photo will stay hidden until your friend sends one back. It's the ultimate fair trade."
                         }
                     </p>
                 </div>
-                
+
                 {/* Upload Buttons - Mobile First Design */}
                 <div className="space-y-3 sm:space-y-0 sm:flex sm:flex-row sm:gap-3 lg:gap-4 items-center justify-center w-full">
                     {isLandingPage ? (
                         <>
                             {/* Mobile: Full width stacked buttons */}
-                            <Button 
-                                variant="outline" 
+                            <Button
+                                variant="outline"
                                 size="lg"
                                 className="w-full sm:w-auto border-2 border-[#FF75A0] text-[#FF75A0] hover:bg-[#FF75A0]/10 active:bg-[#FF75A0]/20 dark:border-[#FF75A0] dark:text-[#FF75A0] dark:hover:bg-[#FF75A0]/20 rounded-lg sm:rounded-xl px-4 sm:px-6 lg:px-8 py-3 h-12 sm:h-12 lg:h-14 font-medium text-sm sm:text-base active:scale-98 transition-all duration-150"
                                 onClick={handleLandingPageUpload}
                             >
                                 📷 Upload Photo
                             </Button>
-                            <Button 
-                                variant="outline" 
-                                size="lg"
-                                className="w-full sm:w-auto border-2 border-[#FFAA70] text-[#FFAA70] hover:bg-[#FFAA70]/10 active:bg-[#FFAA70]/20 dark:border-[#FFAA70] dark:text-[#FFAA70] dark:hover:bg-[#FFAA70]/20 rounded-lg sm:rounded-xl px-4 sm:px-6 lg:px-8 py-3 h-12 sm:h-12 lg:h-14 font-medium text-sm sm:text-base active:scale-98 transition-all duration-150"
-                                onClick={handleLandingPageUpload}
-                            >
-                                🎥 Upload Video
-                            </Button>
+
                         </>
                     ) : (
                         <div className="space-y-3 sm:space-y-0 sm:flex sm:flex-row sm:gap-3 lg:gap-4 w-full items-center justify-center">
@@ -124,36 +104,17 @@ export function FileUploadArea({
                                             container: "w-full flex justify-center"
                                         }}
                                         content={{
-                                            button: "📸 Choose Photo",
+                                            button: "🖼️ Upload Your Photo to Start",
                                             allowedContent: ""
                                         }}
                                     />
                                 </div>
                             </div>
-                            <div className="w-full sm:w-auto flex justify-center">
-                                <div className="relative w-full sm:w-auto">
-                                    <UploadButton
-                                        endpoint="videoUploader"
-                                        onUploadBegin={handleVideoUploadBegin}
-                                        onClientUploadComplete={handleVideoUploadComplete}
-                                        onUploadError={onVideoUploadError}
-                                        onUploadProgress={(progress) => setInternalProgress(progress)}
-                                        appearance={{
-                                            button: "bg-gradient-to-r from-[#FFAA70] to-[#e6955a] border-0 rounded-lg sm:rounded-xl px-4 sm:px-6 py-3 h-12 font-medium text-white shadow-lg hover:shadow-xl active:scale-98 transition-all duration-150 w-full sm:w-auto text-sm sm:text-base",
-                                            allowedContent: "hidden",
-                                            container: "w-full flex justify-center"
-                                        }}
-                                        content={{
-                                            button: "🎬 Choose Video",
-                                            allowedContent: ""
-                                        }}
-                                    />
-                                </div>
-                            </div>
+
                         </div>
                     )}
                 </div>
-                
+
                 {/* Loading State with Progress - Mobile Optimized */}
                 {!isLandingPage && isUploading && (
                     <div className="space-y-3 sm:space-y-4">
@@ -166,7 +127,7 @@ export function FileUploadArea({
                                 <span className="font-bold">{Math.round(displayProgress)}%</span>
                             </div>
                             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 sm:h-3 overflow-hidden">
-                                <div 
+                                <div
                                     className="h-full bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] rounded-full transition-all duration-300 ease-out"
                                     style={{ width: `${displayProgress}%` }}
                                 />

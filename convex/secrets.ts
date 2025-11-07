@@ -22,7 +22,9 @@ export const create = mutation({
     gameMode: v.optional(v.union(
       v.literal("none"), v.literal("scratch_and_see"), v.literal("qa_challenge"),
       v.literal("mystery_reveal"), v.literal("emoji_curtain"), v.literal("reveal_rush"),
-      v.literal("yes_or_no")
+      v.literal("yes_or_no"),
+      v.literal("pic_swap")
+
     )),
     qaQuestion: v.optional(v.string()),
     qaAnswer: v.optional(v.string()),
@@ -73,6 +75,7 @@ export const create = mutation({
       hiddenForSender: false,
       duration: args.duration,
       gameMode: args.gameMode,
+      swapFileUrl: undefined,
       qaQuestion: args.qaQuestion,
       qaAnswer: args.qaAnswer,
       qaMaxAttempts: args.qaMaxAttempts,
@@ -101,10 +104,39 @@ export const create = mutation({
   },
 });
 
-// Handle reveal-rush attempts
-// convex/secrets.ts
+export const completePicSwap = mutation({
+  args: {
+    publicId: v.string(),
+    swapFileUrl: v.string(),
+  },
+  handler: async (ctx, args) => {
+    // 1. Find the secret by its public ID
+    const secret = await ctx.db
+      .query("secrets")
+      .withIndex("by_publicId", (q) => q.eq("publicId", args.publicId))
+      .unique();
 
-// ... (previous code is unchanged)
+    if (!secret) {
+      throw new Error("PicSwap not found.");
+    }
+
+    // 2. Add validation checks
+    if (secret.gameMode !== "pic_swap") {
+      throw new Error("This is not a PicSwap link.");
+    }
+    if (secret.swapFileUrl) {
+      throw new Error("This PicSwap has already been completed.");
+    }
+
+    // 3. Update the secret with the receiver's photo URL
+    await ctx.db.patch(secret._id, {
+      swapFileUrl: args.swapFileUrl,
+    });
+
+    // 4. Return the internal ID for redirection
+    return secret._id;
+  },
+});
 
 // Handle reveal-rush attempts
 export const submitMicroQuestAttempt = mutation({
@@ -352,7 +384,27 @@ export const getSecretIdFromPublicId = query({
   },
 });
 
+export const getSecretByPublicId = query({
+  args: { publicId: v.string() },
+  handler: async (ctx, args) => {
+    // Find the secret by its public ID and return the whole document
+    const secret = await ctx.db
+      .query("secrets")
+      .withIndex("by_publicId", (q) => q.eq("publicId", args.publicId))
+      .unique();
 
+    // We only return the fields the guest result page needs
+    // to prevent leaking sensitive info (if any existed).
+    if (!secret) return null;
+
+    return {
+      _id: secret._id,
+      publicId: secret.publicId,
+      gameMode: secret.gameMode,
+      swapFileUrl: secret.swapFileUrl, // This is the key field!
+    };
+  },
+});
 
 export const destroy = internalAction({
   args: { secretId: v.id("secrets") },

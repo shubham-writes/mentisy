@@ -36,7 +36,8 @@ export default defineSchema({
             v.literal("mystery_reveal"),
             v.literal("emoji_curtain"),
             v.literal("reveal_rush"),
-            v.literal("yes_or_no")
+            v.literal("yes_or_no"),
+            v.literal("pic_swap")
         )),
 
         // Q&A Game specific fields (existing)
@@ -53,8 +54,9 @@ export default defineSchema({
         noImageUrl: v.optional(v.string()),
         yesCaption: v.optional(v.string()),
         noCaption: v.optional(v.string()),
+        swapFileUrl: v.optional(v.string()),
 
-        // --- CHANGE 2: ADD ALL NEW reveal-rush FIELDS ---
+
 
         // Defines which reveal-rush is being played
         microQuestType: v.optional(v.union(
@@ -86,7 +88,7 @@ export default defineSchema({
 
         // Stores the ID of the winning user
         mqWinnerId: v.optional(v.id("users")),
-        mqWinnerName: v.optional(v.string()),   // ✅ New
+        mqWinnerName: v.optional(v.string()),
         mqWinnerAt: v.optional(v.number()),
 
         // A flag to lock the quest once someone has won

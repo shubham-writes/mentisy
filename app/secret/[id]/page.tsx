@@ -1,4 +1,4 @@
-// app/secret/[id]/page.tsx (Refactored)
+// app/secret/[id]/page.tsx
 "use client";
 
 import { useSecretPage } from "@/hooks/useSecretPage";
@@ -37,11 +37,11 @@ export default function SecretPage({ params }: { params: { id: string } }) {
 
     // Error states
     if (secret === null || isSecretExpiredOrAlreadyViewed(secret)) {
-      return <ErrorStates type="not-found" />;
+      return <ErrorStates type="not-found" gameMode={secret?.gameMode} />;
     }
 
     if (hasExpiredDuringViewing) {
-      return <ErrorStates type="expired" />;
+      return <ErrorStates type="expired" gameMode={secret?.gameMode} />;
     }
 
     console.log("SECRET DATA:", secret);
@@ -107,9 +107,9 @@ export default function SecretPage({ params }: { params: { id: string } }) {
 
   const getHeading = () => {
     if (secret === null ||
-        secret === undefined ||
-        hasExpiredDuringViewing ||
-        isSecretExpiredOrAlreadyViewed(secret)) {
+      secret === undefined ||
+      hasExpiredDuringViewing ||
+      isSecretExpiredOrAlreadyViewed(secret)) {
       return "";
     }
 
@@ -124,7 +124,7 @@ export default function SecretPage({ params }: { params: { id: string } }) {
       <div className="w-full max-w-full mt-16 sm:max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-6 sm:mb-8">
-          
+
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] bg-clip-text text-transparent leading-tight px-2">
             {getHeading()}
           </h1>

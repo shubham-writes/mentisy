@@ -9,7 +9,8 @@ import { useSignIn, useSignUp } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { FilePreview } from "./file-preview";
 
-import { PersonalizedHeader } from "./personalized-header";
+//import { PersonalizedHeader } from "./personalized-header";
+
 import { UseCaseTips } from "./use-case-tips";
 import { useCaseTemplates } from "./use-case-templates";
 
@@ -60,7 +61,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     const [showTips, setShowTips] = useState(false);
     const [templateApplied, setTemplateApplied] = useState(false);
     const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
-    const [gameMode, setGameMode] = useState<GameMode>("none");
+    const [gameMode, setGameMode] = useState<GameMode>("pic_swap");
     const [qaQuestion, setQaQuestion] = useState("");
     const [qaAnswer, setQaAnswer] = useState("");
     const [qaMaxAttempts, setQaMaxAttempts] = useState(3);
@@ -76,6 +77,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     const [isInstructionsExpanded, setIsInstructionsExpanded] = useState(false);
     const [isMoreSettingsExpanded, setIsMoreSettingsExpanded] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
+    const [showOtherGames, setShowOtherGames] = useState(false);
 
     // ✅ Define a type for the image file object
     type ImageFile = { url: string; type: "image" };
@@ -334,6 +336,13 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                 alert("Please upload an image and complete the Reveal Rush challenge fields.");
                 return;
             }
+
+        } else if (gameMode === 'pic_swap') {
+            if (!uploadedFile || uploadedFile.type === 'video') {
+                alert("PicSwap requires an image to be uploaded.");
+                return;
+            }
+
         } else if (!message && !uploadedFile) {
             alert("Please provide a message or upload a file.");
             return;
@@ -391,15 +400,33 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
             const publicId = await createSecret(mutationParams);
 
             if (publicId) {
-                // NEW: Fire the Vercel Analytics custom event
+                // Fire the Vercel Analytics event first
                 track('Create Fun Link', {
                     gameMode: gameMode,
                     fileType: uploadedFile?.type ?? 'none',
                     isGuest: !isSignedIn
                 });
 
-                const link = `${window.location.origin}/redirect/${publicId}`;
-                setGeneratedLink(link);
+                // NEW: PicSwap logic for guests
+                if (gameMode === 'pic_swap' && !isSignedIn) {
+                    // 1. Save to localStorage for recovery
+                    const history = JSON.parse(localStorage.getItem('mentisyGuestHistory') || '[]');
+                    history.push({
+                        publicId: publicId,
+                        gameMode: 'pic_swap',
+                        createdAt: new Date().toISOString()
+                    });
+                    localStorage.setItem('mentisyGuestHistory', JSON.stringify(history));
+
+                    // 2. Redirect to the new result page
+                    router.push(`/swap/result/${publicId}`);
+                    setGeneratedLink(""); // Ensure no link is shown on the form
+
+                } else {
+                    // EXISTING LOGIC: For logged-in users or other game modes
+                    const link = `${window.location.origin}/redirect/${publicId}`;
+                    setGeneratedLink(link);
+                }
             }
 
             // Reset all form fields after successful creation
@@ -517,8 +544,10 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     return (
         <div className="w-full max-w-7xl mx-auto px-2 sm:px-2 md:px-6 lg:px-8">
             {/* The rest of your JSX return statement is correct and does not need changes */}
-            {/* ... */}
-            <PersonalizedHeader useCase={useCase} isLandingPage={isLandingPage} />
+
+
+            {/* <PersonalizedHeader useCase={useCase} isLandingPage={isLandingPage} /> */}
+
 
             {/* Use Case Tips - Mobile Optimized */}
             <UseCaseTips
@@ -528,7 +557,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
             />
 
             {/* Main Form Container - Mobile First Responsive */}
-            <div className="bg-white/80 dark:bg-gray-900/50 dark:border mb-20 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-xl sm:shadow-2xl border border-white/20 dark:border-gray-800 overflow-hidden">
+            <div className="bg-white/80 dark:bg-gray-900/50 dark:border mb-10 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-xl sm:shadow-2xl border border-white/20 dark:border-gray-800 overflow-hidden">
                 <div className="p-2 sm:p-2 md:p-8 lg:p-10">
 
                     {/* Landing Page Notice */}
@@ -549,7 +578,16 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                             <WatermarkSettings addWatermark={addWatermark} onWatermarkChange={setAddWatermark} />
                                         </div>
                                     ) : (
-                                        <FileUploadArea isLandingPage={isLandingPage} isUploading={isUploading} uploadProgress={uploadProgress} onSaveFormData={saveFormData} onShowSignupPrompt={() => setShowSignupPrompt(true)} onImageUploadBegin={() => setIsUploading(true)} onImageUploadComplete={handleImageUploadComplete} onImageUploadError={handleUploadError} onVideoUploadBegin={() => setIsUploading(true)} onVideoUploadComplete={handleVideoUploadComplete} onVideoUploadError={handleUploadError} />
+                                        <FileUploadArea
+                                            isLandingPage={isLandingPage}
+                                            isUploading={isUploading}
+                                            uploadProgress={uploadProgress}
+                                            onSaveFormData={saveFormData}
+                                            onShowSignupPrompt={() => setShowSignupPrompt(true)}
+                                            onImageUploadBegin={() => setIsUploading(true)}
+                                            onImageUploadComplete={handleImageUploadComplete}
+                                            onImageUploadError={handleUploadError}
+                                        />
                                     )}
                                 </>
                             ) : (
@@ -576,202 +614,13 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                         {/* RIGHT COLUMN - Game Features & Settings (Better organized hierarchy) */}
                         <div className="space-y-4 sm:space-y-6 order-2">
 
+
                             {/* 1. Game Mode Selector - Top Priority (Interactive Features) */}
-                            <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
-                                <GameModeSelector
-                                    selectedMode={gameMode}
-                                    onModeChange={handleGameModeChange}
-                                    isGameModeDisabled={isGameModeDisabled}
-                                    uploadedFile={uploadedFile}
-                                    onFeedbackClick={handleGameFeedbackClick}
-                                />
 
-
-                            </div>
 
                             {/* 2. Dynamic Instructions Panel - Visual Guide (Right after game selection) */}
                             {/* 2. Elegant Game Mode Instructions - Collapsible */}
-                            <div className={`rounded-xl sm:rounded-2xl border shadow-lg transition-all duration-150 ${gameMode === 'none' ? 'bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200/50 dark:border-blue-700/50' :
-                                gameMode === 'scratch_and_see' ? 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200/50 dark:border-green-700/50' :
-                                    gameMode === 'qa_challenge' ? 'bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 border-purple-200/50 dark:border-purple-700/50' :
-                                        gameMode === 'yes_or_no' ? 'bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20 border-teal-200/50 dark:border-teal-700/50' :
-                                            'bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-orange-200/50 dark:border-orange-700/50'
-                                }`}>
-                                {/* Compact Header - Always Visible */}
-                                <div
-                                    className="p-4 sm:p-5 cursor-pointer flex items-center justify-between hover:bg-white/30 dark:hover:bg-black/10 transition-colors duration-100"
-                                    onClick={() => setIsInstructionsExpanded(!isInstructionsExpanded)}
-                                >
-                                    <div className="flex items-center space-x-3">
-                                        {/* Mode Icon */}
-                                        <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-white/50 dark:bg-black/20">
-                                            <span className="text-lg">
-                                                {gameMode === 'none' && 'ⓘ'}
-                                                {gameMode === 'scratch_and_see' && '🐾'}
-                                                {gameMode === 'qa_challenge' && '🤔'}
-                                                {gameMode === 'reveal_rush' && '🏆'}
-                                                {gameMode === 'yes_or_no' && '👍'}
-                                            </span>
-                                        </div>
 
-                                        {/* Mode Title & Quick Description */}
-                                        <div className="flex-1 min-w-0">
-                                            <h3 className={`font-semibold text-sm sm:text-base ${gameMode === 'none' ? 'text-blue-800 dark:text-blue-200' :
-                                                gameMode === 'scratch_and_see' ? 'text-green-800 dark:text-green-200' :
-                                                    gameMode === 'qa_challenge' ? 'text-purple-800 dark:text-purple-200' :
-                                                        gameMode === 'yes_or_no' ? 'text-teal-800 dark:text-teal-200' :
-                                                            'text-orange-800 dark:text-orange-200'
-                                                }`}>
-                                                {gameMode === 'none' && 'Add Some Fun?'}
-                                                {gameMode === 'scratch_and_see' && 'Scratch & Reveal Magic'}
-                                                {gameMode === 'qa_challenge' && 'Brain Teaser Mode'}
-                                                {gameMode === 'reveal_rush' && 'Competition Mode'}
-                                                {gameMode === 'yes_or_no' && 'Two Choices, One Secret'}
-                                            </h3>
-                                            <p className={`text-xs opacity-70 truncate ${gameMode === 'none' ? 'text-blue-600 dark:text-blue-300' :
-                                                gameMode === 'scratch_and_see' ? 'text-green-600 dark:text-green-300' :
-                                                    gameMode === 'qa_challenge' ? 'text-purple-600 dark:text-purple-300' :
-                                                        gameMode === 'yes_or_no' ? 'text-teal-600 dark:text-teal-300' :
-                                                            'text-orange-600 dark:text-orange-300'
-                                                }`}>
-                                                {gameMode === 'none' && 'Upload an image to unlock interactive modes'}
-                                                {gameMode === 'scratch_and_see' && 'Interactive scratching experience'}
-                                                {gameMode === 'qa_challenge' && 'Answer correctly to unlock content'}
-                                                {gameMode === 'reveal_rush' && 'Multi-player competition mode'}
-                                                {gameMode === 'yes_or_no' && 'Two choices, two different reveals'}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    {/* Expand/Collapse Icon */}
-                                    <div className={`flex-shrink-0 w-6 h-6 flex items-center justify-center transition-transform duration-150 ${isInstructionsExpanded ? 'rotate-180' : 'rotate-0'
-                                        }`}>
-                                        <svg className="w-4 h-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                        </svg>
-                                    </div>
-                                </div>
-
-                                {/* Expandable Content */}
-                                <div className={`overflow-hidden transition-all duration-150 ease-in-out ${isInstructionsExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-                                    }`}>
-                                    <div className="px-4 sm:px-5 pb-4 sm:pb-5 border-t border-current/10">
-                                        <div className="pt-4">
-                                            {/* Detailed Description */}
-                                            <p className={`text-sm mb-4 ${gameMode === 'none' ? 'text-blue-600 dark:text-blue-300' :
-                                                gameMode === 'scratch_and_see' ? 'text-green-600 dark:text-green-300' :
-                                                    gameMode === 'qa_challenge' ? 'text-purple-600 dark:text-purple-300' :
-                                                        gameMode === 'yes_or_no' ? 'text-teal-600 dark:text-teal-300' :
-                                                            'text-orange-600 dark:text-orange-300'
-                                                }`}>
-                                                {gameMode === 'none' && 'Upload an image to unlock interactive game modes and challenges that make your moments more engaging!'}
-                                                {gameMode === 'scratch_and_see' && 'Recipients will see a blurred version first, then scratch to gradually reveal your image with smooth interactive animations.'}
-                                                {gameMode === 'qa_challenge' && 'Recipients must answer your custom question correctly to unlock the moment. Perfect for personal security or fun challenges.'}
-                                                {gameMode === 'reveal_rush' && 'Multiple people compete to solve your challenge! The first correct answer wins access to your moment.'}
-                                                {gameMode === 'yes_or_no' && 'Pose a question and provide two different visual outcomes. The recipient’s choice of “Yes” or “No” determines which image they get to see.'}
-                                            </p>
-
-                                            {/* Feature List */}
-                                            <div className="space-y-2 mb-4">
-                                                {gameMode === 'none' && (
-                                                    <>
-                                                        <div className="flex items-center space-x-2 text-xs text-blue-500 dark:text-blue-400">
-                                                            <span>🤔</span>
-                                                            <span>Q&A Challenges</span>
-                                                        </div>
-                                                        <div className="flex items-center space-x-2 text-xs text-blue-500 dark:text-blue-400">
-                                                            <span>🏆</span>
-                                                            <span>Group Competitions</span>
-                                                        </div>
-                                                        <div className="flex items-center space-x-2 text-xs text-blue-500 dark:text-blue-400">
-                                                            <span>🐾</span>
-                                                            <span>Scratch & Reveal</span>
-                                                        </div>
-                                                    </>
-                                                )}
-                                                {gameMode === 'scratch_and_see' && (
-                                                    <>
-                                                        <div className="flex items-center space-x-2 text-xs text-green-500 dark:text-green-400">
-                                                            <span>👆</span>
-                                                            <span>Interactive scratching experience</span>
-                                                        </div>
-                                                        <div className="flex items-center space-x-2 text-xs text-green-500 dark:text-green-400">
-                                                            <span>🎨</span>
-                                                            <span>Gradual image reveal</span>
-                                                        </div>
-                                                        <div className="flex items-center space-x-2 text-xs text-green-500 dark:text-green-400">
-                                                            <span>📱</span>
-                                                            <span>Perfect for mobile & desktop</span>
-                                                        </div>
-                                                    </>
-                                                )}
-                                                {gameMode === 'qa_challenge' && (
-                                                    <>
-                                                        <div className="flex items-center space-x-2 text-xs text-purple-500 dark:text-purple-400">
-                                                            <span>❓</span>
-                                                            <span>Custom question & answer</span>
-                                                        </div>
-                                                        <div className="flex items-center space-x-2 text-xs text-purple-500 dark:text-purple-400">
-                                                            <span>🎯</span>
-                                                            <span>Multiple attempts allowed</span>
-                                                        </div>
-                                                        <div className="flex items-center space-x-2 text-xs text-purple-500 dark:text-purple-400">
-                                                            <span>💡</span>
-                                                            <span>Optional hints system</span>
-                                                        </div>
-                                                    </>
-                                                )}
-                                                {gameMode === 'reveal_rush' && (
-                                                    <>
-                                                        <div className="flex items-center space-x-2 text-xs text-orange-500 dark:text-orange-400">
-                                                            <span>👥</span>
-                                                            <span>Multi-player competition</span>
-                                                        </div>
-                                                        <div className="flex items-center space-x-2 text-xs text-orange-500 dark:text-orange-400">
-                                                            <span>⚡</span>
-                                                            <span>First correct answer wins</span>
-                                                        </div>
-                                                        <div className="flex items-center space-x-2 text-xs text-orange-500 dark:text-orange-400">
-                                                            <span>🎉</span>
-                                                            <span>Great for group chats</span>
-                                                        </div>
-                                                    </>
-                                                )}
-                                                {gameMode === 'yes_or_no' && (
-                                                    <>
-                                                        <div className="flex items-center space-x-2 text-xs text-teal-500 dark:text-teal-400">
-                                                            <span>❓</span>
-                                                            <span>Pose any question</span>
-                                                        </div>
-                                                        <div className="flex items-center space-x-2 text-xs text-teal-500 dark:text-teal-400">
-                                                            <span>🖼️</span>
-                                                            <span>Two unique image reveals</span>
-                                                        </div>
-                                                        <div className="flex items-center space-x-2 text-xs text-teal-500 dark:text-teal-400">
-                                                            <span>🎁</span>
-                                                            <span>Perfect for surprises & announcements</span>
-                                                        </div>
-                                                    </>
-                                                )}
-                                            </div>
-
-                                            {/* Pro Tip */}
-                                            <div className="pt-3 border-t border-current/10">
-                                                <div className="flex items-start space-x-2">
-                                                    <span className="text-sm flex-shrink-0">💡</span>
-                                                    <p className="text-xs opacity-80 leading-relaxed">
-                                                        {gameMode === 'none' && "Pro tip: Games make your moments more engaging and memorable! Perfect for special occasions."}
-                                                        {gameMode === 'scratch_and_see' && "Pro tip: Works best with photos, artwork, or visual surprises that benefit from gradual reveal."}
-                                                        {gameMode === 'qa_challenge' && "Pro tip: Use inside jokes or personal questions for better security and more fun interactions."}
-                                                        {gameMode === 'reveal_rush' && "Pro tip: Perfect for friend groups, teams, or family challenges. Great conversation starter!"}
-                                                        {gameMode === 'yes_or_no' && "Pro tip: Great for gender reveals, asking someone out, or any scenario where you want to give the recipient a fun choice."}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
 
                             {/* 3. Game-Specific Forms (Conditional - After instructions) */}
                             {gameMode === 'yes_or_no' && (
@@ -839,10 +688,10 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                         {/* Title & Description */}
                                         <div className="flex-1 min-w-0">
                                             <h3 className="font-semibold text-sm sm:text-base text-gray-800 dark:text-gray-200">
-                                                More Settings
+                                                Customize & Other Games
                                             </h3>
                                             <p className="text-xs opacity-70 truncate text-gray-600 dark:text-gray-300">
-                                                {uploadedFile ? 'Caption & timer settings' : 'Message & timer settings'}
+                                                Set a timer, add a caption, or try other fun modes
                                             </p>
                                         </div>
                                     </div>
@@ -857,11 +706,11 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                 </div>
 
                                 {/* Expandable Content */}
-                                <div className={`overflow-hidden transition-all duration-150 ease-in-out ${isMoreSettingsExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                                <div className={`overflow-hidden transition-all duration-150 ease-in-out ${isMoreSettingsExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
                                     }`}>
                                     <div className="px-4 sm:px-5 pb-4 sm:pb-5 border-t border-gray-200/30 dark:border-gray-700/30">
                                         <div className="pt-4 space-y-6">
-                                            {/* Caption/Message Fields */}
+                                            {/* Caption/Message Fields - NOW AT TOP */}
                                             <FormFields
                                                 recipientName={recipientName}
                                                 publicNote={publicNote}
@@ -885,6 +734,17 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                                 isTimerDisabled={isTimerDisabled}
                                                 gameMode={gameMode}
                                             />
+
+                                            {/* Game Mode Selector - NOW AT BOTTOM */}
+                                            <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
+                                                <GameModeSelector
+                                                    selectedMode={gameMode}
+                                                    onModeChange={handleGameModeChange}
+                                                    isGameModeDisabled={isGameModeDisabled}
+                                                    uploadedFile={uploadedFile}
+                                                    onFeedbackClick={handleGameFeedbackClick}
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -921,7 +781,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                 ) : isLandingPage ? (
                                     "🚀 Create Account & Send"
                                 ) : (
-                                    "✨ Generate Fun Link"
+                                    "✨ Create & Share"
                                 )}
                             </Button>
                         </div>
@@ -938,17 +798,17 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                 {isUploading ? (
                                     <>
                                         <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-white mr-2 sm:mr-3"></div>
-                                        Your moment is uploading...
+                                        Your photo is uploading...
                                     </>
                                 ) : isLoading ? (
                                     <>
                                         <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-white mr-2 sm:mr-3"></div>
-                                        Creating your fun link...
+                                        Creating your link...
                                     </>
                                 ) : isLandingPage ? (
                                     "🚀 Create Account & Send some fun"
                                 ) : (
-                                    "✨ Generate Fun Link"
+                                    "✨ Create & Share"
                                 )}
                             </Button>
                         </div>
