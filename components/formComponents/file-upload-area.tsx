@@ -91,7 +91,7 @@ export function FileUploadArea({
                         <div className="space-y-3 sm:space-y-0 sm:flex sm:flex-row sm:gap-3 lg:gap-4 w-full items-center justify-center">
                             {/* Custom styled upload buttons for authenticated users - Mobile Optimized */}
                             <div className="w-full sm:w-auto flex justify-center">
-                                <div className="relative w-full sm:w-auto">
+                                <div className="relative w-auto">
                                     <UploadButton
                                         endpoint="imageUploader"
                                         onUploadBegin={handleImageUploadBegin}
@@ -99,7 +99,7 @@ export function FileUploadArea({
                                         onUploadError={onImageUploadError}
                                         onUploadProgress={(progress) => setInternalProgress(progress)}
                                         appearance={{
-                                            button: "relative overflow-hidden bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750 border-2 border-[#FF75A0]/30 dark:border-[#FFAA70]/40 rounded-xl px-8 py-4 h-14 font-semibold text-gray-800 dark:text-white shadow-lg hover:shadow-xl hover:scale-105 hover:border-[#FF75A0]/50 dark:hover:border-[#FFAA70]/60 active:scale-100 transition-all duration-300 w-full sm:w-auto text-base group",
+                                            button: "relative overflow-hidden bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750 border-2 border-[#FF75A0]/30 dark:border-[#FFAA70]/40 rounded-xl px-6 py-4 h-14 font-semibold text-gray-800 dark:text-white shadow-lg hover:shadow-xl hover:scale-105 hover:border-[#FF75A0]/50 dark:hover:border-[#FFAA70]/60 active:scale-100 transition-all duration-300 w-full sm:w-auto text-sm sm:text-base group whitespace-nowrap",
                                             allowedContent: "hidden",
                                             container: "w-full flex justify-center"
                                         }}
@@ -119,7 +119,7 @@ export function FileUploadArea({
                                                         <svg className="w-5 h-5 text-[#FF75A0] group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                         </svg>
-                                                        Upload Your Photo to Start
+                                                        Upload Photo to Start
                                                         <svg className="w-4 h-4 text-[#FF75A0] group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                                                         </svg>
