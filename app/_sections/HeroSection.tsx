@@ -46,29 +46,38 @@ export default function HeroSection() {
       {/* PicSwap-Specific How it Works - To be placed BELOW the form */}
       <div className="relative px-4 sm:px-6 mx-auto max-w-4xl pb-16 sm:pb-20">
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl mx-auto">
-          <div className="text-center space-y-3">
-            <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-orange-400 rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto">
-              <Upload className="w-6 h-6" />
+        <div className="grid grid-cols-3 sm:grid-cols-3 gap-4 sm:gap-8 max-w-3xl mx-auto">
+          <div className="text-center space-y-2 sm:space-y-3">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto">
+              <Upload className="w-4 h-4 sm:w-6 sm:h-6" />
             </div>
-            <h3 className="font-semibold text-gray-900 dark:text-white">You Upload</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Share your photo and get a unique link</p>
+            <h3 className="font-semibold text-gray-900 dark:text-white text-xs sm:text-base">You Upload</h3>
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+              <span className="hidden sm:inline">Share your photo and get a unique link</span>
+              <span className="sm:hidden">Get & share link</span>
+            </p>
           </div>
 
-          <div className="text-center space-y-3">
-            <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto">
-              <Lock className="w-6 h-6" />
+          <div className="text-center space-y-2 sm:space-y-3">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto">
+              <Lock className="w-4 h-4 sm:w-6 sm:h-6" />
             </div>
-            <h3 className="font-semibold text-gray-900 dark:text-white">Friend Sees Form</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">They must upload their photo to unlock yours</p>
+            <h3 className="font-semibold text-gray-900 dark:text-white text-xs sm:text-base">Friend Sees Form</h3>
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+              <span className="hidden sm:inline">They must upload their photo to unlock yours</span>
+              <span className="sm:hidden">They upload to unlock</span>
+            </p>
           </div>
 
-          <div className="text-center space-y-3">
-            <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto">
-              <Unlock className="w-6 h-6" />
+          <div className="text-center space-y-2 sm:space-y-3">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-emerald-500 to-green-500 rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto">
+              <Unlock className="w-4 h-4 sm:w-6 sm:h-6" />
             </div>
-            <h3 className="font-semibold text-gray-900 dark:text-white">Both Revealed</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Fair exchange—you both see each other&apos;s photos</p>
+            <h3 className="font-semibold text-gray-900 dark:text-white text-xs sm:text-base">Both Revealed</h3>
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+              <span className="hidden sm:inline">Fair exchange—you both see each other&apos;s photos</span>
+              <span className="sm:hidden">Fair exchange</span>
+            </p>
           </div>
         </div>
       </div>

@@ -40,7 +40,7 @@ function StatusCard({
     return (
         <div className="flex flex-col items-center justify-center text-center p-8 mt-24">
             <Icon className={`w-16 h-16 ${colorClass} mb-10`} />
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 mt-24">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 mt-10">
                 {title}
             </h2>
             <p className="text-gray-600 dark:text-gray-400">{message}</p>
@@ -118,7 +118,7 @@ export default function SwapPage() {
             <StatusCard
                 icon={CheckCircle}
                 title="Swap Already Completed"
-                message="This photo swap has already been completed. Redirecting you..."
+                message="This photo swap has already been completed."
             />
         );
         // We could even add: router.push(`/secret/${secret._id}`);
