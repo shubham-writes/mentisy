@@ -808,7 +808,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                 ) : isLandingPage ? (
                                     "🚀 Create Account & Send some fun"
                                 ) : (
-                                    "✨ Create & Share"
+                                    "Create & Share"
                                 )}
                             </Button>
                         </div>
