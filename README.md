@@ -44,7 +44,7 @@ This project was built to demonstrate **modern, scalable system design**:
 
 ## 📸 Screenshots
 
-| Landing Page | The Swap Flow |
+| Landing Page | The Swap Form |
 |:---:|:---:|
 | ![Landing Page](./screenshots/landing_mentisy.png) | ![Swap Flow](./screenshots/swap_form.png) |
 | *The new frictionless Hero section* | *Fair trade in action* |
