@@ -61,3 +61,39 @@ Want to see the code in action?
    ```bash
    git clone https://github.com/shubham-builds/mentisy.git
    cd mentisy
+
+2. Install dependencies
+   ```bash
+   npm install
+
+3. Create your environment file
+   ```bash
+   cp .env.example .env.local
+
+Then open .env.local and fill in the required values:
+NEXT_PUBLIC_CONVEX_URL
+CLERK_PUBLISHABLE_KEY
+CLERK_SECRET_KEY
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+Any other project-specific environment variables
+
+4. Start the Convex backend
+   ```bash
+   npx convex dev
+This will generate your Convex URL — paste it into:
+   ```bash
+   NEXT_PUBLIC_CONVEX_URL=
+
+5. Start the Next.js development server
+   ```bash
+   npm run dev
+6. Open Mentisy locally
+   visit:
+   ```bash
+   http://localhost:3000
+
+   
+
+
+
+
