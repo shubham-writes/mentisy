@@ -93,9 +93,4 @@ Want to see the code in action?
    visit:
    ```bash
    http://localhost:3000
-
-   
-
-
-
-
+   ```
