@@ -2,6 +2,8 @@
 
 ![Next.js](https://img.shields.io/badge/Next.js-14-black) ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue) ![Convex](https://img.shields.io/badge/Backend-Convex-orange) ![Tailwind](https://img.shields.io/badge/Style-Tailwind-38b2ac)
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-mentisy.com-green?style=for-the-badge)](https://www.mentisy.com/)
+
 ### 🚨 The Problem
 We've all been there: You're chatting with a friend, they ask for a photo, you send one... and **they leave you on "seen."** The exchange is unfair.
 
