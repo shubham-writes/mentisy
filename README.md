@@ -83,10 +83,11 @@ Any other project-specific environment variables
 This will generate your Convex URL — paste it into:
    ```bash
    NEXT_PUBLIC_CONVEX_URL=
-
+  ```
 5. Start the Next.js development server
    ```bash
    npm run dev
+   ```
 6. Open Mentisy locally
    visit:
    ```bash
