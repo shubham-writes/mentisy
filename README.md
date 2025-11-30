@@ -1,4 +1,4 @@
-# 📸 Mentisy: The Fair Photo Swap App
+# 🔄 Mentisy: The Fair Photo Swap App
 
 ![Next.js](https://img.shields.io/badge/Next.js-14-black) ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue) ![Convex](https://img.shields.io/badge/Backend-Convex-orange) ![Tailwind](https://img.shields.io/badge/Style-Tailwind-38b2ac)
 
