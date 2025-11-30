@@ -104,6 +104,8 @@ video::-webkit-media-controls-mute-button {
   }
 }
 
+
+
 /* Utility classes */
 @layer utilities {
   .scrollbar-hide {

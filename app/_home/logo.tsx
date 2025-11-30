@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { Poppins } from "next/font/google";
-import { cn } from "@/lib/utils";
 
 const font = Poppins({
   subsets: ["latin"],
@@ -18,11 +17,6 @@ export const Logo = () => {
         height={56}  // similar to h-14
         className="object-contain rounded-ful"
         priority
-      />
-
-      
-
-      
-    </div>
+      /></div>
   );
 };
