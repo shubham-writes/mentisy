@@ -1,6 +1,8 @@
-# 📸 Mentisy: The Fair Photo Swap App
+# 🔄 Mentisy: The Fair Photo Swap App
 
 ![Next.js](https://img.shields.io/badge/Next.js-14-black) ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue) ![Convex](https://img.shields.io/badge/Backend-Convex-orange) ![Tailwind](https://img.shields.io/badge/Style-Tailwind-38b2ac)
+
+👉 Live Demo: https://www.mentisy.com
 
 ### 🚨 The Problem
 We've all been there: You're chatting with a friend, they ask for a photo, you send one... and **they leave you on "seen."** The exchange is unfair.
@@ -44,7 +46,7 @@ This project was built to demonstrate **modern, scalable system design**:
 
 ## 📸 Screenshots
 
-| Landing Page | The Swap Flow |
+| Landing Page | The Swap Form |
 |:---:|:---:|
 | ![Landing Page](./screenshots/landing_mentisy.png) | ![Swap Flow](./screenshots/swap_form.png) |
 | *The new frictionless Hero section* | *Fair trade in action* |
@@ -59,3 +61,36 @@ Want to see the code in action?
    ```bash
    git clone https://github.com/shubham-builds/mentisy.git
    cd mentisy
+
+2. Install dependencies
+   ```bash
+   npm install
+
+3. Create your environment file
+   ```bash
+   cp .env.example .env.local
+   ```
+   Then open .env.local and fill in the required values:
+   NEXT_PUBLIC_CONVEX_URL
+   CLERK_PUBLISHABLE_KEY
+   CLERK_SECRET_KEY
+   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+   Any other project-specific environment variables
+
+4. Start the Convex backend
+   ```bash
+   npx convex dev
+   ```
+   This will generate your Convex URL — paste it into:
+   ```bash
+   NEXT_PUBLIC_CONVEX_URL=
+   ```
+5. Start the Next.js development server
+   ```bash
+   npm run dev
+   ```
+6. Open Mentisy locally
+   visit:
+   ```bash
+   http://localhost:3000
+   ```
