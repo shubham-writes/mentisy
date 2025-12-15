@@ -36,6 +36,7 @@ import { YesNoSettings } from "./formComponents/yes-no-settings";
 
 import { track } from '@vercel/analytics/react';
 import { useAuth } from "@clerk/nextjs";
+import { InstagramReelEmbed } from "@/components/InstagramReelEmbed";
 
 
 
@@ -78,6 +79,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     const [isMoreSettingsExpanded, setIsMoreSettingsExpanded] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [showOtherGames, setShowOtherGames] = useState(false);
+    const [isGameModeSelectorOpen, setIsGameModeSelectorOpen] = useState(false);
 
     // ✅ Define a type for the image file object
     type ImageFile = { url: string; type: "image" };
@@ -567,7 +569,9 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                     <div className="space-y-6 sm:space-y-8 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-8 xl:gap-12">
 
                         {/* LEFT COLUMN - Content & Media Flow */}
+                        {/* LEFT COLUMN - Content & Controls */}
                         <div className="space-y-4 sm:space-y-6 order-1">
+                            {/* 1. File Upload / Preview Area (Existing) */}
                             {gameMode !== 'yes_or_no' ? (
                                 <>
                                     {uploadedFile ? (
@@ -591,7 +595,6 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                     )}
                                 </>
                             ) : (
-                                // ✅ RENDER the new image uploaders in the left column
                                 <>
                                     <YesNoImageUploaders
                                         yesFile={yesFile}
@@ -602,38 +605,18 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                         onNoImageRemove={() => setNoFile(null)}
                                         addWatermark={addWatermark}
                                     />
-
                                     <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
                                         <WatermarkSettings addWatermark={addWatermark} onWatermarkChange={setAddWatermark} />
                                     </div>
                                 </>
                             )}
-                        </div>
 
-
-                        {/* RIGHT COLUMN - Game Features & Settings (Better organized hierarchy) */}
-                        <div className="space-y-4 sm:space-y-6 order-2">
-
-
-                            {/* 1. Game Mode Selector - Top Priority (Interactive Features) */}
-
-
-                            {/* 2. Dynamic Instructions Panel - Visual Guide (Right after game selection) */}
-                            {/* 2. Elegant Game Mode Instructions - Collapsible */}
-
-
-                            {/* 3. Game-Specific Forms (Conditional - After instructions) */}
+                            {/* 2. ✅ MOVED: Game Specific Forms (Now below Upload Area) */}
                             {gameMode === 'yes_or_no' && (
                                 <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
-                                    <YesNoSettings
-                                        question={yesNoQuestion}
-                                        onQuestionChange={setYesNoQuestion}
-
-
-                                    />
+                                    <YesNoSettings question={yesNoQuestion} onQuestionChange={setYesNoQuestion} />
                                 </div>
                             )}
-
 
                             {gameMode === 'qa_challenge' && uploadedFile?.type === 'image' && (
                                 <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
@@ -671,23 +654,21 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                 </div>
                             )}
 
-                            {/* More Settings Panel - Collapsible Caption + Timer */}
-                            <div className={`rounded-xl sm:rounded-2xl border shadow-lg transition-all duration-150 mt-6 sm:mt-8 ${'bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border-gray-200/50 dark:border-gray-700/50'
-                                }`}>
+                            {/* 3. ✅ MOVED: Customize & Other Games Dropdown */}
+                            <div className={`rounded-xl sm:rounded-2xl border shadow-lg transition-all duration-150 ${'bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border-gray-200/50 dark:border-gray-700/50'}`}>
                                 {/* Header - Always Visible */}
                                 <div
-                                    className="p-4 sm:p-5 cursor-pointer flex items-center justify-between hover:bg-white/30 dark:hover:bg-black/10 transition-colors duration-100"
+                                    className="p-4 sm:p-5 cursor-pointer flex items-center justify-between gap-3 hover:bg-white/30 dark:hover:bg-black/10 transition-colors duration-100"
                                     onClick={() => setIsMoreSettingsExpanded(!isMoreSettingsExpanded)}
                                 >
-                                    <div className="flex items-center space-x-3">
-                                        {/* Settings Icon */}
+                                    {/* Left side: Icon + Text */}
+                                    <div className="flex items-center gap-3 flex-1 min-w-0"> {/* Added flex-1 and min-w-0 here */}
                                         <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-white/50 dark:bg-black/20">
                                             <span className="text-lg">⚙️</span>
                                         </div>
 
-                                        {/* Title & Description */}
-                                        <div className="flex-1 min-w-0">
-                                            <h3 className="font-semibold text-sm sm:text-base text-gray-800 dark:text-gray-200">
+                                        <div className="flex-1 min-w-0"> {/* Ensure this shrinks if needed */}
+                                            <h3 className="font-semibold text-sm sm:text-base text-gray-800 dark:text-gray-200 truncate">
                                                 Customize & Other Games
                                             </h3>
                                             <p className="text-xs opacity-70 truncate text-gray-600 dark:text-gray-300">
@@ -696,9 +677,8 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                         </div>
                                     </div>
 
-                                    {/* Expand/Collapse Icon */}
-                                    <div className={`flex-shrink-0 w-6 h-6 flex items-center justify-center transition-transform duration-150 ${isMoreSettingsExpanded ? 'rotate-180' : 'rotate-0'
-                                        }`}>
+                                    {/* Right side: Arrow (Fixed width, never shrinks) */}
+                                    <div className={`flex-shrink-0 w-6 h-6 flex items-center justify-center transition-transform duration-150 ${isMoreSettingsExpanded ? 'rotate-180' : 'rotate-0'}`}>
                                         <svg className="w-4 h-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                         </svg>
@@ -706,11 +686,9 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                 </div>
 
                                 {/* Expandable Content */}
-                                <div className={`overflow-hidden transition-all duration-150 ease-in-out ${isMoreSettingsExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
-                                    }`}>
+                                <div className={`overflow-hidden transition-all duration-150 ease-in-out ${isMoreSettingsExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'}`}>
                                     <div className="px-4 sm:px-5 pb-4 sm:pb-5 border-t border-gray-200/30 dark:border-gray-700/30">
                                         <div className="pt-4 space-y-6">
-                                            {/* Caption/Message Fields - NOW AT TOP */}
                                             <FormFields
                                                 recipientName={recipientName}
                                                 publicNote={publicNote}
@@ -726,16 +704,12 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                                 noCaption={noCaption}
                                                 onNoCaptionChange={setNoCaption}
                                             />
-
-                                            {/* Timer Settings */}
                                             <TimerSettings
                                                 duration={duration}
                                                 onDurationChange={setDuration}
                                                 isTimerDisabled={isTimerDisabled}
                                                 gameMode={gameMode}
                                             />
-
-                                            {/* Game Mode Selector - NOW AT BOTTOM */}
                                             <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
                                                 <GameModeSelector
                                                     selectedMode={gameMode}
@@ -749,8 +723,31 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
 
+                        {/* RIGHT COLUMN - Game Features & Settings (Better organized hierarchy) */}
+                        {/* RIGHT COLUMN - Video Reel Display Only */}
+                        <div className="space-y-4 sm:space-y-6 order-2 hidden lg:block">
+                            <div className="sticky top-8"> {/* Optional: Makes the video stick while scrolling */}
+                                <div className="w-80 mx-auto bg-white/40 dark:bg-black/20 p-2 rounded-2xl border border-white/20 shadow-sm backdrop-blur-sm">
+                                    <p className="text-center text-xs text-gray-500 mb-2 font-medium uppercase tracking-wider opacity-70">
+                                        See how it works
+                                    </p>
+
+                                    <div className="relative w-full aspect-[9/16] overflow-hidden rounded-xl shadow-2xl">
+                                        <video
+                                            src="/assets/demo-reel.mp4"
+                                            className="w-full h-full object-cover"
+                                            autoPlay
+                                            loop
+                                            muted
+                                            playsInline
+                                            controls={true}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -813,8 +810,11 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                             </Button>
                         </div>
                     </div>
+
                 </div>
             </div>
+
+
 
             {/* Generated Link Section - Mobile: Full Width Card, Desktop: Below Main Container */}
             {!isLandingPage && generatedLink && (
@@ -827,6 +827,27 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                     />
                 </div>
             )}
+
+
+            {/* MOBILE VIDEO - Shown ONLY on mobile, below the button */}
+            <div className="lg:hidden mt-8 mb-4">
+                <div className="w-full max-w-xs mx-auto bg-white/40 dark:bg-black/20 p-2 rounded-2xl border border-white/20 shadow-sm backdrop-blur-sm">
+                    <p className="text-center text-xs text-gray-500 mb-2 font-medium uppercase tracking-wider opacity-70">
+                        See how it works
+                    </p>
+                    <div className="relative w-full aspect-[9/16] overflow-hidden rounded-xl shadow-2xl">
+                        <video
+                            src="/assets/demo-reel.mp4"
+                            className="w-full h-full object-cover"
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            controls={true}
+                        />
+                    </div>
+                </div>
+            </div>
 
             {/* Signup Modal */}
             <SignupModal
