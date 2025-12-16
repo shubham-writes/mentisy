@@ -18,6 +18,7 @@ import {
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { SignInButton } from "@clerk/nextjs";
+import { GeneratedLinkDisplay } from "@/components/formComponents/generated-link-display";
 
 // --- Helper Components ---
 // (We define these here for a self-contained file, but you can move them)
@@ -117,32 +118,34 @@ export default function SwapResultPage() {
                         {/* ✅ 1. Reduced gap between CheckCircle and heading */}
                         <div className="relative flex flex-col justify-center items-center mb-2">
                             <div className="flex items-center justify-center space-x-2">
-                                <CheckCircle className="w-8 h-8 text-green-500" />
-                                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+                                <CheckCircle className="w-6 h-6 text-green-500" />
+                                <h1 className="text-md sm:text-xl font-semibold text-gray-900 dark:text-white">
                                     It&apos;s a Swap!
                                 </h1>
                             </div>
                         </div>
 
-                        <p className="text-base text-gray-600 dark:text-gray-400 mb-2">
+                        <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
                             Your friend sent their photo. Here it is!
                         </p>
 
                         {/* ✅ 2. Show full image (no crop) */}
-                        <div className="relative w-full aspect-square rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 mb-2 shadow-md">
+                        <div className="relative w-full rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 mb-4 shadow-md bg-gray-50 dark:bg-black/20">
                             <Image
                                 src={secret.swapFileUrl}
                                 alt="Swapped Photo"
-                                fill
-                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                className="object-contain bg-black/5" // 👈 'contain' shows full image; added subtle bg so empty space looks clean
+                                width={0}
+                                height={0}
+                                sizes="100vw"
+                                style={{ width: '100%', height: 'auto' }} // 👈 This is the magic: auto-height based on aspect ratio
+                                priority
                             />
                         </div>
 
                         <div className="space-y-3">
                             <SignInButton mode="modal">
                                 <Button
-                                    size="lg"
+                                    size="sm"
                                     className="w-full font-semibold bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-[#e65a85] hover:to-[#e6955a] transition-transform transform hover:scale-105"
                                 >
                                     <UserPlus className="w-5 h-5 mr-2" />
@@ -151,7 +154,7 @@ export default function SwapResultPage() {
                             </SignInButton>
 
                             <Button
-                                size="lg"
+                                size="sm"
                                 variant="outline"
                                 className="w-full"
                                 onClick={() => router.push('/')}
@@ -181,25 +184,12 @@ export default function SwapResultPage() {
                         </p>
 
                         {/* Share Link Input */}
-                        <div className="relative w-full mb-6">
-                            <input
-                                type="text"
-                                value={shareLink}
-                                readOnly
-                                className="w-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg h-12 px-4 pr-12 text-sm text-gray-700 dark:text-gray-300 font-mono"
+                        <div className="mb-6 text-left">
+                            <GeneratedLinkDisplay
+                                generatedLink={shareLink}
+                                publicNote="" // Optional: PicSwap usually doesn't show the note here
+                                gameMode="pic_swap" // Pass this so we can add a custom message inside GeneratedLinkDisplay if needed
                             />
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="absolute right-2 top-1/2 -translate-y-1/2"
-                                onClick={handleCopy}
-                            >
-                                {copied ? (
-                                    <Check className="w-5 h-5 text-green-500" />
-                                ) : (
-                                    <Copy className="w-5 h-5 text-gray-500" />
-                                )}
-                            </Button>
                         </div>
 
                         <p className="text-xs text-gray-500 dark:text-gray-500">
