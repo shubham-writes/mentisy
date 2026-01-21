@@ -34,7 +34,7 @@ function HelloPageContent() {
     }, [scrollTo, isSignedIn, router]);
 
     return (
-        <div className="flex flex-col items-center justify-start text-center gap-y-8 flex-1">
+        <div className="flex flex-col items-center justify-start text-center gap-y-8 flex-1 mt-16">
 
             {/* The SecretForm is now visible to EVERYONE */}
             <section id="secret-form" className="w-full scroll-mt-24 py-4">

@@ -44,7 +44,7 @@ export default function SecretPage({ params }: { params: { id: string } }) {
       return <ErrorStates type="expired" gameMode={secret?.gameMode} />;
     }
 
-    console.log("SECRET DATA:", secret);
+
 
     const showLoadingIndicator = secret.fileUrl && isMediaLoading;
     const secureFileUrl = secret.fileUrl || "";

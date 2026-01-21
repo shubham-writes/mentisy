@@ -1,15 +1,11 @@
-// secret-form.tsx (Complete and Corrected)
-
 "use client";
 
-import { useState, useEffect, useCallback } from "react"; // <-- useCallback is imported
+import { useState, useEffect, useCallback } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { useSignIn, useSignUp } from "@clerk/nextjs";
+
 import { Button } from "@/components/ui/button";
 import { FilePreview } from "./file-preview";
-
-//import { PersonalizedHeader } from "./personalized-header";
 
 import { UseCaseTips } from "./use-case-tips";
 import { useCaseTemplates } from "./use-case-templates";
@@ -37,6 +33,8 @@ import { YesNoSettings } from "./formComponents/yes-no-settings";
 import { track } from '@vercel/analytics/react';
 import { useAuth } from "@clerk/nextjs";
 
+import InteractiveGameCard from "./formComponents/InteractiveGameCard";
+
 
 
 
@@ -44,6 +42,8 @@ interface SecretFormProps {
     isLandingPage?: boolean;
     useCase?: string;
 }
+
+
 
 export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) {
     // ... (Your existing state declarations are all fine)
@@ -78,8 +78,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     const [isInstructionsExpanded, setIsInstructionsExpanded] = useState(false);
     const [isMoreSettingsExpanded, setIsMoreSettingsExpanded] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
-    const [showOtherGames, setShowOtherGames] = useState(false);
-    const [isGameModeSelectorOpen, setIsGameModeSelectorOpen] = useState(false);
+
 
     // ✅ Define a type for the image file object
     type ImageFile = { url: string; type: "image" };
@@ -93,8 +92,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     const [noCaption, setNoCaption] = useState("");
 
     const createSecret = useMutation(api.secrets.create);
-    const { signIn } = useSignIn();
-    const { signUp } = useSignUp();
+
     const { isSignedIn } = useAuth();
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -140,7 +138,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
         }
     }, [clearGeneratedLink]);
 
-    // --- FIXED: THE useEffect HOOK WITH UPLOAD LOGIC ---
+    //This useEffect handles the PWA (Progressive Web App) Share Target API
     useEffect(() => {
         const handleSharedFile = async () => {
             if (searchParams.get("shared") === "true") {
@@ -258,10 +256,6 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
     }, [searchParams, router, handleFileUpload]);
 
 
-    // ... (The rest of your file is fine, no changes needed below this line)
-    // All your other useEffects, handlers, and the return statement can remain exactly as they are in the file you sent.
-    // I am including the rest of the file here for completeness.
-
     const handleGameFeedbackClick = () => {
         setIsFeedbackModalOpen(true);
     };
@@ -321,7 +315,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
             e.stopPropagation();
         }
 
-        // --- VALIDATION LOGIC (updated for clarity) ---
+        // --- VALIDATION LOGIC ---
         if (gameMode === 'yes_or_no') {
             // Use yesFile and noFile for validation
             if (!yesNoQuestion.trim() || !yesFile || !noFile) {
@@ -350,7 +344,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
             return;
         }
 
-        // The isLandingPage block that forced sign-up has been removed.
+        // --- END VALIDATION ---
 
         setIsLoading(true);
         try {
@@ -545,13 +539,6 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
 
     return (
         <div className="w-full max-w-7xl mx-auto px-2 sm:px-2 md:px-6 lg:px-8">
-            {/* The rest of your JSX return statement is correct and does not need changes */}
-
-
-            {/* <PersonalizedHeader useCase={useCase} isLandingPage={isLandingPage} /> */}
-
-
-            {/* Use Case Tips - Mobile Optimized */}
             <UseCaseTips
                 useCase={useCase}
                 isVisible={showTips}
@@ -571,7 +558,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                         {/* LEFT COLUMN - Content & Media Flow */}
                         {/* LEFT COLUMN - Content & Controls */}
                         <div className="space-y-4 sm:space-y-6 order-1">
-                            {/* 1. File Upload / Preview Area (Existing) */}
+                            {/* 1. File Upload / Preview Area */}
                             {gameMode !== 'yes_or_no' ? (
                                 <>
                                     {uploadedFile ? (
@@ -611,7 +598,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                 </>
                             )}
 
-                            {/* 2. ✅ MOVED: Game Specific Forms (Now below Upload Area) */}
+                            {/* 2. Game Mode Specific Settings */}
                             {gameMode === 'yes_or_no' && (
                                 <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
                                     <YesNoSettings question={yesNoQuestion} onQuestionChange={setYesNoQuestion} />
@@ -654,7 +641,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                 </div>
                             )}
 
-                            {/* 3. ✅ MOVED: Customize & Other Games Dropdown */}
+                            {/* 3. More Settings Accordion */}
                             <div className={`rounded-xl sm:rounded-2xl border shadow-lg transition-all duration-150 ${'bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border-gray-200/50 dark:border-gray-700/50'}`}>
                                 {/* Header - Always Visible */}
                                 <div
@@ -662,7 +649,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                     onClick={() => setIsMoreSettingsExpanded(!isMoreSettingsExpanded)}
                                 >
                                     {/* Left side: Icon + Text */}
-                                    <div className="flex items-center gap-3 flex-1 min-w-0"> {/* Added flex-1 and min-w-0 here */}
+                                    <div className="flex items-center gap-3 flex-1 min-w-0">
                                         <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-white/50 dark:bg-black/20">
                                             <span className="text-lg">⚙️</span>
                                         </div>
@@ -726,27 +713,33 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                         </div>
 
 
-                        {/* RIGHT COLUMN - Game Features & Settings (Better organized hierarchy) */}
-                        {/* RIGHT COLUMN - Video Reel Display Only */}
-                        <div className="space-y-4 sm:space-y-6 order-2 hidden lg:block">
-                            <div className="sticky top-8"> {/* Optional: Makes the video stick while scrolling */}
-                                <div className="w-80 mx-auto bg-white/40 dark:bg-black/20 p-2 rounded-2xl border border-white/20 shadow-sm backdrop-blur-sm">
-                                    <p className="text-center text-xs text-gray-500 mb-2 font-medium uppercase tracking-wider opacity-70">
-                                        See how it works
-                                    </p>
-
-                                    <div className="relative w-full aspect-[9/16] overflow-hidden rounded-xl shadow-2xl">
-                                        <video
-                                            src="/assets/demo-reel.mp4"
-                                            className="w-full h-full object-cover"
-                                            autoPlay
-                                            loop
-                                            muted
-                                            playsInline
-                                            controls={true}
-                                        />
+                        {/* RIGHT COLUMN - Interactive Card or Demo Video */}
+                        <div className="hidden lg:block space-y-4 sm:space-y-6 order-2">
+                            <div className="sticky top-8">
+                                {isSignedIn ? (
+                                    // ✅ OPTION A: Logged In View (Welcome Card)
+                                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                        <InteractiveGameCard />
                                     </div>
-                                </div>
+                                ) : (
+                                    // ✅ OPTION B: Guest View (Demo Video)
+                                    <div className="w-80 mx-auto bg-white/40 dark:bg-black/20 p-2 rounded-2xl border border-white/20 shadow-sm backdrop-blur-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                        <p className="text-center text-xs text-gray-500 mb-2 font-medium uppercase tracking-wider opacity-70">
+                                            ✨ See how it works
+                                        </p>
+                                        <div className="relative w-full aspect-[9/16] overflow-hidden rounded-xl shadow-2xl">
+                                            <video
+                                                src="/assets/demo-reel.mp4"
+                                                className="w-full h-full object-cover"
+                                                autoPlay
+                                                loop
+                                                muted
+                                                playsInline
+                                                controls={true}
+                                            />
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -816,7 +809,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
 
 
 
-            {/* Generated Link Section - Mobile: Full Width Card, Desktop: Below Main Container */}
+            {/* Generated Link Display */}
             {!isLandingPage && generatedLink && (
                 <div className="mt-4 sm:mt-6 lg:mt-8">
                     <GeneratedLinkDisplay
@@ -828,26 +821,31 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                 </div>
             )}
 
-
             {/* MOBILE VIDEO - Shown ONLY on mobile, below the button */}
-            <div className="lg:hidden mt-8 mb-4">
-                <div className="w-full max-w-xs mx-auto bg-white/40 dark:bg-black/20 p-2 rounded-2xl border border-white/20 shadow-sm backdrop-blur-sm">
-                    <p className="text-center text-xs text-gray-500 mb-2 font-medium uppercase tracking-wider opacity-70">
-                        See how it works
-                    </p>
-                    <div className="relative w-full aspect-[9/16] overflow-hidden rounded-xl shadow-2xl">
-                        <video
-                            src="/assets/demo-reel.mp4"
-                            className="w-full h-full object-cover"
-                            autoPlay
-                            loop
-                            muted
-                            playsInline
-                            controls={true}
-                        />
+            {!isSignedIn && (
+                <div className="lg:hidden mt-8 mb-4">
+                    <div className="w-full max-w-xs mx-auto bg-white/40 dark:bg-black/20 p-2 rounded-2xl border border-white/20 shadow-sm backdrop-blur-sm">
+                        <p className="text-center text-xs text-gray-500 mb-2 font-medium uppercase tracking-wider opacity-70">
+                            See how it works
+                        </p>
+                        <div className="relative w-full aspect-[9/16] overflow-hidden rounded-xl shadow-2xl">
+                            <video
+                                src="/assets/demo-reel.mp4"
+                                className="w-full h-full object-cover"
+                                autoPlay
+                                loop
+                                muted
+                                playsInline
+                                controls={true}
+                            />
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
+
+
+
+
 
             {/* Signup Modal */}
             <SignupModal
@@ -858,7 +856,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
             <FeedbackModal
                 isOpen={isFeedbackModalOpen}
                 onClose={() => setIsFeedbackModalOpen(false)}
-                defaultTab="game" // This will open with game suggestion tab
+                defaultTab="game"
             />
         </div>
     );

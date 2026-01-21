@@ -3,7 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css";
 
-// --- NEW: Import ClerkProvider ---
+
 import { ClerkProvider } from '@clerk/nextjs'
 
 import { ThemeProvider } from "@/components/theme-provider";
@@ -77,7 +77,6 @@ const clerkAppearance = {
   },
 
   layout: {
-    // Add privacy policy and terms links - updated to match your folder structure
     privacyPageUrl: "/privacy",
     termsPageUrl: "/terms",
     // Show terms and privacy policy links

@@ -1,7 +1,7 @@
 // convex/secrets.ts
 import { v } from "convex/values";
 import { mutation, internalMutation, internalAction, query, internalQuery, action } from "./_generated/server";
-import { api, internal } from "./_generated/api";
+import { internal } from "./_generated/api";
 import { paginationOptsValidator } from "convex/server";
 import { Id } from "./_generated/dataModel";
 
@@ -269,13 +269,7 @@ export const readAndReveal = mutation({
   },
 });
 
-// ... (the rest of the file remains the same)
 
-// Rest of your functions (unchanged) ...
-
-
-
-// ... (the rest of the file remains the same)
 
 export const getMySecrets = query({
   args: { paginationOpts: paginationOptsValidator },

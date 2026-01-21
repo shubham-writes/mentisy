@@ -199,7 +199,7 @@ export function MySecretsList() {
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center space-x-3">
                                                     {/* Status Icon */}
-                                                    <div className="flex-shrink-0">
+                                                    <div className="flex-shrink-0 justify-center items-center">
                                                         {(secret.gameMode === "pic_swap" && secret.swapFileUrl) ? (
                                                             <div className="w-8 h-8 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center">
                                                                 <span className="text-lg">🔄</span>

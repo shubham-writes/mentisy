@@ -176,7 +176,7 @@ export const Navbar = () => {
                                     >
                                         <Button
                                             size="sm"
-                                            className="rounded-full bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-purple-600 hover:to-pink-600 border-0 shadow-lg transform hover:scale-105 transition-all duration-200 px-6"
+                                            className="rounded-full bg-gradient-to-r from-[#FF75A0] to-[#FFAA70]  border-0 shadow-lg transform hover:scale-105 transition-all duration-200 px-6"
                                         >
                                             <Sparkles className="w-4 h-4 mr-2" />
                                             Get Started
@@ -327,7 +327,7 @@ export const Navbar = () => {
                                         forceRedirectUrl="/hello"
                                     >
                                         <Button
-                                            className="w-full justify-start rounded-lg bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] hover:from-purple-600 hover:to-pink-600 border-0 shadow-md h-10 text-sm"
+                                            className="w-full justify-start rounded-lg bg-gradient-to-r from-[#FF75A0] to-[#FFAA70]  border-0 shadow-md h-10 text-sm"
                                             onClick={() => setIsMobileMenuOpen(false)}
                                         >
                                             <Sparkles className="w-4 h-4 mr-2" />

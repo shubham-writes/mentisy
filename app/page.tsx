@@ -1,27 +1,20 @@
 // app/(landing)/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Authenticated, Unauthenticated } from "convex/react";
 import { SecretForm } from "@/components/secret-form";
 
-// Layout Components
 
 import Footer from "./_sections/Footer";
 
-// Section Components
+
 import HeroSection from "./_sections/HeroSection";
-
-//import FeaturesComparison from "./_sections/FeaturesComparison";
-//import TestimonialsSection from "./_sections/TestimonialsSection";
-//import FaqSection from "./_sections/FaqSection";
-
-//import FinalCta from "./_sections/FinalCta";
 
 import AuthenticatedDashboard from "./_sections/AuthenticatedDashboard";
 
 export default function Home() {
-  const [userCount, setUserCount] = useState(1032);
+
 
   useEffect(() => {
     const originalScrollBehavior = document.documentElement.style.scrollBehavior;
@@ -51,15 +44,6 @@ export default function Home() {
             </div>
           </div>
         </div>
-
-
-
-
-
-
-
-
-
 
 
         <Footer />
