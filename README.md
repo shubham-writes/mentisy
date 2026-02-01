@@ -1,65 +1,75 @@
-# 🔄 Mentisy: The Fair Photo Swap App
+# 🔄 Mentisy: The "Zero-Trust" Photo Swap Protocol
 
-![Next.js](https://img.shields.io/badge/Next.js-14-black) ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue) ![Convex](https://img.shields.io/badge/Backend-Convex-orange) ![Tailwind](https://img.shields.io/badge/Style-Tailwind-38b2ac)
+![Next.js](https://img.shields.io/badge/Next.js-14-black) ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue) ![Convex](https://img.shields.io/badge/Backend-Convex-orange) ![PWA](https://img.shields.io/badge/Native-PWA-purple)
 
-👉 Live Demo: https://www.mentisy.com
+👉 **Live Demo:** [mentisy.com](https://www.mentisy.com)
 
 ### 🚨 The Problem
-We've all been there: You're chatting with a friend, they ask for a photo, you send one... and **they leave you on "seen."** The exchange is unfair.
+Social messaging has a "freeloader" problem: You send a photo, they view it, but never reply. The exchange is fundamentally unfair.
 
-### ✅ The Solution: PicSwap
-Mentisy is a Progressive Web App (PWA) built to solve the "you send first" standoff. It ensures a **fair trade** using a "lock-and-blur" mechanic. You only see their photo *after* you send yours.
+### ✅ The Solution
+Mentisy is a secure, ephemeral messaging platform that enforces a **Cryptographic Fair Trade**. It uses a "Reply-to-Reveal" protocol where the recipient cannot view your message until their own reply is cryptographically verified by the server.
+
+---
+
+## 🏗️ System Design & Architecture
+
+I built Mentisy to solve three specific engineering challenges in real-time web apps: **Trust, Latency, and Concurrency.**
+
+### 1. 🛡️ Zero-Trust Security Architecture
+Most "blur" apps just hide the image with CSS, which is easily bypassed via "Inspect Element."
+* **My Solution:** I implemented a **Server-Side Field Selection** pattern. The sensitive image URL is strictly excluded from the API response payload by default.
+* **The Protocol:** The server only releases the specific file URL to the client *after* the `completeSwap` ACID transaction is successfully committed. Even if a user intercepts the network traffic, the data literally does not exist on their device until they pay the "price" (uploading a photo).
+
+### 2. 📱 Native-Grade PWA (Web Share Target)
+To compete with native apps, Mentisy needed to live in the OS Share Sheet.
+* **Implementation:** Leveraged the **Web Share Target API Level 2** and a custom **Service Worker**.
+* **Flow:** Users can share a photo directly from their Android/iOS Gallery -> Mentisy. The Service Worker intercepts the `POST` request, parks the binary stream in **IndexedDB**, and hydrates the React state seamlessly on launch.
+
+### 3. ⏳ The "Preload-Then-Reveal" Pattern
+Network latency often ruins ephemeral "10-second" timers. If an image takes 8 seconds to load, the user only sees it for 2 seconds.
+* **Solution:** I decoupled the "Network Time" from the "Viewing Time."
+* **Logic:** The app invisibly preloads the heavy media assets into the browser cache. The countdown timer (and visibility) is only triggered *after* the `onLoad` event confirms the asset is fully rendered in the DOM.
 
 ---
 
 ## ✨ Key Features
 
 ### 🔄 PicSwap (The Hero Mechanic)
-* **Fair Exchange Logic:** Photos are blurred and locked on the server until both parties contribute.
-* **Real-time Reveal:** Using Convex subscriptions, both screens unlock instantly the moment the trade is complete.
+* **Atomic Transactions:** Uses Convex's ACID guarantees to handle the swap state. If a user tries to "double spend" (swap one photo for two secrets), the transaction rolls back.
+* **Real-time Reveal:** No polling. Uses WebSocket subscriptions to unlock both screens instantly the moment the trade is complete.
 
 ### 🚀 Frictionless Guest Mode
-* **No Sign-up Required:** Users can create and complete a swap anonymously to lower entry barriers.
-* **Persistent Sessions:** LocalStorage handles guest identity so users don't lose their swaps if they reload.
+* **Anonymous Auth:** Custom implementation of persistent guest sessions using LocalStorage and Fingerprinting, allowing users to track their swap history without an account.
 
-### 🛡️ Safety & Privacy
-* **Smart Overlay:** A custom CSS/JS layer preventing sneaky right-click saves.
-* **Auto-Expiry:** Swaps can be set to expire, ensuring photos don't live on the server forever.
-
-### 📱 PWA (Progressive Web App)
-* **Installable:** Users can install Mentisy to their home screen for a native app experience.
-* **Offline Capable:** Service workers cache core assets for fast loading on Indian 4G networks.
+### 🧹 Server-Side Auto-Expiry
+* **Cron Architecture:** Unlike client-side timers (which stop if you close the tab), Mentisy uses **Convex Schedulers**. A background job runs on the server to physically delete the asset from storage (UploadThing) and the database 10 seconds after viewing.
 
 ---
 
 ## 🛠️ Tech Stack
 
-This project was built to demonstrate **modern, scalable system design**:
-
-* **Frontend:** Next.js 14 (App Router), React, TypeScript, Tailwind CSS
-* **Backend & Database:** Convex (Real-time database, Serverless functions)
-* **Authentication:** Clerk (for "Pro" accounts) + Custom Anonymous Auth (for Guest Mode)
-* **State Management:** Zustand
-* **UI Components:** Shadcn/UI + Lucide React + Framer Motion
+* **Frontend:** Next.js 14 (App Router), TypeScript, Tailwind CSS
+* **Backend:** Convex (Real-time DB, Serverless Functions, Schedulers)
+* **Storage:** UploadThing (Object Storage with Cron cleanup)
+* **Auth:** Clerk (Metadata-based Role Management)
+* **State:** Zustand (Client), TanStack Query (Server State)
 
 ---
 
 ## 📸 Screenshots
 
-| Landing Page | The Swap Form |
+| Landing Page | The Swap Flow |
 |:---:|:---:|
 | ![Landing Page](./screenshots/landing_mentisy.png) | ![Swap Flow](./screenshots/swap_form.png) |
-| *The new frictionless Hero section* | *Fair trade in action* |
 
 ---
 
 ## ⚡ Getting Started Locally
 
-Want to see the code in action?
-
 1. **Clone the repo**
    ```bash
-   git clone https://github.com/shubham-builds/mentisy.git
+   git clone [https://github.com/shubham-builds/mentisy.git](https://github.com/shubham-builds/mentisy.git)
    cd mentisy
 
 2. Install dependencies
