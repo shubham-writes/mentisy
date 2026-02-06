@@ -1,18 +1,12 @@
 // components/sections/HeroSection.tsx
-"use client";
-
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Upload, Lock, Unlock } from "lucide-react";
 
 export default function HeroSection() {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
-
   return (
-    <div className={`relative transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+    // Optimization: Removed transition-all duration-1000 opacity-0 translate-y-8
+    // This allows the browser to paint the text immediately (LCP fix)
+    <div className="relative">
       {/* Expanded Background - covers entire hero section */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#FF75A0]/8 to-[#FFAA70]/8 dark:from-[#FF75A0]/15 dark:to-[#FFAA70]/15" />
 
@@ -25,6 +19,8 @@ export default function HeroSection() {
           <div className="text-center space-y-4 sm:space-y-6">
 
             {/* Clear, Powerful Headline */}
+            {/* Added 'eager' loading context implies avoiding lazy loading here, 
+                but for text, standard HTML is inherently eager. */}
             <h1 className="text-4xl font-bold sm:text-4xl md:text-6xl leading-tight tracking-tight">
               <span className="bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] bg-clip-text text-transparent">
                 The Fun, Fair Way

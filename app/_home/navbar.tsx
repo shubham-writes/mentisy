@@ -135,18 +135,14 @@ export const Navbar = () => {
 
                         {/* Desktop Right Side - Auth & Settings */}
                         <div className="hidden md:flex items-center space-x-4">
-                            {/* Loading State */}
-                            {isLoading && (
-                                <div className="flex items-center space-x-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-full">
-                                    <LoaderCircle className="w-4 h-4 animate-spin text-purple-500" />
-                                    <span className="text-sm text-gray-600 dark:text-gray-300">Loading...</span>
-                                </div>
-                            )}
+
 
                             {/* Unauthenticated State */}
-                            {!isAuthenticated && !isLoading && (
+                            {(!isAuthenticated || isLoading) && (
                                 <div className="flex items-center space-x-3">
-                                    {guestHistory.length > 0 && (
+                                    {/* Wrap Guest History in !isLoading check to prevent hydration mismatch if localstorage isn't ready, 
+                or keep it if you handled hydration correctly */}
+                                    {!isLoading && guestHistory.length > 0 && (
                                         <Button
                                             variant="ghost"
                                             size="sm"
@@ -157,6 +153,7 @@ export const Navbar = () => {
                                             My Swaps
                                         </Button>
                                     )}
+
                                     <SignInButton mode="modal" fallbackRedirectUrl="/hello" forceRedirectUrl="/hello">
                                         <Button
                                             variant="ghost"
@@ -176,23 +173,20 @@ export const Navbar = () => {
                                     >
                                         <Button
                                             size="sm"
-                                            className="rounded-full bg-gradient-to-r from-[#FF75A0] to-[#FFAA70]  border-0 shadow-lg transform hover:scale-105 transition-all duration-200 px-6"
+                                            className="rounded-full bg-gradient-to-r from-[#FF75A0] to-[#FFAA70] border-0 shadow-lg transform hover:scale-105 transition-all duration-200 px-6"
                                         >
                                             <Sparkles className="w-4 h-4 mr-2" />
                                             Get Started
                                         </Button>
                                     </SignUpButton>
-
-
                                 </div>
                             )}
 
                             {/* Authenticated State */}
                             {isAuthenticated && !isLoading && (
-                                <div className="flex items-center space-x-4">
+                                <div className="flex items-center space-x-4 animate-in fade-in zoom-in duration-300">
                                     {/* User Profile Section */}
                                     <div className="flex items-center space-x-3 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-full p-1 border border-purple-200 dark:border-purple-800">
-
                                         <CustomUserButton
                                             afterSignOutUrl="/"
                                             appearance={{
