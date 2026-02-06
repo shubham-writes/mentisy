@@ -20,6 +20,7 @@ import { GeneratedLinkDisplay } from "./formComponents/generated-link-display";
 import { GameModeSelector } from "./formComponents/game-mode-selector";
 import { QAFormFields } from "./qa-form-fields";
 import { MicroQuestFormFields } from "./reveal-rush-form-fields";
+import { SmartVideo } from "@/components/smart-video";
 
 
 import { GameMode, MicroQuestType } from "@/lib/types";
@@ -728,14 +729,9 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                                             ✨ See how it works
                                         </p>
                                         <div className="relative w-full aspect-[9/16] overflow-hidden rounded-xl shadow-2xl">
-                                            <video
-                                                src="/assets/demo-reel.mp4"
-                                                className="w-full h-full object-cover"
-                                                autoPlay
-                                                loop
-                                                muted
-                                                playsInline
-                                                controls={true}
+                                            <SmartVideo
+                                                posterSrc="/assets/video-poster.webp"
+                                                videoSrc="/assets/demo-reel.webm"
                                             />
                                         </div>
                                     </div>
@@ -830,7 +826,7 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                         </p>
                         <div className="relative w-full aspect-[9/16] overflow-hidden rounded-xl shadow-2xl">
                             <video
-                                src="/assets/demo-reel.mp4"
+                                src="/assets/demo-reel.webm"
                                 className="w-full h-full object-cover"
                                 autoPlay
                                 loop
