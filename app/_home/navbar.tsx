@@ -207,15 +207,11 @@ export const Navbar = () => {
 
                         {/* Mobile Right Side - Compact */}
                         <div className="md:hidden flex items-center space-x-2">
-                            {/* Loading State Mobile */}
-                            {isLoading && (
-                                <LoaderCircle className="w-5 h-5 animate-spin text-[#FF75A0]" />
-                            )}
+
 
                             {/* Authenticated State Mobile - Compact */}
                             {isAuthenticated && !isLoading && (
-                                <div className="flex items-center space-x-2">
-
+                                <div className="flex items-center space-x-2 animate-in fade-in zoom-in duration-300">
                                     <CustomUserButton
                                         afterSignOutUrl="/"
                                         appearance={{

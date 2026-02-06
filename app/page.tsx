@@ -3,7 +3,7 @@
 
 import { useEffect } from "react";
 import { Authenticated, Unauthenticated } from "convex/react";
-import { SecretForm } from "@/components/secret-form";
+import dynamic from "next/dynamic";
 
 
 import Footer from "./_sections/Footer";
@@ -12,6 +12,16 @@ import Footer from "./_sections/Footer";
 import HeroSection from "./_sections/HeroSection";
 
 import AuthenticatedDashboard from "./_sections/AuthenticatedDashboard";
+
+const SecretForm = dynamic(
+  () => import("@/components/secret-form").then((mod) => mod.SecretForm), // 👈 Add this .then() part
+  {
+    ssr: true,
+    loading: () => (
+      <div className="w-full max-w-md mx-auto h-[400px] bg-white/40 dark:bg-black/20 rounded-3xl animate-pulse" />
+    ),
+  }
+);
 
 export default function Home() {
 

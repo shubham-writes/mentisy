@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { Play } from "lucide-react";
 import Image from "next/image";
 
@@ -13,14 +13,6 @@ export function SmartVideo({ posterSrc, videoSrc }: SmartVideoProps) {
     const [isPlaying, setIsPlaying] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
 
-    // OPTIONAL: Auto-play the video only after the page is fully idle
-    // (Remove this useEffect if you want strictly "click to play")
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsPlaying(true);
-        }, 3000); // Wait 3 seconds after load to start fetching video
-        return () => clearTimeout(timer);
-    }, []);
 
     if (!isPlaying) {
         return (
@@ -34,8 +26,8 @@ export function SmartVideo({ posterSrc, videoSrc }: SmartVideoProps) {
                     alt="Video preview"
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    priority // This tells Next.js to load this image ASAP for LCP score
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    priority={false} // Change to false for mobile if it's below the fold
+                    sizes="(max-width: 768px) 100vw, 33vw"
                 />
 
                 {/* Play Button Overlay */}
