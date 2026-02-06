@@ -825,14 +825,9 @@ export function SecretForm({ isLandingPage = false, useCase }: SecretFormProps) 
                             See how it works
                         </p>
                         <div className="relative w-full aspect-[9/16] overflow-hidden rounded-xl shadow-2xl">
-                            <video
-                                src="/assets/demo-reel.webm"
-                                className="w-full h-full object-cover"
-                                autoPlay
-                                loop
-                                muted
-                                playsInline
-                                controls={true}
+                            <SmartVideo
+                                posterSrc="/assets/video-poster.jpg"
+                                videoSrc="/assets/demo-reel.mp4"
                             />
                         </div>
                     </div>
